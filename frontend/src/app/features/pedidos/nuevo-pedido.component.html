@@ -1,0 +1,107 @@
+<!-- pb-24: deja lugar al pie fijo con el total -->
+<div class="pb-24 max-w-3xl mx-auto">
+
+  <h1 class="text-xl font-semibold text-gray-800 mb-4">Nuevo pedido</h1>
+
+  <section class="bg-white rounded-lg border border-gray-200 p-4 flex flex-col gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Fecha</label>
+        <p-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)"
+                      dateFormat="dd/mm/yy" [showIcon]="true" styleClass="w-full" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Cuenta</label>
+        <p-autoComplete [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
+                        (onSelect)="elegirCuenta($event.value)"
+                        [suggestions]="cuentasSugeridas()" optionLabel="nombre"
+                        placeholder="Buscar por nombre" [minLength]="1"
+                        styleClass="w-full" inputStyleClass="w-full" />
+      </div>
+    </div>
+
+    @if (esVenta()) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-700">Condicion</label>
+          <p-selectButton [options]="condiciones" optionLabel="label" optionValue="value"
+                          [ngModel]="condicion()" (ngModelChange)="cambiarCondicion($event)"
+                          [allowEmpty]="false" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-700">Descuento %</label>
+          <p-inputNumber [ngModel]="descuentoPct()" (ngModelChange)="cambiarDescuento($event)"
+                         [min]="0" [max]="100" [maxFractionDigits]="2" styleClass="w-full" />
+        </div>
+      </div>
+    } @else {
+      <p class="text-sm text-gray-500">
+        Esta cuenta no lleva precio de venta: las lineas se valorizan al costo.
+      </p>
+    }
+
+    <div class="flex flex-col gap-1">
+      <label class="text-sm text-gray-700">Observacion</label>
+      <input pInputText [ngModel]="observacion()" (ngModelChange)="observacion.set($event)" />
+    </div>
+  </section>
+
+  <!-- Lineas apiladas en tarjetas: en un celular una tabla con scroll horizontal no se usa -->
+  <section class="mt-4 flex flex-col gap-3">
+    @for (linea of lineas(); track $index) {
+      <div class="bg-white rounded-lg border border-gray-200 p-3 flex flex-col gap-2">
+        <div class="flex items-start gap-2">
+          <div class="flex-1 flex flex-col gap-1">
+            <label class="text-sm text-gray-700">Articulo</label>
+            <p-autoComplete [ngModel]="linea.producto" (completeMethod)="buscarProductos($event)"
+                            (onSelect)="elegirProducto($index, $event.value)"
+                            [suggestions]="productosSugeridos()" optionLabel="nombre"
+                            placeholder="Buscar articulo" [minLength]="1"
+                            styleClass="w-full" inputStyleClass="w-full" />
+          </div>
+          <p-button icon="pi pi-times" severity="danger" [text]="true" class="mt-6"
+                    (onClick)="quitarLinea($index)" ariaLabel="Quitar linea" />
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 items-end">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-700">Unidades</label>
+            <p-inputNumber [ngModel]="linea.unidades" (ngModelChange)="cambiarUnidades($index, $event)"
+                           [showButtons]="true" [min]="0" [maxFractionDigits]="2"
+                           inputmode="decimal" styleClass="w-full" inputStyleClass="w-full text-center" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-sm text-gray-700">Precio</span>
+            <span class="py-2">{{ linea.precioUnitario | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-sm text-gray-700">Importe</span>
+            <span class="py-2 font-medium">
+              {{ linea.unidades * linea.precioUnitario | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        @if (sePideAlProveedor(linea)) {
+          <span class="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 self-start">
+            Se pide al proveedor (stock: {{ linea.stockDisponible | number:'1.0-2' }})
+          </span>
+        }
+      </div>
+    }
+
+    <p-button label="Articulo" icon="pi pi-plus" severity="secondary" [outlined]="true"
+              styleClass="w-full" (onClick)="agregarLinea()" />
+  </section>
+</div>
+
+<!-- Pie fijo: el total y Guardar siempre a la vista -->
+<div class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 px-4 py-3
+            flex items-center gap-3 md:pl-64 no-imprimir">
+  <div class="flex-1">
+    <p class="text-xs text-gray-500">Total</p>
+    <p class="text-lg font-semibold">{{ total() | number:'1.2-2' }}</p>
+  </div>
+  <p-button label="Guardar" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar()" />
+</div>

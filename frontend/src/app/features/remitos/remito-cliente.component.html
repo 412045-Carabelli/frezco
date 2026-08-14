@@ -1,0 +1,53 @@
+@if (remito(); as datos) {
+  <div class="no-imprimir flex justify-end mb-3">
+    <p-button label="Imprimir" icon="pi pi-print" (onClick)="imprimir()" />
+  </div>
+
+  <article class="remito bg-white border border-gray-200 rounded-lg p-6 mx-auto">
+    <header class="flex justify-between items-start border-b border-gray-300 pb-3 mb-4">
+      <div>
+        <p class="text-lg font-semibold" [style.color]="marca.color">{{ marca.nombre }}</p>
+        <p class="text-sm text-gray-500">Remito de entrega</p>
+      </div>
+      <div class="text-right text-sm">
+        <p class="font-semibold">{{ datos.numero }}</p>
+        <p>{{ datos.fecha }}</p>
+      </div>
+    </header>
+
+    <p class="text-sm mb-4"><span class="text-gray-500">Cliente:</span> {{ datos.cliente }}</p>
+
+    <table class="w-full text-sm">
+      <thead>
+      <tr class="border-b border-gray-300 text-left">
+        <th class="py-2">Articulo</th>
+        <th class="py-2 text-right">Unid.</th>
+        <th class="py-2 text-right">Precio</th>
+        <th class="py-2 text-right">Importe</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (linea of datos.lineas; track linea.producto) {
+          <tr class="border-b border-gray-100">
+            <td class="py-2">{{ linea.producto }}</td>
+            <td class="py-2 text-right">{{ linea.unidades | number:'1.0-2' }}</td>
+            <td class="py-2 text-right">{{ linea.precioUnitario | number:'1.2-2' }}</td>
+            <td class="py-2 text-right">{{ linea.importe | number:'1.2-2' }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+      <tr>
+        <td colspan="3" class="py-3 text-right font-semibold">Total</td>
+        <td class="py-3 text-right font-semibold">{{ datos.total | number:'1.2-2' }}</td>
+      </tr>
+      </tfoot>
+    </table>
+
+    @if (datos.observacion) {
+      <p class="text-sm text-gray-500 mt-4">{{ datos.observacion }}</p>
+    }
+  </article>
+} @else {
+  <p class="text-gray-500">Cargando remito...</p>
+}

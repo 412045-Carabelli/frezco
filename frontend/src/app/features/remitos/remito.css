@@ -1,0 +1,23 @@
+.remito {
+  max-width: 21cm;
+}
+
+/* Impresion: solo el remito. El menu y los botones ya llevan .no-imprimir. */
+@media print {
+  :host {
+    display: block;
+  }
+
+  .remito {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+}

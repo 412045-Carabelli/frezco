@@ -8,8 +8,6 @@ interface ItemMenu {
   etiqueta: string;
   icono: string;
   ruta: string;
-  /** Las pantallas que todavia no existen se muestran deshabilitadas. */
-  disponible: boolean;
 }
 
 @Component({
@@ -27,14 +25,14 @@ export class LayoutComponent {
   readonly menuAbierto = signal(false);
 
   readonly items: ItemMenu[] = [
-    { etiqueta: 'Resumen', icono: 'pi-home', ruta: '/resumen', disponible: true },
-    { etiqueta: 'Pedidos', icono: 'pi-shopping-cart', ruta: '/pedidos', disponible: false },
-    { etiqueta: 'Cobros y pagos', icono: 'pi-wallet', ruta: '/movimientos', disponible: false },
-    { etiqueta: 'Stock', icono: 'pi-box', ruta: '/stock', disponible: false },
-    { etiqueta: 'Cuentas corrientes', icono: 'pi-book', ruta: '/cuentas-corrientes', disponible: false },
-    { etiqueta: 'Remito proveedor', icono: 'pi-file', ruta: '/remito-proveedor', disponible: false },
-    { etiqueta: 'Articulos', icono: 'pi-tag', ruta: '/articulos', disponible: false },
-    { etiqueta: 'Cuentas', icono: 'pi-users', ruta: '/cuentas', disponible: false }
+    { etiqueta: 'Resumen', icono: 'pi-home', ruta: '/resumen' },
+    { etiqueta: 'Pedidos', icono: 'pi-shopping-cart', ruta: '/pedidos' },
+    { etiqueta: 'Cobros y pagos', icono: 'pi-wallet', ruta: '/movimientos' },
+    { etiqueta: 'Stock', icono: 'pi-box', ruta: '/stock' },
+    { etiqueta: 'Cuentas corrientes', icono: 'pi-book', ruta: '/cuentas-corrientes' },
+    { etiqueta: 'Remito proveedor', icono: 'pi-file', ruta: '/remito-proveedor' },
+    { etiqueta: 'Articulos', icono: 'pi-tag', ruta: '/articulos' },
+    { etiqueta: 'Cuentas', icono: 'pi-users', ruta: '/cuentas' }
   ];
 
   alternarMenu(): void {

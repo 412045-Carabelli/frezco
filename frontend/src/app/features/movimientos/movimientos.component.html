@@ -1,0 +1,90 @@
+<h1 class="text-xl font-semibold text-gray-800 mb-4">Cobros y pagos</h1>
+
+<section class="bg-white rounded-lg border border-gray-200 p-4 mb-4 flex flex-wrap items-end gap-3">
+  <div class="flex flex-col gap-1">
+    <label class="text-sm text-gray-700">Fecha</label>
+    <p-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)" dateFormat="dd/mm/yy" />
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <label class="text-sm text-gray-700">Tipo</label>
+    <p-selectButton [options]="tipos" optionLabel="label" optionValue="value"
+                    [ngModel]="tipo()" (ngModelChange)="cambiarTipo($event)" [allowEmpty]="false" />
+  </div>
+
+  <div class="flex flex-col gap-1 min-w-56">
+    <label class="text-sm text-gray-700">Cuenta</label>
+    <p-autoComplete [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
+                    (onSelect)="elegirCuenta($event.value)" [suggestions]="cuentasSugeridas()"
+                    optionLabel="nombre" [minLength]="1" placeholder="Buscar cuenta"
+                    styleClass="w-full" inputStyleClass="w-full" />
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <label class="text-sm text-gray-700">Importe</label>
+    <p-inputNumber [ngModel]="importe()" (ngModelChange)="importe.set($event)"
+                   mode="decimal" [minFractionDigits]="2" />
+    @if (saldoCuenta() !== null) {
+      <span class="text-xs text-gray-500">Saldo actual: {{ saldoCuenta() | number:'1.2-2' }}</span>
+    }
+  </div>
+
+  <div class="flex flex-col gap-1 flex-1 min-w-48">
+    <label class="text-sm text-gray-700">Observacion</label>
+    <input pInputText [ngModel]="observacion()" (ngModelChange)="observacion.set($event)" />
+  </div>
+
+  <p-button label="Registrar" icon="pi pi-check" [loading]="guardando()"
+            [disabled]="!cuentaValida()" (onClick)="guardar()" />
+</section>
+
+<div class="flex flex-wrap items-end gap-3 mb-3">
+  <div class="flex flex-col gap-1">
+    <label class="text-sm text-gray-700">Desde</label>
+    <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
+  </div>
+  <div class="flex flex-col gap-1">
+    <label class="text-sm text-gray-700">Hasta</label>
+    <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
+  </div>
+  <p-button label="Filtrar" icon="pi pi-filter" severity="secondary" (onClick)="cargar()" />
+</div>
+
+<p-table [value]="movimientos()" [loading]="cargando()" [paginator]="movimientos().length > 25"
+         [rows]="25" styleClass="bg-white rounded-lg border border-gray-200">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Fecha</th>
+      <th>Tipo</th>
+      <th>Cuenta</th>
+      <th class="text-right">Importe</th>
+      <th>Observacion</th>
+      <th></th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-movimiento>
+    <tr>
+      <td>{{ movimiento.fecha }}</td>
+      <td>
+        <p-tag [severity]="movimiento.tipo === 'COBRO' ? 'success' : 'warn'"
+               [value]="movimiento.tipo === 'COBRO' ? 'Cobro' : 'Pago'" />
+      </td>
+      <td>{{ movimiento.cuentaNombre }}</td>
+      <td class="text-right">{{ movimiento.importe | number:'1.2-2' }}</td>
+      <td class="text-gray-500">{{ movimiento.observacion }}</td>
+      <td class="text-right">
+        <p-button icon="pi pi-trash" severity="danger" [text]="true" size="small"
+                  (onClick)="confirmarBorrado(movimiento)" ariaLabel="Borrar" />
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="6" class="text-center text-gray-500 py-6">Sin movimientos en el periodo.</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-confirmDialog />

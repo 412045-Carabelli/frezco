@@ -1,21 +1,49 @@
-import { Component, inject } from '@angular/core';
-import { SesionService } from '../../core/sesion.service';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DecimalPipe, PercentPipe } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
+import { MessageService } from 'primeng/api';
+import { ApiService } from '../../core/api.service';
+import { aFecha, aTexto } from '../../core/fechas';
+import { Resumen } from '../../core/modelos';
 
-/**
- * Placeholder. Los indicadores del periodo se implementan en la Etapa 6.
- * Ver docs/05-pantallas.md punto 10.
- */
 @Component({
   selector: 'app-resumen',
   standalone: true,
-  template: `
-    <h1 class="text-xl font-semibold text-gray-800">Resumen</h1>
-    <p class="text-sm text-gray-500 mt-1">Sesion iniciada como {{ sesion.usuario() }}.</p>
-    <p class="text-sm text-gray-500 mt-4">
-      Los indicadores del periodo se cargan en la Etapa 6 del plan.
-    </p>
-  `
+  imports: [FormsModule, DecimalPipe, PercentPipe, ButtonModule, DatePickerModule],
+  templateUrl: './resumen.component.html'
 })
 export class ResumenComponent {
-  readonly sesion = inject(SesionService);
+
+  private readonly api = inject(ApiService);
+  private readonly mensajes = inject(MessageService);
+
+  readonly resumen = signal<Resumen | null>(null);
+  readonly cargando = signal(false);
+  readonly desde = signal<Date | null>(null);
+  readonly hasta = signal<Date | null>(null);
+
+  constructor() {
+    this.cargar();
+  }
+
+  /** Sin fechas, el backend devuelve el mes en curso y de ahi salen los filtros. */
+  cargar(): void {
+    this.cargando.set(true);
+    this.api.resumen(aTexto(this.desde()), aTexto(this.hasta())).subscribe({
+      next: resumen => {
+        this.resumen.set(resumen);
+        if (!this.desde()) {
+          this.desde.set(aFecha(resumen.desde));
+          this.hasta.set(aFecha(resumen.hasta));
+        }
+        this.cargando.set(false);
+      },
+      error: () => {
+        this.cargando.set(false);
+        this.mensajes.add({ severity: 'error', summary: 'No se pudo cargar el resumen' });
+      }
+    });
+  }
 }
