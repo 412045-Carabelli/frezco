@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+/**
+ * Escalado de tipografia accesible: mismo criterio que el Sistema de Gestion de Obras.
+ * No fijar font-size en html en px, para que el zoom del navegador siga funcionando.
+ */
+:root {
+  --font-scale-multiplier: 0.9;
+  --base-font-size: 1rem;
+
+  /* Color de marca. El nombre comercial y los colores viven en configuracion,
+     no en el dominio. Ver CLAUDE.md. */
+  --color-marca: #0891b2;
+  --color-marca-oscuro: #0e7490;
+}
+
+html {
+  font-size: calc(var(--base-font-size) * var(--font-scale-multiplier));
+}
+
+body {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+  background-color: #f9fafb;
+  color: #111827;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ============================================================
+   PrimeNG DataTable - estilos globales.
+   No usar ::ng-deep en componentes para estos casos.
+   ============================================================ */
+
+.p-datatable .p-datatable-thead > tr > th {
+  background-color: #f9fafb;
+  color: #374151;
+  font-weight: 600;
+  padding: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f9fafb !important;
+}
+
+.p-tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.p-paginator {
+  padding: 1rem;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.p-inputtext {
+  border: 1px solid #e5e7eb;
+}
+
+.p-inputtext:enabled:hover {
+  border-color: #d1d5db;
+}
+
+.p-inputtext:enabled:focus {
+  border-color: var(--color-marca);
+  box-shadow: 0 0 0 0.2rem rgba(8, 145, 178, 0.2);
+}
+
+.p-select,
+.p-multiselect {
+  border: 1px solid #e5e7eb;
+}
+
+/* Mobile: la carga de pedidos tiene que ser usable con una mano. */
+@media (max-width: 768px) {
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Estilos de impresion de remitos. Se completan en la Etapa 5. */
+@media print {
+  .no-imprimir {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+  }
+}

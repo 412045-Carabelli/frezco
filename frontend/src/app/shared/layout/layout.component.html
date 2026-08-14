@@ -1,0 +1,56 @@
+<div class="min-h-screen flex">
+
+  <!-- Menu lateral: fijo en escritorio, deslizante en mobile -->
+  <aside
+    class="fixed inset-y-0 left-0 z-30 w-60 bg-white border-r border-gray-200 flex flex-col
+           transition-transform md:translate-x-0 no-imprimir"
+    [class.-translate-x-full]="!menuAbierto()">
+
+    <div class="px-4 py-4 border-b border-gray-200">
+      <p class="text-lg font-semibold" [style.color]="marca.color">{{ marca.nombre }}</p>
+      <p class="text-xs text-gray-500">{{ marca.descripcion }}</p>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto py-2">
+      @for (item of items; track item.ruta) {
+        @if (item.disponible) {
+          <a [routerLink]="item.ruta"
+             routerLinkActive="bg-gray-100 font-medium"
+             (click)="cerrarMenu()"
+             class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+            <i class="pi {{ item.icono }} text-gray-500"></i>
+            {{ item.etiqueta }}
+          </a>
+        } @else {
+          <span class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 cursor-not-allowed"
+                title="Pendiente de implementacion">
+            <i class="pi {{ item.icono }}"></i>
+            {{ item.etiqueta }}
+          </span>
+        }
+      }
+    </nav>
+
+    <div class="px-4 py-3 border-t border-gray-200">
+      <p-button label="Salir" icon="pi pi-sign-out" severity="secondary"
+                [text]="true" size="small" (onClick)="salir()" />
+    </div>
+  </aside>
+
+  <!-- Fondo oscuro del menu en mobile -->
+  @if (menuAbierto()) {
+    <div class="fixed inset-0 z-20 bg-black/30 md:hidden no-imprimir" (click)="cerrarMenu()"></div>
+  }
+
+  <div class="flex-1 flex flex-col md:ml-60">
+    <header class="h-14 bg-white border-b border-gray-200 flex items-center gap-2 px-3 md:hidden no-imprimir">
+      <p-button icon="pi pi-bars" severity="secondary" [text]="true" (onClick)="alternarMenu()"
+                ariaLabel="Abrir menu" />
+      <span class="font-semibold" [style.color]="marca.color">{{ marca.nombre }}</span>
+    </header>
+
+    <main class="flex-1 p-4">
+      <router-outlet />
+    </main>
+  </div>
+</div>

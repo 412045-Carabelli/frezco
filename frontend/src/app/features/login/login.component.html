@@ -1,0 +1,29 @@
+<div class="min-h-screen flex items-center justify-center p-4">
+  <form class="w-full max-w-sm bg-white rounded-lg border border-gray-200 p-6 flex flex-col gap-4"
+        (ngSubmit)="ingresar()">
+
+    <div class="text-center">
+      <p class="text-2xl font-semibold" [style.color]="marca.color">{{ marca.nombre }}</p>
+      <p class="text-sm text-gray-500">{{ marca.descripcion }}</p>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="usuario" class="text-sm text-gray-700">Usuario</label>
+      <input pInputText id="usuario" name="usuario" autocomplete="username"
+             [ngModel]="usuario()" (ngModelChange)="usuario.set($event)" />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="clave" class="text-sm text-gray-700">Clave</label>
+      <p-password inputId="clave" name="clave" [feedback]="false" [toggleMask]="true"
+                  styleClass="w-full" inputStyleClass="w-full"
+                  [ngModel]="clave()" (ngModelChange)="clave.set($event)" />
+    </div>
+
+    @if (error()) {
+      <p-message severity="error" [text]="error()" />
+    }
+
+    <p-button type="submit" label="Ingresar" [loading]="cargando()" styleClass="w-full" />
+  </form>
+</div>

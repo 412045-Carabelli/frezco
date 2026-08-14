@@ -9,16 +9,19 @@ Estimación total: **18 a 25 horas efectivas** con asistencia de IA.
 
 ## Etapa 1 — Esqueleto y modelo (2-3 h)
 
-- [ ] Proyecto Spring Boot con las dependencias: Web, Data JPA, Validation, Security,
+- [x] Proyecto Spring Boot con las dependencias: Web, Data JPA, Validation, Security,
       Flyway, driver de SQL Server
-- [ ] Proyecto Angular standalone con PrimeNG v17
-- [ ] `docker-compose.yml` con backend, frontend y conexión a la base existente
-- [ ] Migración `V1__esquema_inicial.sql` con las cinco tablas
-- [ ] Migración `V2__datos_semilla.sql` con proveedor, Refuerzo Stock y Consumo Propio
-- [ ] Entidades JPA y repositorios
-- [ ] Autenticación básica con credenciales de variables de entorno
+- [x] Proyecto Angular standalone con PrimeNG v19
+- [x] `docker-compose.yml` con backend, frontend y conexión a la base existente
+- [x] Migración `V1__esquema_inicial.sql` con las cinco tablas
+- [x] Migración `V2__datos_semilla.sql` con proveedor, Refuerzo Stock y Consumo Propio
+- [x] Entidades JPA y repositorios
+- [x] Autenticación básica con credenciales de variables de entorno
 
 **Verificable:** la app levanta, Flyway corre las migraciones, el login funciona.
+
+Estado: backend y frontend compilan. La verificación contra la base queda pendiente de
+levantar SQL Server (el stack de obras) en el VPS o en local con Docker.
 
 ---
 

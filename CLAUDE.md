@@ -23,15 +23,19 @@ con queries sobre los movimientos, no con tablas de saldos denormalizadas.
 
 | Capa | Tecnología |
 |---|---|
-| Backend | Spring Boot 3.x, Java 21 |
+| Backend | Spring Boot 3.3.5, Java 17 |
 | Persistencia | Spring Data JPA + SQL Server |
 | Migraciones | Flyway |
-| Frontend | Angular 17+ standalone components, signals |
-| UI | PrimeNG v17 |
+| Frontend | Angular 19 standalone components, signals |
+| UI | PrimeNG v19 + Tailwind |
 | Deploy | Docker Compose en VPS existente |
 
-La base de datos SQL Server ya existe en el VPS (la usa otro sistema). Este proyecto
-usa una **base separada** en la misma instancia.
+Java 17 y no 21: es la versión que usa el Sistema de Gestión de Obras en el mismo VPS.
+Subir de versión es cambiar `java.version` en el pom y el tag del Dockerfile.
+
+La base de datos SQL Server ya existe en el VPS (la usa el Sistema de Gestión de Obras).
+Este proyecto usa una **base separada** en la misma instancia y se engancha a la red
+Docker `sgo_backend` de ese stack.
 
 ## Estructura del repositorio
 
