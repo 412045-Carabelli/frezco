@@ -1,0 +1,15 @@
+* text=auto eol=lf
+
+*.sql   text eol=lf
+*.java  text eol=lf
+*.ts    text eol=lf
+*.html  text eol=lf
+*.scss  text eol=lf
+*.md    text eol=lf
+
+*.png   binary
+*.jpg   binary
+*.pdf   binary
+mvnw    text eol=lf
+*.bat   text eol=crlf
+*.ps1   text eol=crlf
