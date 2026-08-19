@@ -1,0 +1,5 @@
+# FrezCo - backup diario de la base, 03:00 hora del servidor.
+SHELL=/bin/bash
+PATH=/opt/mssql-tools18/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 3 * * * root /backup.sh >> /var/log/frezco-backup.log 2>&1

@@ -75,6 +75,32 @@ services:
     networks:
       - sgo_backend
 
+  # Backup diario de la base a las 03:00, retencion 7 dias.
+  backup:
+    build: ./backup
+    container_name: frezco_backup
+    environment:
+      - DB_HOST=${DB_HOST:-sqlserver}
+      - DB_PORT=${DB_PORT:-1433}
+      - DB_NAME=${DB_NAME:-frezco}
+      - DB_USER=${DB_USER:-sa}
+      - DB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - backup_data:/backups
+    depends_on:
+      crear-base:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - sgo_backend
+
 networks:
   sgo_backend:
     external: true
+
+volumes:
+  backup_data:

@@ -49,6 +49,7 @@ backend/          Spring Boot
     stock/        consultas de stock (sin entidad propia)
     remito/       armado de remitos cliente y proveedor
     resumen/      dashboard
+    cuentacorriente/  estados de cuenta por tipo de cuenta
     config/       seguridad, CORS, excepciones
   src/main/resources/db/migration/   Flyway
 frontend/         Angular
@@ -56,8 +57,24 @@ frontend/         Angular
     features/     una carpeta por pantalla
     core/         servicios HTTP, interceptores, guard
     shared/       componentes reutilizables
+backup/           backup diario de la base
+db/               creación de la base e importación de la planilla
 docs/             documentación funcional y técnica
 ```
+
+## Dónde vive la lógica no trivial
+
+El precio de una línea y el reparto stock/proveedor varían según el tipo de cuenta del
+pedido. Cada variante es una estrategia inyectada por Spring, no un `if` dentro del
+servicio:
+
+- `pedido/precio/` — `PrecioDeVenta` (cliente) y `PrecioAlCosto` (refuerzo y consumo).
+- `pedido/reparto/` — `RepartoDeSalida` (cliente y consumo) y `RepartoDeEntrada` (refuerzo).
+- `cuentacorriente/` — una estrategia por tipo de cuenta para las reglas de debe/haber.
+
+Agregar un tipo de cuenta es agregar una clase, no editar un `switch`. Los siete casos de
+reparto de `docs/03-reglas-negocio.md` están cubiertos por tests: si tocás esa lógica,
+tienen que seguir pasando.
 
 ## Documentación
 
@@ -70,6 +87,7 @@ Leer en este orden antes de escribir código:
 4. `docs/04-api.md` — endpoints REST
 5. `docs/05-pantallas.md` — pantallas y comportamiento de UI
 6. `docs/07-decisiones-pendientes.md` — puntos sin confirmar con el cliente
+7. `docs/08-guia-uso.md` — guía de uso para la usuaria
 
 El plan de trabajo por etapas está en `docs/06-plan.md`.
 

@@ -27,10 +27,10 @@ levantar SQL Server (el stack de obras) en el VPS o en local con Docker.
 
 ## Etapa 2 — ABMs (2-3 h)
 
-- [ ] Backend: CRUD de productos y cuentas, con las validaciones de cuentas únicas
+- [x] Backend: CRUD de productos y cuentas, con las validaciones de cuentas únicas
       por tipo especial
-- [ ] Frontend: pantallas de Artículos y Cuentas
-- [ ] Cálculo de margen porcentual mostrado en el formulario de artículo
+- [x] Frontend: pantallas de Artículos y Cuentas
+- [x] Cálculo de margen porcentual mostrado en el formulario de artículo
 
 **Verificable:** se pueden cargar los 30 productos y las 30 cuentas a mano.
 
@@ -40,12 +40,12 @@ levantar SQL Server (el stack de obras) en el VPS o en local con Docker.
 
 **La etapa más delicada del proyecto.** Es donde está toda la lógica no trivial.
 
-- [ ] `PedidoService.crear()` con: resolución de precio por condición y descuento,
+- [x] `PedidoService.crear()` con: resolución de precio por condición y descuento,
       congelado de precio y costo, numeración por prefijo, reparto stock/proveedor
-- [ ] Consumo de stock incremental dentro del mismo pedido
-- [ ] Anulación de pedidos
-- [ ] `GET /api/pedidos/precio` para la vista previa
-- [ ] **Tests unitarios de los siete casos de la tabla de `03-reglas-negocio.md`**
+- [x] Consumo de stock incremental dentro del mismo pedido
+- [x] Anulación de pedidos
+- [x] `GET /api/pedidos/precio` para la vista previa
+- [x] **Tests unitarios de los siete casos de la tabla de `03-reglas-negocio.md`**
       antes de escribir el frontend
 
 **Verificable:** los tests pasan. Cargar un pedido por API y verificar el reparto.
@@ -54,11 +54,11 @@ levantar SQL Server (el stack de obras) en el VPS o en local con Docker.
 
 ## Etapa 4 — Pantalla de carga de pedidos (4-5 h)
 
-- [ ] Formulario de encabezado con precarga de descuento
-- [ ] Grilla de líneas con autocompletado de artículo y precio automático
-- [ ] Aviso "se pide al proveedor" cuando no hay stock
-- [ ] Layout mobile: tarjetas apiladas, botón flotante, pie fijo
-- [ ] Listado de pedidos con filtros y anulación
+- [x] Formulario de encabezado con precarga de descuento
+- [x] Grilla de líneas con autocompletado de artículo y precio automático
+- [x] Aviso "se pide al proveedor" cuando no hay stock
+- [x] Layout mobile: tarjetas apiladas, botón flotante, pie fijo
+- [x] Listado de pedidos con filtros y anulación
 
 **Verificable:** cargar un pedido completo desde un celular real, sin usar la PC.
 Si eso no es cómodo, la etapa no está terminada.
@@ -67,11 +67,11 @@ Si eso no es cómodo, la etapa no está terminada.
 
 ## Etapa 5 — Remitos y stock (3-4 h)
 
-- [ ] Endpoint y pantalla de remito de cliente
-- [ ] Endpoint y pantalla de remito de proveedor por período, agrupado por fecha
-- [ ] CSS de impresión para ambos
-- [ ] Consulta de stock y detalle de movimientos por producto
-- [ ] Pantalla de Stock
+- [x] Endpoint y pantalla de remito de cliente
+- [x] Endpoint y pantalla de remito de proveedor por período, agrupado por fecha
+- [x] CSS de impresión para ambos
+- [x] Consulta de stock y detalle de movimientos por producto
+- [x] Pantalla de Stock
 
 **Verificable:** imprimir un remito desde el celular y que salga prolijo en el PDF.
 
@@ -79,11 +79,11 @@ Si eso no es cómodo, la etapa no está terminada.
 
 ## Etapa 6 — Cuentas corrientes y resumen (3-4 h)
 
-- [ ] Consulta de cuenta corriente unificando pedidos y movimientos, con saldo corriendo
-- [ ] Endpoint de saldos de todas las cuentas
-- [ ] ABM de cobros y pagos
-- [ ] Pantallas de Cuentas corrientes y Cobros y pagos
-- [ ] Endpoint y pantalla de Resumen
+- [x] Consulta de cuenta corriente unificando pedidos y movimientos, con saldo corriendo
+- [x] Endpoint de saldos de todas las cuentas
+- [x] ABM de cobros y pagos
+- [x] Pantallas de Cuentas corrientes y Cobros y pagos
+- [x] Endpoint y pantalla de Resumen
 
 **Verificable:** el saldo de un cliente coincide con lo calculado a mano sobre sus
 pedidos y cobros.
@@ -92,16 +92,20 @@ pedidos y cobros.
 
 ## Etapa 7 — Migración, deploy y entrega (2-3 h)
 
-- [ ] Script de importación de la planilla actual (productos, cuentas, pedidos
+- [x] Script de importación de la planilla actual (productos, cuentas, pedidos
       históricos con su reparto ya calculado)
 - [ ] Verificación cruzada: los totales del sistema tienen que coincidir con los de la
       planilla. Ventas, margen y saldos por cuenta.
 - [ ] Deploy en el VPS con Docker Compose
-- [ ] Cron de backup diario de la base, retención 7 días
+- [x] Cron de backup diario de la base, retención 7 días
 - [ ] Prueba de restauración del backup (hacerla de verdad, una vez)
-- [ ] Guía de uso de una página para la usuaria
+- [x] Guía de uso de una página para la usuaria (`08-guia-uso.md`)
 
 **Verificable:** el sistema en producción muestra los mismos números que la planilla.
+
+Estado: el script de importación (`db/importar/`), el backup diario y la guía están
+listos. Lo que queda depende del VPS y de la planilla real: correr la importación,
+verificar los totales contra el Excel, desplegar y probar una restauración de verdad.
 
 ---
 
