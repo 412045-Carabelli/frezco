@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { DrawerModule } from 'primeng/drawer';
+import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { MARCA } from '../../config/marca';
 import { SesionService } from '../../core/sesion.service';
@@ -21,7 +22,7 @@ interface ItemMenu {
   standalone: true,
   imports: [
     RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, FormsModule, ButtonModule,
-    ToggleSwitchModule, DrawerModule
+    ToggleSwitchModule, DrawerModule, TooltipModule
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css'

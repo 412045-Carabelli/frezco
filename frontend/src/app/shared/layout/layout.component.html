@@ -49,17 +49,14 @@
       <p-button icon="pi pi-bars" [text]="true" (onClick)="alternarMenu()"
                 ariaLabel="Abrir menú" styleClass="!text-white" />
       <span class="font-semibold flex-1">{{ marca.nombre }}</span>
-      @if (hayAyuda()) {
-        <p-button icon="pi pi-question-circle" [text]="true" (onClick)="ayudaDeEstaPantalla()"
-                  ariaLabel="Cómo se usa esta pantalla" styleClass="!text-white" />
-      }
     </header>
 
-    <!-- En escritorio el boton de ayuda flota abajo a la derecha, siempre a mano. -->
+    <!-- Boton de ayuda: redondo, abajo a la derecha, siempre a mano. -->
     @if (hayAyuda()) {
-      <p-button icon="pi pi-question-circle" label="¿Cómo se usa?" [rounded]="true"
-                (onClick)="ayudaDeEstaPantalla()"
-                styleClass="hidden md:inline-flex fixed bottom-5 right-5 z-20 shadow-lg no-imprimir" />
+      <p-button icon="pi pi-question" [rounded]="true" size="large"
+                (onClick)="ayudaDeEstaPantalla()" ariaLabel="Cómo se usa esta pantalla"
+                pTooltip="Cómo se usa esta pantalla" tooltipPosition="left"
+                styleClass="boton-ayuda no-imprimir" />
     }
 
     <main class="flex-1 p-4">
