@@ -1,6 +1,7 @@
+<h1 class="titulo-pantalla mb-4">Pedidos</h1>
+
 <div class="flex flex-wrap items-center gap-2 mb-4">
-  <h1 class="titulo-pantalla flex-1">Pedidos</h1>
-  <p-button label="Nuevo pedido" icon="pi pi-plus" routerLink="/pedidos/nuevo"
+  <p-button label="Nuevo pedido" icon="pi pi-plus" (onClick)="abrirNuevoPedido()"
             data-tutorial="nuevo-pedido" />
 </div>
 
@@ -108,6 +109,26 @@
       <span class="text-gray-500">Costo {{ pedido.totalCosto | number:'1.2-2' }}</span>
       <span class="text-gray-500">Margen {{ pedido.margen | number:'1.2-2' }}</span>
     </div>
+  </p-dialog>
+}
+
+@if (nuevoPedidoAbierto()) {
+  <p-dialog [visible]="true" (visibleChange)="cerrarNuevoPedido()" [modal]="true"
+            [style]="{ width: '52rem' }" [breakpoints]="{ '960px': '92vw', '640px': '100vw' }"
+            header="Nuevo pedido">
+    <app-nuevo-pedido #formNuevoPedido (guardado)="alGuardarPedido($event)" />
+
+    <ng-template pTemplate="footer">
+      <div data-tutorial="pie-total" class="flex items-center gap-3 w-full">
+        <div class="flex-1 text-left">
+          <p class="text-xs text-gray-500 m-0">Total</p>
+          <p class="text-lg font-semibold m-0">{{ formNuevoPedido.total() | number:'1.2-2' }}</p>
+        </div>
+        <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrarNuevoPedido()" />
+        <p-button label="Guardar" icon="pi pi-check" [loading]="formNuevoPedido.guardando()"
+                  (onClick)="formNuevoPedido.guardar()" />
+      </div>
+    </ng-template>
   </p-dialog>
 }
 

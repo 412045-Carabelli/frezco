@@ -1,5 +1,6 @@
+<h1 class="titulo-pantalla mb-4">Resumen</h1>
+
 <div class="flex flex-wrap items-end gap-3 mb-4">
-  <h1 class="titulo-pantalla flex-1">Resumen</h1>
   <div class="flex flex-col gap-1" data-tutorial="periodo">
     <label class="text-sm text-gray-700">Desde</label>
     <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />

@@ -1,6 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
@@ -11,7 +10,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { aTexto } from '../../core/fechas';
-import { CondicionVenta, Cuenta, Producto } from '../../core/modelos';
+import { CondicionVenta, Cuenta, Pedido, Producto } from '../../core/modelos';
 
 interface LineaEnEdicion {
   producto: Producto | null;
@@ -33,7 +32,9 @@ export class NuevoPedidoComponent {
 
   private readonly api = inject(ApiService);
   private readonly mensajes = inject(MessageService);
-  private readonly router = inject(Router);
+
+  /** El padre decide que hacer despues de guardar: cerrar el modal, refrescar, navegar. */
+  readonly guardado = output<Pedido>();
 
   readonly fecha = signal<Date>(new Date());
   readonly cuenta = signal<Cuenta | null>(null);
@@ -136,12 +137,7 @@ export class NuevoPedidoComponent {
       next: pedido => {
         this.guardando.set(false);
         this.mensajes.add({ severity: 'success', summary: `Pedido ${pedido.numero} guardado` });
-        // El flujo natural es cargar la venta y mandar el remito.
-        if (pedido.cuenta.tipo === 'CLIENTE') {
-          this.router.navigate(['/remitos/cliente', pedido.id]);
-        } else {
-          this.router.navigate(['/pedidos']);
-        }
+        this.guardado.emit(pedido);
       },
       error: respuesta => {
         this.guardando.set(false);

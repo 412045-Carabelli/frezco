@@ -1,54 +1,48 @@
-<!-- pb-24: deja lugar al pie fijo con el total -->
-<div class="pb-24 max-w-3xl mx-auto">
+<div class="flex flex-col gap-3">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="flex flex-col gap-1">
+      <label class="text-sm text-gray-700">Fecha</label>
+      <p-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)"
+                    dateFormat="dd/mm/yy" [showIcon]="true" styleClass="w-full" />
+    </div>
 
-  <h1 class="titulo-pantalla mb-4">Nuevo pedido</h1>
+    <div class="flex flex-col gap-1" data-tutorial="cuenta">
+      <label class="text-sm text-gray-700">Cuenta</label>
+      <p-autoComplete [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
+                      (onSelect)="elegirCuenta($event.value)"
+                      [suggestions]="cuentasSugeridas()" optionLabel="nombre"
+                      placeholder="Buscar por nombre" [minLength]="1"
+                      [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full" />
+    </div>
+  </div>
 
-  <section class="tarjeta p-4 flex flex-col gap-3">
+  @if (esVenta()) {
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-700">Fecha</label>
-        <p-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)"
-                      dateFormat="dd/mm/yy" [showIcon]="true" styleClass="w-full" />
+        <label class="text-sm text-gray-700">Condicion</label>
+        <p-selectButton [options]="condiciones" optionLabel="label" optionValue="value"
+                        [ngModel]="condicion()" (ngModelChange)="cambiarCondicion($event)"
+                        [allowEmpty]="false" />
       </div>
-
-      <div class="flex flex-col gap-1" data-tutorial="cuenta">
-        <label class="text-sm text-gray-700">Cuenta</label>
-        <p-autoComplete [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
-                        (onSelect)="elegirCuenta($event.value)"
-                        [suggestions]="cuentasSugeridas()" optionLabel="nombre"
-                        placeholder="Buscar por nombre" [minLength]="1"
-                        styleClass="w-full" inputStyleClass="w-full" />
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Descuento %</label>
+        <p-inputNumber [ngModel]="descuentoPct()" (ngModelChange)="cambiarDescuento($event)"
+                       [min]="0" [max]="100" [maxFractionDigits]="2" styleClass="w-full" />
       </div>
     </div>
+  } @else {
+    <p class="text-sm text-gray-500">
+      Esta cuenta no lleva precio de venta: las lineas se valorizan al costo.
+    </p>
+  }
 
-    @if (esVenta()) {
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1">
-          <label class="text-sm text-gray-700">Condicion</label>
-          <p-selectButton [options]="condiciones" optionLabel="label" optionValue="value"
-                          [ngModel]="condicion()" (ngModelChange)="cambiarCondicion($event)"
-                          [allowEmpty]="false" />
-        </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-sm text-gray-700">Descuento %</label>
-          <p-inputNumber [ngModel]="descuentoPct()" (ngModelChange)="cambiarDescuento($event)"
-                         [min]="0" [max]="100" [maxFractionDigits]="2" styleClass="w-full" />
-        </div>
-      </div>
-    } @else {
-      <p class="text-sm text-gray-500">
-        Esta cuenta no lleva precio de venta: las lineas se valorizan al costo.
-      </p>
-    }
-
-    <div class="flex flex-col gap-1">
-      <label class="text-sm text-gray-700">Observacion</label>
-      <input pInputText [ngModel]="observacion()" (ngModelChange)="observacion.set($event)" />
-    </div>
-  </section>
+  <div class="flex flex-col gap-1">
+    <label class="text-sm text-gray-700">Observacion</label>
+    <input pInputText [ngModel]="observacion()" (ngModelChange)="observacion.set($event)" />
+  </div>
 
   <!-- Lineas apiladas en tarjetas: en un celular una tabla con scroll horizontal no se usa -->
-  <section class="mt-4 flex flex-col gap-3">
+  <div class="flex flex-col gap-3 mt-1">
     @for (linea of lineas(); track $index) {
       <div class="tarjeta p-3 flex flex-col gap-2">
         <div class="flex items-start gap-2">
@@ -58,7 +52,7 @@
                             (onSelect)="elegirProducto($index, $event.value)"
                             [suggestions]="productosSugeridos()" optionLabel="nombre"
                             placeholder="Buscar articulo" [minLength]="1"
-                            styleClass="w-full" inputStyleClass="w-full" />
+                            [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full" />
           </div>
           <p-button icon="pi pi-times" severity="danger" [text]="true" class="mt-6"
                     (onClick)="quitarLinea($index)" ariaLabel="Quitar linea" />
@@ -93,16 +87,5 @@
 
     <p-button label="Artículo" icon="pi pi-plus" severity="secondary" [outlined]="true"
               styleClass="w-full" data-tutorial="agregar-linea" (onClick)="agregarLinea()" />
-  </section>
-</div>
-
-<!-- Pie fijo: el total y Guardar siempre a la vista -->
-<div data-tutorial="pie-total"
-     class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 px-4 py-3
-            flex items-center gap-3 md:pl-64 no-imprimir">
-  <div class="flex-1">
-    <p class="text-xs text-gray-500">Total</p>
-    <p class="text-lg font-semibold">{{ total() | number:'1.2-2' }}</p>
   </div>
-  <p-button label="Guardar" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar()" />
 </div>

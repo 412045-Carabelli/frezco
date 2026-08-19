@@ -1,5 +1,6 @@
+<h1 class="titulo-pantalla mb-4">Stock</h1>
+
 <div class="flex flex-wrap items-center gap-3 mb-4">
-  <h1 class="titulo-pantalla flex-1">Stock</h1>
   <div class="flex items-center gap-2">
     <p-toggleswitch [ngModel]="soloConStock()" (ngModelChange)="soloConStock.set($event); cargar()"
                     inputId="conStock" />

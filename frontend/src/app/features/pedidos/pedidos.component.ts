@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -14,13 +14,16 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { aTexto, primerDiaDelMes } from '../../core/fechas';
 import { Cuenta, Pedido } from '../../core/modelos';
+import { NuevoPedidoComponent } from './nuevo-pedido.component';
+import { TutorialService } from '../../core/tutorial.service';
 
 @Component({
   selector: 'app-pedidos',
   standalone: true,
   imports: [
     FormsModule, DecimalPipe, RouterLink, AutoCompleteModule, ButtonModule, DatePickerModule,
-    DialogModule, TableModule, TagModule, ToggleSwitchModule, ConfirmDialogModule
+    DialogModule, TableModule, TagModule, ToggleSwitchModule, ConfirmDialogModule,
+    NuevoPedidoComponent
   ],
   providers: [ConfirmationService],
   templateUrl: './pedidos.component.html'
@@ -30,6 +33,8 @@ export class PedidosComponent {
   private readonly api = inject(ApiService);
   private readonly mensajes = inject(MessageService);
   private readonly confirmacion = inject(ConfirmationService);
+  private readonly router = inject(Router);
+  private readonly tutorial = inject(TutorialService);
 
   readonly pedidos = signal<Pedido[]>([]);
   readonly cargando = signal(false);
@@ -39,6 +44,7 @@ export class PedidosComponent {
   readonly incluirAnulados = signal(false);
   readonly cuentasSugeridas = signal<Cuenta[]>([]);
   readonly detalle = signal<Pedido | null>(null);
+  readonly nuevoPedidoAbierto = signal(false);
 
   constructor() {
     this.cargar();
@@ -75,6 +81,25 @@ export class PedidosComponent {
 
   verDetalle(pedido: Pedido): void {
     this.detalle.set(pedido);
+  }
+
+  abrirNuevoPedido(): void {
+    this.nuevoPedidoAbierto.set(true);
+    this.tutorial.iniciarSiCorresponde('/pedidos/nuevo');
+  }
+
+  cerrarNuevoPedido(): void {
+    this.nuevoPedidoAbierto.set(false);
+  }
+
+  /** El flujo natural es cargar la venta y mandar el remito; refuerzo y consumo vuelven al listado. */
+  alGuardarPedido(pedido: Pedido): void {
+    this.nuevoPedidoAbierto.set(false);
+    if (pedido.cuenta.tipo === 'CLIENTE') {
+      this.router.navigate(['/remitos/cliente', pedido.id]);
+    } else {
+      this.cargar();
+    }
   }
 
   confirmarAnulacion(pedido: Pedido): void {

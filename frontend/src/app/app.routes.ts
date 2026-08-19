@@ -23,11 +23,6 @@ export const routes: Routes = [
           import('./features/pedidos/pedidos.component').then(c => c.PedidosComponent)
       },
       {
-        path: 'pedidos/nuevo',
-        loadComponent: () =>
-          import('./features/pedidos/nuevo-pedido.component').then(c => c.NuevoPedidoComponent)
-      },
-      {
         path: 'remitos/cliente/:pedidoId',
         loadComponent: () =>
           import('./features/remitos/remito-cliente.component').then(c => c.RemitoClienteComponent)
