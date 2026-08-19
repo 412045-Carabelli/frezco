@@ -76,9 +76,6 @@ docker compose -f docker-compose.ghcr.yml up -d
 
 Para correrlo dentro del mismo stack del Sistema de Gestion de Obras, copiar los
 servicios `backend`, `frontend` y `backup` de ese archivo (no `crear-base`, que corre
-una vez sola) dentro del `docker-compose.yml` de obras.
-
-**Primera vez:** GHCR crea los paquetes como privados. Para no tener que hacer
-`docker login` en el VPS, hay que pasarlos a publicos una sola vez, despues del primer
-push a `main`: en GitHub, Profile -> Packages -> `frezco-backend` (y `frezco-frontend`)
--> Package settings -> Change visibility -> Public.
+una vez sola) dentro del `docker-compose.yml` de obras. Como el repositorio es publico,
+GHCR publica los paquetes como publicos automaticamente: no hace falta `docker login`
+en el VPS para bajarlas.
