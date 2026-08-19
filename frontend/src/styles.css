@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "primeicons/primeicons.css";
+@import "driver.js/dist/driver.css";
 
 /**
  * Escalado de tipografia accesible: mismo criterio que el Sistema de Gestion de Obras.
@@ -9,10 +10,17 @@
   --font-scale-multiplier: 0.9;
   --base-font-size: 1rem;
 
-  /* Color de marca. El nombre comercial y los colores viven en configuracion,
-     no en el dominio. Ver CLAUDE.md. */
-  --color-marca: #0891b2;
-  --color-marca-oscuro: #0e7490;
+  /* Color de marca. Los valores salen de config/marca.ts; si cambia uno, cambian los dos. */
+  --marca-50: #ecfeff;
+  --marca-100: #cffafe;
+  --marca-200: #a5f3fc;
+  --marca-500: #06b6d4;
+  --marca: #0891b2;
+  --marca-oscuro: #0e7490;
+  --marca-texto: #155e75;
+
+  --superficie: #f5f7f9;
+  --borde: #e5e7eb;
 }
 
 html {
@@ -23,31 +31,82 @@ body {
   font-size: 1rem;
   line-height: 1.5;
   margin: 0;
-  background-color: #f9fafb;
+  background-color: var(--superficie);
   color: #111827;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 /* ============================================================
-   PrimeNG DataTable - estilos globales.
-   No usar ::ng-deep en componentes para estos casos.
+   Bloques reutilizables. Evitan repetir la misma lista de clases
+   de Tailwind en cada pantalla.
+   ============================================================ */
+
+/* Tarjeta base: todo lo que es contenido va adentro de una. */
+.tarjeta {
+  background-color: #ffffff;
+  border: 1px solid var(--borde);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 4%);
+}
+
+/* Barra de filtros y formularios cortos arriba de una tabla. */
+.barra-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+/* Titulo de pantalla, con el filete de color de la marca. */
+.titulo-pantalla {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  padding-left: 0.625rem;
+  border-left: 4px solid var(--marca);
+  line-height: 1.2;
+}
+
+/* Tarjeta de indicador del resumen. */
+.tarjeta-indicador {
+  border-top: 3px solid var(--marca);
+}
+
+label {
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   PrimeNG - estilos globales. No usar ::ng-deep en los componentes.
    ============================================================ */
 
 .p-datatable .p-datatable-thead > tr > th {
-  background-color: #f9fafb;
-  color: #374151;
+  background-color: var(--marca-50);
+  color: var(--marca-texto);
   font-weight: 600;
-  padding: 1rem;
-  border-bottom: 2px solid #e5e7eb;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--marca-100);
+  white-space: nowrap;
 }
 
 .p-datatable .p-datatable-tbody > tr > td {
-  padding: 1rem;
+  padding: 0.875rem 1rem;
   border-bottom: 1px solid #f3f4f6;
 }
 
 .p-datatable .p-datatable-tbody > tr:hover {
-  background-color: #f9fafb !important;
+  background-color: var(--marca-50) !important;
+}
+
+.p-datatable .p-datatable-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+.p-datatable .p-datatable-tfoot > tr > td {
+  background-color: #f9fafb;
+  border-top: 1px solid var(--borde);
 }
 
 .p-tag {
@@ -58,39 +117,105 @@ body {
 }
 
 .p-paginator {
-  padding: 1rem;
+  padding: 0.75rem;
   background-color: #ffffff;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--borde);
 }
 
-.p-inputtext {
-  border: 1px solid #e5e7eb;
+.p-inputtext,
+.p-select,
+.p-multiselect {
+  border: 1px solid #d8dde3;
 }
 
 .p-inputtext:enabled:hover {
-  border-color: #d1d5db;
+  border-color: var(--marca-200);
 }
 
 .p-inputtext:enabled:focus {
-  border-color: var(--color-marca);
-  box-shadow: 0 0 0 0.2rem rgba(8, 145, 178, 0.2);
+  border-color: var(--marca);
+  box-shadow: 0 0 0 3px rgb(8 145 178 / 15%);
 }
 
-.p-select,
-.p-multiselect {
-  border: 1px solid #e5e7eb;
+/* Los botones principales tienen que ser grandes: se usan con una mano en el celular. */
+.p-button {
+  font-weight: 500;
 }
 
-/* Mobile: la carga de pedidos tiene que ser usable con una mano. */
+/* ============================================================
+   Mobile. La carga de pedidos tiene que ser usable con una mano.
+   ============================================================ */
+
 @media (max-width: 768px) {
   .p-datatable .p-datatable-thead > tr > th,
   .p-datatable .p-datatable-tbody > tr > td {
     padding: 0.75rem 0.5rem;
     font-size: 0.875rem;
   }
+
+  .barra-filtros > * {
+    flex: 1 1 100%;
+  }
+
+  /* Campos y botones comodos para el dedo. */
+  .p-button,
+  .p-inputtext,
+  .p-select {
+    min-height: 2.75rem;
+  }
 }
 
-/* Estilos de impresion de remitos. Se completan en la Etapa 5. */
+/* ============================================================
+   Tutorial guiado (driver.js) con los colores de la marca.
+   ============================================================ */
+
+.driver-popover.tutorial-frezco {
+  border-radius: 0.75rem;
+  max-width: 22rem;
+  box-shadow: 0 10px 25px rgb(16 24 40 / 20%);
+}
+
+.driver-popover.tutorial-frezco .driver-popover-title {
+  font-size: 1rem;
+  color: var(--marca-texto);
+}
+
+.driver-popover.tutorial-frezco .driver-popover-description {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.driver-popover.tutorial-frezco .driver-popover-next-btn {
+  background-color: var(--marca);
+  color: #ffffff;
+  text-shadow: none;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.4rem 0.9rem;
+}
+
+.driver-popover.tutorial-frezco .driver-popover-prev-btn {
+  border-radius: 0.375rem;
+  padding: 0.4rem 0.9rem;
+}
+
+.driver-popover.tutorial-frezco .driver-popover-progress-text {
+  color: #6b7280;
+}
+
+/* En el celular los botones tienen que ser comodos para el dedo. */
+@media (max-width: 768px) {
+  .driver-popover.tutorial-frezco .driver-popover-navigation-btns button {
+    min-height: 2.5rem;
+    padding-inline: 1rem;
+  }
+}
+
+/* ============================================================
+   Impresion: solo el remito.
+   ============================================================ */
+
 @media print {
   .no-imprimir {
     display: none !important;

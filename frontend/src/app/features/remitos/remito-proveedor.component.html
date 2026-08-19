@@ -1,4 +1,4 @@
-<div class="no-imprimir flex flex-wrap items-end gap-3 mb-4">
+<div class="no-imprimir flex flex-wrap items-end gap-3 mb-4" data-tutorial="acciones-remito">
   <div class="flex flex-col gap-1">
     <label class="text-sm text-gray-700">Desde</label>
     <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
@@ -13,7 +13,7 @@
 </div>
 
 @if (remito(); as datos) {
-  <article class="remito bg-white border border-gray-200 rounded-lg p-6 mx-auto">
+  <article class="remito tarjeta p-6 mx-auto">
     <header class="flex justify-between items-start border-b border-gray-300 pb-3 mb-4">
       <div>
         <p class="text-lg font-semibold" [style.color]="marca.color">{{ marca.nombre }}</p>

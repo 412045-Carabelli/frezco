@@ -1,0 +1,22 @@
+/* Item activo del menu: fondo suave y filete del color de la marca. */
+.item-menu.activo {
+  background-color: var(--marca-50);
+  color: var(--marca-texto);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--marca);
+}
+
+.item-menu.activo i {
+  color: var(--marca);
+}
+
+.encabezado-marca {
+  background: linear-gradient(135deg, var(--marca) 0%, var(--marca-oscuro) 100%);
+}
+
+/* El drawer trae su propio padding; el menu lo maneja por item. */
+:host ::ng-deep .p-drawer-content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}

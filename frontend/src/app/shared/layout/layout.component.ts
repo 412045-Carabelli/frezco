@@ -1,8 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NgTemplateOutlet } from '@angular/common';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { DrawerModule } from 'primeng/drawer';
+import { FormsModule } from '@angular/forms';
 import { MARCA } from '../../config/marca';
 import { SesionService } from '../../core/sesion.service';
+import { TutorialService } from '../../core/tutorial.service';
 
 interface ItemMenu {
   etiqueta: string;
@@ -13,16 +19,22 @@ interface ItemMenu {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, ButtonModule],
-  templateUrl: './layout.component.html'
+  imports: [
+    RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, FormsModule, ButtonModule,
+    ToggleSwitchModule, DrawerModule
+  ],
+  templateUrl: './layout.component.html',
+  styleUrl: './layout.component.css'
 })
 export class LayoutComponent {
 
   private readonly sesion = inject(SesionService);
   private readonly router = inject(Router);
 
+  readonly tutorial = inject(TutorialService);
   readonly marca = MARCA;
-  readonly menuAbierto = signal(false);
+  menuAbierto = false;
+  readonly rutaActual = signal('');
 
   readonly items: ItemMenu[] = [
     { etiqueta: 'Resumen', icono: 'pi-home', ruta: '/resumen' },
@@ -35,12 +47,27 @@ export class LayoutComponent {
     { etiqueta: 'Cuentas', icono: 'pi-users', ruta: '/cuentas' }
   ];
 
+  constructor() {
+    this.router.events
+      .pipe(filter(evento => evento instanceof NavigationEnd))
+      .subscribe(evento => this.alCambiarDePantalla((evento as NavigationEnd).urlAfterRedirects));
+  }
+
   alternarMenu(): void {
-    this.menuAbierto.update(abierto => !abierto);
+    this.menuAbierto = !this.menuAbierto;
   }
 
   cerrarMenu(): void {
-    this.menuAbierto.set(false);
+    this.menuAbierto = false;
+  }
+
+  ayudaDeEstaPantalla(): void {
+    this.cerrarMenu();
+    this.tutorial.iniciar(this.rutaActual());
+  }
+
+  hayAyuda(): boolean {
+    return this.tutorial.hayAyudaPara(this.rutaActual());
   }
 
   salir(): void {
@@ -48,5 +75,13 @@ export class LayoutComponent {
       next: () => this.router.navigate(['/login']),
       error: () => this.router.navigate(['/login'])
     });
+  }
+
+  /** El tutorial se abre solo en cada pantalla nueva mientras la ayuda automatica este activa. */
+  private alCambiarDePantalla(url: string): void {
+    const ruta = url.split('?')[0];
+    this.rutaActual.set(ruta);
+    this.cerrarMenu();
+    this.tutorial.iniciarSiCorresponde(ruta);
   }
 }

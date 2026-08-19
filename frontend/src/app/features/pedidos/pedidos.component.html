@@ -1,9 +1,10 @@
 <div class="flex flex-wrap items-center gap-2 mb-4">
-  <h1 class="text-xl font-semibold text-gray-800 flex-1">Pedidos</h1>
-  <p-button label="Nuevo pedido" icon="pi pi-plus" routerLink="/pedidos/nuevo" />
+  <h1 class="titulo-pantalla flex-1">Pedidos</h1>
+  <p-button label="Nuevo pedido" icon="pi pi-plus" routerLink="/pedidos/nuevo"
+            data-tutorial="nuevo-pedido" />
 </div>
 
-<div class="bg-white rounded-lg border border-gray-200 p-3 mb-4 flex flex-wrap items-end gap-3">
+<div class="tarjeta barra-filtros mb-4">
   <div class="flex flex-col gap-1">
     <label class="text-sm text-gray-700">Desde</label>
     <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
@@ -27,8 +28,8 @@
   <p-button label="Filtrar" icon="pi pi-filter" severity="secondary" (onClick)="cargar()" />
 </div>
 
-<p-table [value]="pedidos()" [loading]="cargando()" [paginator]="pedidos().length > 25" [rows]="25"
-         styleClass="bg-white rounded-lg border border-gray-200">
+<p-table data-tutorial="tabla-pedidos" [value]="pedidos()" [loading]="cargando()" [paginator]="pedidos().length > 25" [rows]="25"
+         styleClass="tarjeta overflow-hidden">
   <ng-template pTemplate="header">
     <tr>
       <th>Numero</th>

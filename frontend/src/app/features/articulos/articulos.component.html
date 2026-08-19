@@ -1,13 +1,13 @@
 <div class="flex flex-wrap items-center gap-2 mb-4">
-  <h1 class="text-xl font-semibold text-gray-800 flex-1">Articulos</h1>
+  <h1 class="titulo-pantalla flex-1">Artículos</h1>
   <input pInputText placeholder="Buscar" [ngModel]="busqueda()"
          (ngModelChange)="busqueda.set($event)" (keyup.enter)="cargar()" />
   <p-button icon="pi pi-search" severity="secondary" (onClick)="cargar()" ariaLabel="Buscar" />
-  <p-button label="Nuevo" icon="pi pi-plus" (onClick)="nuevo()" />
+  <p-button label="Nuevo" icon="pi pi-plus" data-tutorial="nuevo-articulo" (onClick)="nuevo()" />
 </div>
 
 <p-table [value]="productos()" [loading]="cargando()" [paginator]="productos().length > 20"
-         [rows]="20" styleClass="bg-white rounded-lg border border-gray-200">
+         [rows]="20" styleClass="tarjeta overflow-hidden">
   <ng-template pTemplate="header">
     <tr>
       <th>Articulo</th>

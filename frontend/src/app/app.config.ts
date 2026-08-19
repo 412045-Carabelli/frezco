@@ -6,12 +6,21 @@ import { registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
+import { definePreset } from '@primeng/themes';
 import { MessageService } from 'primeng/api';
 
 import { routes } from './app.routes';
 import { credencialesInterceptor } from './core/credenciales.interceptor';
+import { MARCA } from './config/marca';
 
 registerLocaleData(localeEsAr);
+
+/** Aura con el color de la marca como primario: botones, foco y estados activos. */
+const temaFrezco = definePreset(Aura, {
+  semantic: {
+    primary: MARCA.escala
+  }
+});
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,7 +30,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: temaFrezco,
         options: {
           prefix: 'p',
           darkModeSelector: 'light-theme',

@@ -1,45 +1,66 @@
+<!-- El contenido del menu se escribe una vez y se usa en las dos versiones. -->
+<ng-template #contenidoMenu>
+  <nav class="flex-1 overflow-y-auto py-2">
+    @for (item of items; track item.ruta) {
+      <a [routerLink]="item.ruta"
+         routerLinkActive="activo"
+         (click)="cerrarMenu()"
+         class="item-menu flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50">
+        <i class="pi {{ item.icono }} text-gray-400"></i>
+        {{ item.etiqueta }}
+      </a>
+    }
+  </nav>
+
+  <div class="px-4 py-3 border-t border-gray-200 flex flex-col gap-3">
+    <!-- Ayuda automatica: se puede apagar cuando ya se le agarro la mano al sistema. -->
+    <div class="flex items-center justify-between gap-2">
+      <label for="ayuda-auto" class="text-sm text-gray-600">Ayuda automática</label>
+      <p-toggleswitch inputId="ayuda-auto" [ngModel]="tutorial.automatico()"
+                      (ngModelChange)="tutorial.alternarAutomatico($event)" />
+    </div>
+
+    <p-button label="Salir" icon="pi pi-sign-out" severity="secondary"
+              [text]="true" size="small" (onClick)="salir()" />
+  </div>
+</ng-template>
+
 <div class="min-h-screen flex">
 
-  <!-- Menu lateral: fijo en escritorio, deslizante en mobile -->
-  <aside
-    class="fixed inset-y-0 left-0 z-30 w-60 bg-white border-r border-gray-200 flex flex-col
-           transition-transform md:translate-x-0 no-imprimir"
-    [class.-translate-x-full]="!menuAbierto()">
-
-    <div class="px-4 py-4 border-b border-gray-200">
-      <p class="text-lg font-semibold" [style.color]="marca.color">{{ marca.nombre }}</p>
-      <p class="text-xs text-gray-500">{{ marca.descripcion }}</p>
+  <!-- Escritorio: menu fijo a la izquierda -->
+  <aside data-tutorial="menu"
+         class="hidden md:flex fixed inset-y-0 left-0 z-30 w-60 bg-white border-r border-gray-200
+                flex-col no-imprimir">
+    <div class="encabezado-marca px-4 py-4 text-white">
+      <p class="text-lg font-semibold leading-tight">{{ marca.nombre }}</p>
+      <p class="text-xs opacity-90">{{ marca.descripcion }}</p>
     </div>
-
-    <nav class="flex-1 overflow-y-auto py-2">
-      @for (item of items; track item.ruta) {
-        <a [routerLink]="item.ruta"
-           routerLinkActive="bg-gray-100 font-medium"
-           (click)="cerrarMenu()"
-           class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
-          <i class="pi {{ item.icono }} text-gray-500"></i>
-          {{ item.etiqueta }}
-        </a>
-      }
-    </nav>
-
-    <div class="px-4 py-3 border-t border-gray-200">
-      <p-button label="Salir" icon="pi pi-sign-out" severity="secondary"
-                [text]="true" size="small" (onClick)="salir()" />
-    </div>
+    <ng-container *ngTemplateOutlet="contenidoMenu" />
   </aside>
 
-  <!-- Fondo oscuro del menu en mobile -->
-  @if (menuAbierto()) {
-    <div class="fixed inset-0 z-20 bg-black/30 md:hidden no-imprimir" (click)="cerrarMenu()"></div>
-  }
+  <!-- Mobile: el mismo menu dentro de un drawer de PrimeNG -->
+  <p-drawer [(visible)]="menuAbierto" [style]="{ width: '17rem' }" styleClass="md:hidden no-imprimir"
+            [header]="marca.nombre">
+    <ng-container *ngTemplateOutlet="contenidoMenu" />
+  </p-drawer>
 
   <div class="flex-1 flex flex-col md:ml-60">
-    <header class="h-14 bg-white border-b border-gray-200 flex items-center gap-2 px-3 md:hidden no-imprimir">
-      <p-button icon="pi pi-bars" severity="secondary" [text]="true" (onClick)="alternarMenu()"
-                ariaLabel="Abrir menu" />
-      <span class="font-semibold" [style.color]="marca.color">{{ marca.nombre }}</span>
+    <header class="encabezado-marca h-14 flex items-center gap-2 px-2 text-white md:hidden no-imprimir">
+      <p-button icon="pi pi-bars" [text]="true" (onClick)="alternarMenu()"
+                ariaLabel="Abrir menú" styleClass="!text-white" />
+      <span class="font-semibold flex-1">{{ marca.nombre }}</span>
+      @if (hayAyuda()) {
+        <p-button icon="pi pi-question-circle" [text]="true" (onClick)="ayudaDeEstaPantalla()"
+                  ariaLabel="Cómo se usa esta pantalla" styleClass="!text-white" />
+      }
     </header>
+
+    <!-- En escritorio el boton de ayuda flota abajo a la derecha, siempre a mano. -->
+    @if (hayAyuda()) {
+      <p-button icon="pi pi-question-circle" label="¿Cómo se usa?" [rounded]="true"
+                (onClick)="ayudaDeEstaPantalla()"
+                styleClass="hidden md:inline-flex fixed bottom-5 right-5 z-20 shadow-lg no-imprimir" />
+    }
 
     <main class="flex-1 p-4">
       <router-outlet />
