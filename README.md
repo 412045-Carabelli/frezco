@@ -57,3 +57,28 @@ cd frontend && npm start
 
 La planilla actual se importa una sola vez con el script de
 [db/importar](db/importar/README.md), que genera el SQL a partir de CSV.
+
+## Deploy en el VPS
+
+Cada push a `main` publica dos imagenes en GHCR via
+[.github/workflows/publish-ghcr.yml](.github/workflows/publish-ghcr.yml):
+
+- `ghcr.io/412045-carabelli/frezco-backend:latest`
+- `ghcr.io/412045-carabelli/frezco-frontend:latest`
+
+En el VPS, [docker-compose.ghcr.yml](docker-compose.ghcr.yml) las consume en vez de
+buildearlas localmente:
+
+```bash
+docker compose -f docker-compose.ghcr.yml pull
+docker compose -f docker-compose.ghcr.yml up -d
+```
+
+Para correrlo dentro del mismo stack del Sistema de Gestion de Obras, copiar los
+servicios `backend`, `frontend` y `backup` de ese archivo (no `crear-base`, que corre
+una vez sola) dentro del `docker-compose.yml` de obras.
+
+**Primera vez:** GHCR crea los paquetes como privados. Para no tener que hacer
+`docker login` en el VPS, hay que pasarlos a publicos una sola vez, despues del primer
+push a `main`: en GitHub, Profile -> Packages -> `frezco-backend` (y `frezco-frontend`)
+-> Package settings -> Change visibility -> Public.

@@ -1,0 +1,115 @@
+# =======================
+# FrezCo con imagenes publicadas en GHCR (ghcr.io/412045-carabelli/frezco-*), en vez de
+# buildearlas localmente. Es lo que se corre en el VPS.
+#
+# Las publica .github/workflows/publish-ghcr.yml en cada push a main.
+#
+# Prerequisito: la red `sgo_backend` tiene que existir (la crea el compose de obras).
+#   docker network ls | grep sgo_backend
+#
+# Uso standalone:
+#   docker compose -f docker-compose.ghcr.yml up -d
+#
+# Para sumarlo al stack de obras, copiar los servicios backend/frontend/backup (no
+# crear-base, que corre una vez sola) dentro del docker-compose.yml de ese stack.
+# =======================
+services:
+
+  crear-base:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: frezco_crear_base
+    volumes:
+      - ./db:/db:ro
+    environment:
+      - DB_HOST=${DB_HOST:-sqlserver}
+      - DB_PORT=${DB_PORT:-1433}
+      - DB_NAME=${DB_NAME:-frezco}
+      - DB_USER=${DB_USER:-sa}
+      - DB_PASSWORD=${DB_PASSWORD}
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        for i in $$(seq 1 30); do
+          /opt/mssql-tools/bin/sqlcmd -S "$$DB_HOST,$$DB_PORT" -U "$$DB_USER" -P "$$DB_PASSWORD" -Q "SELECT 1" && break
+          echo "Esperando SQL Server ($$i)"; sleep 5
+        done
+        /opt/mssql-tools/bin/sqlcmd -S "$$DB_HOST,$$DB_PORT" -U "$$DB_USER" -P "$$DB_PASSWORD" \
+          -v DB_NAME="$$DB_NAME" -i /db/crear-base.sql
+    restart: "no"
+    networks:
+      - sgo_backend
+
+  backend:
+    pull_policy: always
+    image: ghcr.io/412045-carabelli/frezco-backend:latest
+    container_name: frezco_backend
+    ports:
+      - "${BACKEND_PORT:-8090}:8090"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=${DB_HOST:-sqlserver}
+      - DB_PORT=${DB_PORT:-1433}
+      - DB_NAME=${DB_NAME:-frezco}
+      - DB_USER=${DB_USER:-sa}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - APP_USER=${APP_USER:-admin}
+      - APP_PASSWORD=${APP_PASSWORD}
+      - JAVA_OPTS=-Xms64m -Xmx256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200
+    depends_on:
+      crear-base:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    networks:
+      - sgo_backend
+
+  frontend:
+    pull_policy: always
+    image: ghcr.io/412045-carabelli/frezco-frontend:latest
+    container_name: frezco_frontend
+    ports:
+      - "${FRONTEND_PORT:-4300}:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    networks:
+      - sgo_backend
+
+  # Backup diario de la base a las 03:00, retencion 7 dias. No se publica en GHCR: se
+  # buildea local, es liviano y cambia poco.
+  backup:
+    build: ./backup
+    container_name: frezco_backup
+    environment:
+      - DB_HOST=${DB_HOST:-sqlserver}
+      - DB_PORT=${DB_PORT:-1433}
+      - DB_NAME=${DB_NAME:-frezco}
+      - DB_USER=${DB_USER:-sa}
+      - DB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - backup_data:/backups
+    depends_on:
+      crear-base:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - sgo_backend
+
+networks:
+  sgo_backend:
+    external: true
+
+volumes:
+  backup_data:
