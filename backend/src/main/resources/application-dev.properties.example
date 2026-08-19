@@ -1,0 +1,10 @@
+# Copiar a application-dev.properties y completar con los datos reales.
+# El archivo con las credenciales no se versiona.
+spring.datasource.url=jdbc:sqlserver://HOST:1433;databaseName=frezco;encrypt=false;trustServerCertificate=true
+spring.datasource.username=sa
+spring.datasource.password=
+
+app.seguridad.usuario=admin
+app.seguridad.clave=admin
+
+logging.level.ar.frezco=DEBUG

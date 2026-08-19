@@ -33,3 +33,6 @@ Desktop.ini
 # Datos locales
 data/
 backups/
+
+# Credenciales locales del perfil dev
+application-dev.properties

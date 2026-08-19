@@ -14,6 +14,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -46,6 +48,8 @@ public class Movimiento {
     @Column(length = 300)
     private String observacion;
 
+    // DATETIME2 en UTC, no DATETIME OFFSET: lo escribe el DEFAULT SYSUTCDATETIME() de la tabla.
+    @JdbcTypeCode(SqlTypes.TIMESTAMP)
     @Column(name = "creado_en", nullable = false, insertable = false, updatable = false)
     private Instant creadoEn;
 }
