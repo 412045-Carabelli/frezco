@@ -9,7 +9,11 @@ server {
   resolver 127.0.0.11 valid=10s ipv6=off;
 
   location /api/ {
-    set $upstream http://backend:8090;
+    # BACKEND_UPSTREAM se resuelve via envsubst al arrancar el contenedor (ver Dockerfile).
+    # Default "backend:8090" para el compose standalone; en un stack compartido (por
+    # ejemplo el del Sistema de Gestion de Obras) se sobreescribe con el nombre real
+    # del servicio, para no depender de que se llame justo "backend".
+    set $upstream http://${BACKEND_UPSTREAM};
     proxy_pass $upstream;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
