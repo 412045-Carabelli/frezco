@@ -45,6 +45,10 @@ public class Producto {
     @Column(name = "precio_cantidad", nullable = false)
     private BigDecimal precioCantidad = BigDecimal.ZERO;
 
+    /** Si es mayor a 0, pisa al descuento del pedido para las lineas de este articulo. */
+    @Column(name = "descuento_pct", nullable = false)
+    private BigDecimal descuentoPct = BigDecimal.ZERO;
+
     @Column(nullable = false)
     private boolean activo = true;
 }

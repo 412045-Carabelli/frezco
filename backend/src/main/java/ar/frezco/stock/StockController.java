@@ -25,6 +25,11 @@ public class StockController {
         return servicio.listar(soloConStock);
     }
 
+    @GetMapping("/ranking")
+    public List<RankingProductoDTO> ranking() {
+        return servicio.rankingVentas();
+    }
+
     @GetMapping("/{productoId}/movimientos")
     public List<MovimientoStockDTO> movimientos(
             @PathVariable Long productoId,

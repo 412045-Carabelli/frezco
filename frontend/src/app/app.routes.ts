@@ -57,6 +57,12 @@ export const routes: Routes = [
         path: 'cuentas',
         loadComponent: () =>
           import('./features/cuentas/cuentas.component').then(c => c.CuentasComponent)
+      },
+      {
+        path: 'analisis-comercial',
+        loadComponent: () =>
+          import('./features/analisis-comercial/analisis-comercial.component')
+            .then(c => c.AnalisisComercialComponent)
       }
     ]
   },

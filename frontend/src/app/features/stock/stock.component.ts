@@ -7,7 +7,7 @@ import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
-import { MovimientoStock, StockItem } from '../../core/modelos';
+import { MovimientoStock, RankingProducto, StockItem } from '../../core/modelos';
 
 @Component({
   selector: 'app-stock',
@@ -26,9 +26,11 @@ export class StockComponent {
 
   readonly detalle = signal<StockItem | null>(null);
   readonly movimientos = signal<MovimientoStock[]>([]);
+  readonly ranking = signal<RankingProducto[]>([]);
 
   constructor() {
     this.cargar();
+    this.cargarRanking();
   }
 
   cargar(): void {
@@ -56,5 +58,12 @@ export class StockComponent {
 
   cerrarDetalle(): void {
     this.detalle.set(null);
+  }
+
+  private cargarRanking(): void {
+    this.api.rankingStock().subscribe({
+      next: ranking => this.ranking.set(ranking),
+      error: () => this.mensajes.add({ severity: 'error', summary: 'No se pudo cargar el ranking' })
+    });
   }
 }

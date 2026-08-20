@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -14,14 +15,17 @@ import { Producto } from '../../core/modelos';
 
 const PRODUCTO_NUEVO: Producto = {
   id: null, nombre: '', categoria: null, kg: null, lt: null,
-  costo: 0, precioMinorista: 0, precioMayorista: 0, precioCantidad: 0, activo: true
+  costo: 0, precioMinorista: 0, precioMayorista: 0, precioCantidad: 0, descuentoPct: 0, activo: true
 };
+
+/** Categorias de partida: la usuaria puede agregar otras escribiendolas. */
+const CATEGORIAS_BASE = ['Frutas', 'Verduras', 'Jugos', 'Postres'];
 
 @Component({
   selector: 'app-articulos',
   standalone: true,
   imports: [
-    FormsModule, DecimalPipe, ButtonModule, DialogModule, InputNumberModule,
+    FormsModule, DecimalPipe, AutoCompleteModule, ButtonModule, DialogModule, InputNumberModule,
     InputTextModule, TableModule, TagModule, ConfirmDialogModule
   ],
   providers: [ConfirmationService],
@@ -40,6 +44,7 @@ export class ArticulosComponent {
 
   readonly editando = signal<Producto | null>(null);
   readonly guardando = signal(false);
+  readonly categoriasSugeridas = signal<string[]>([]);
 
   /** Margen porcentual de cada precio contra el costo. Ayuda a decidir sin calculadora. */
   readonly margenes = computed(() => {
@@ -117,6 +122,14 @@ export class ArticulosComponent {
       rejectLabel: 'Cancelar',
       accept: () => this.darDeBaja(producto)
     });
+  }
+
+  /** Combina las categorias fijas con las que ya se usaron, para poder elegir o escribir una nueva. */
+  buscarCategorias(evento: { query: string }): void {
+    const usadas = this.productos().map(p => p.categoria).filter((c): c is string => !!c);
+    const todas = [...new Set([...CATEGORIAS_BASE, ...usadas])].sort();
+    const consulta = evento.query.toLowerCase();
+    this.categoriasSugeridas.set(todas.filter(c => c.toLowerCase().includes(consulta)));
   }
 
   actualizarCampo<K extends keyof Producto>(campo: K, valor: Producto[K]): void {

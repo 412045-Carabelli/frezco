@@ -17,27 +17,27 @@
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="tarjeta tarjeta-indicador p-4">
       <p class="text-sm text-gray-500">Ventas</p>
-      <p class="text-2xl font-semibold">{{ datos.ventas | number:'1.2-2' }}</p>
+      <p class="text-2xl font-semibold">$ {{ datos.ventas | number:'1.2-2' }}</p>
     </div>
     <div class="tarjeta tarjeta-indicador p-4">
       <p class="text-sm text-gray-500">Margen</p>
-      <p class="text-2xl font-semibold">{{ datos.margen | number:'1.2-2' }}</p>
+      <p class="text-2xl font-semibold">$ {{ datos.margen | number:'1.2-2' }}</p>
       <p class="text-xs text-gray-500">{{ datos.margenPct | percent:'1.0-1' }} sobre ventas</p>
     </div>
     <div class="tarjeta tarjeta-indicador p-4">
       <p class="text-sm text-gray-500">A cobrar</p>
-      <p class="text-2xl font-semibold">{{ datos.saldoACobrar | number:'1.2-2' }}</p>
+      <p class="text-2xl font-semibold">$ {{ datos.saldoACobrar | number:'1.2-2' }}</p>
     </div>
     <div class="tarjeta tarjeta-indicador p-4">
       <p class="text-sm text-gray-500">A pagar</p>
-      <p class="text-2xl font-semibold">{{ datos.saldoAPagar | number:'1.2-2' }}</p>
+      <p class="text-2xl font-semibold">$ {{ datos.saldoAPagar | number:'1.2-2' }}</p>
     </div>
   </div>
 
   <div class="flex flex-wrap gap-6 mt-4 text-sm text-gray-600">
     <span>Pedidos: <strong>{{ datos.cantidadPedidos }}</strong></span>
-    <span>Ticket promedio: <strong>{{ datos.ticketPromedio | number:'1.2-2' }}</strong></span>
-    <span class="text-gray-400">Costo del periodo: {{ datos.costo | number:'1.2-2' }}</span>
+    <span>Ticket promedio: <strong>$ {{ datos.ticketPromedio | number:'1.2-2' }}</strong></span>
+    <span class="text-gray-400">Costo del periodo: $ {{ datos.costo | number:'1.2-2' }}</span>
   </div>
 
   <section class="tarjeta p-4 mt-4">

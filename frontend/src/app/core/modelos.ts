@@ -12,6 +12,7 @@ export interface Producto {
   precioMinorista: number;
   precioMayorista: number;
   precioCantidad: number;
+  descuentoPct: number;
   activo: boolean;
 }
 
@@ -152,4 +153,19 @@ export interface Resumen {
   saldoACobrar: number;
   saldoAPagar: number;
   productosSinStock: string[];
+}
+
+export interface RankingProducto {
+  productoId: number;
+  nombre: string;
+  unidadesVendidas: number;
+  sugeridoReponer: number;
+}
+
+export interface AnalisisComercial {
+  desde: string;
+  hasta: string;
+  porProducto: { productoId: number; nombre: string; unidades: number; importe: number }[];
+  porCliente: { cuentaId: number; nombre: string; cantidadPedidos: number; importe: number }[];
+  porZona: { zona: string; importe: number }[];
 }

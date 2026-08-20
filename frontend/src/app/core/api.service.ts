@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
+  AnalisisComercial,
   CondicionVenta,
   CrearPedido,
   Cuenta,
@@ -12,6 +13,7 @@ import {
   Pedido,
   PrecioPreview,
   Producto,
+  RankingProducto,
   RemitoCliente,
   RemitoProveedor,
   Resumen,
@@ -115,6 +117,10 @@ export class ApiService {
       { params: this.parametros({ desde, hasta }) });
   }
 
+  rankingStock(): Observable<RankingProducto[]> {
+    return this.http.get<RankingProducto[]>(`${this.base}/stock/ranking`);
+  }
+
   // ---- Cuentas corrientes ----
 
   cuentaCorriente(cuentaId: number, desde?: string, hasta?: string): Observable<CuentaCorriente> {
@@ -140,6 +146,10 @@ export class ApiService {
 
   resumen(desde?: string, hasta?: string): Observable<Resumen> {
     return this.http.get<Resumen>(`${this.base}/resumen`, { params: this.parametros({ desde, hasta }) });
+  }
+
+  analisisComercial(desde?: string, hasta?: string): Observable<AnalisisComercial> {
+    return this.http.get<AnalisisComercial>(`${this.base}/analisis`, { params: this.parametros({ desde, hasta }) });
   }
 
   private parametros(valores: Record<string, unknown>): HttpParams {

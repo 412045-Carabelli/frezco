@@ -74,6 +74,10 @@
     }
 
     <main class="flex-1 p-4">
+      @if (hayAtras()) {
+        <p-button icon="pi pi-arrow-left" label="Atrás" severity="secondary" [text]="true" size="small"
+                  styleClass="no-imprimir mb-2" (onClick)="volverAtras()" ariaLabel="Volver" />
+      }
       <router-outlet />
     </main>
   </div>

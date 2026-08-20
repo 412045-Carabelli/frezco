@@ -1,6 +1,7 @@
 package ar.frezco.stock;
 
 import ar.frezco.producto.Producto;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -58,6 +59,30 @@ public interface StockRepository extends Repository<Producto, Long> {
     List<MovimientoDeStock> movimientosDe(@Param("productoId") Long productoId,
                                           @Param("desde") LocalDate desde,
                                           @Param("hasta") LocalDate hasta);
+
+    /**
+     * Ranking de ventas para armar el pedido sugerido. Solo cuenta lo vendido a clientes: el
+     * consumo propio y los refuerzos no reflejan demanda real. Ver docs/03-reglas-negocio.md.
+     */
+    @Query("""
+            SELECT p.id AS productoId,
+                   p.nombre AS nombre,
+                   SUM(l.unidades) AS unidadesVendidas
+            FROM PedidoLinea l JOIN l.pedido ped JOIN ped.cuenta c JOIN l.producto p
+            WHERE ped.anulado = false AND c.tipo = ar.frezco.cuenta.TipoCuenta.CLIENTE
+              AND ped.fecha >= :desde
+            GROUP BY p.id, p.nombre
+            ORDER BY SUM(l.unidades) DESC
+            """)
+    List<RankingDeVenta> rankingVentas(@Param("desde") LocalDate desde, Pageable pageable);
+
+    interface RankingDeVenta {
+        Long getProductoId();
+
+        String getNombre();
+
+        BigDecimal getUnidadesVendidas();
+    }
 
     interface StockDeProducto {
         Long getProductoId();

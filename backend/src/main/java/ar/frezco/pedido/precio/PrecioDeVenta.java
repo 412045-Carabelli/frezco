@@ -20,11 +20,18 @@ public class PrecioDeVenta implements PoliticaPrecio {
         return Set.of(TipoCuenta.CLIENTE);
     }
 
+    /**
+     * El descuento del articulo y el del pedido no son acumulativos: si el articulo tiene
+     * descuento propio, ese pisa al general del pedido para esta linea.
+     */
     @Override
     public BigDecimal precioUnitario(Producto producto, CondicionVenta condicion,
                                      BigDecimal descuentoPct) {
         BigDecimal base = condicion.precioBase(producto);
-        BigDecimal factor = BigDecimal.ONE.subtract(descuentoPct.divide(CIEN, 6, RoundingMode.HALF_UP));
+        BigDecimal descuentoEfectivo = producto.getDescuentoPct().signum() > 0
+                ? producto.getDescuentoPct()
+                : descuentoPct;
+        BigDecimal factor = BigDecimal.ONE.subtract(descuentoEfectivo.divide(CIEN, 6, RoundingMode.HALF_UP));
         return base.multiply(factor).setScale(2, RoundingMode.HALF_UP);
     }
 

@@ -1,6 +1,7 @@
 package ar.frezco.stock;
 
 import ar.frezco.config.Periodo;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.math.BigDecimal.ZERO;
 
 @Service
 @Transactional(readOnly = true)
@@ -63,6 +66,23 @@ public class StockService {
                     fila.getEntrada(), fila.getSalida(), saldo));
         }
         return movimientos;
+    }
+
+    /**
+     * Top 5 mas vendidos en los ultimos 30 dias, con sugerencia de reposicion. Solo ventas a
+     * clientes: no cuenta consumo propio ni refuerzos.
+     */
+    public List<RankingProductoDTO> rankingVentas() {
+        StockDisponible stockActual = disponible();
+        LocalDate desde = LocalDate.now().minusDays(30);
+        return repositorio.rankingVentas(desde, PageRequest.of(0, 5)).stream()
+                .map(fila -> {
+                    BigDecimal vendido = fila.getUnidadesVendidas();
+                    BigDecimal disponibleActual = stockActual.de(fila.getProductoId());
+                    BigDecimal sugerido = vendido.subtract(disponibleActual).max(ZERO);
+                    return new RankingProductoDTO(fila.getProductoId(), fila.getNombre(), vendido, sugerido);
+                })
+                .toList();
     }
 
     /** Productos sin stock, para el aviso del resumen. */
