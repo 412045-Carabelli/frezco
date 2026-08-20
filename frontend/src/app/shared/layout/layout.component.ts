@@ -8,6 +8,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { MARCA } from '../../config/marca';
+import { ECOSISTEMA } from '../../config/ecosistema';
 import { SesionService } from '../../core/sesion.service';
 import { TutorialService } from '../../core/tutorial.service';
 
@@ -34,6 +35,7 @@ export class LayoutComponent {
 
   readonly tutorial = inject(TutorialService);
   readonly marca = MARCA;
+  readonly ecosistema = ECOSISTEMA;
   menuAbierto = false;
   readonly rutaActual = signal('');
 

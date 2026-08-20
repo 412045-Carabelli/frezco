@@ -11,7 +11,11 @@
 #   docker compose -f docker-compose.ghcr.yml up -d
 #
 # Para sumarlo al stack de obras, copiar los servicios backend/frontend/backup (no
-# crear-base, que corre una vez sola) dentro del docker-compose.yml de ese stack.
+# crear-base, que corre una vez sola) dentro del docker-compose.ghcr.yml de ese stack.
+#
+# Dominio: el frontend se engancha ademas a `dokploy-network`, la red que administra
+# Dokploy (el PaaS que ya despliega el Sistema de Gestion de Obras). El dominio y el
+# certificado se asignan desde el panel de Dokploy, no en este archivo.
 # =======================
 services:
 
@@ -82,6 +86,7 @@ services:
           memory: 128M
     networks:
       - sgo_backend
+      - dokploy-network
 
   # Backup diario de la base a las 03:00, retencion 7 dias. No se publica en GHCR: se
   # buildea local, es liviano y cambia poco.
@@ -109,6 +114,8 @@ services:
 
 networks:
   sgo_backend:
+    external: true
+  dokploy-network:
     external: true
 
 volumes:

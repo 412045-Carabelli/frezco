@@ -12,6 +12,20 @@
     }
   </nav>
 
+  @if (ecosistema.length) {
+    <div class="px-4 py-2 border-t border-gray-200">
+      <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Otros sistemas</p>
+      @for (sistema of ecosistema; track sistema.url) {
+        <a [href]="sistema.url" target="_blank" rel="noopener"
+           class="item-menu flex items-center gap-3 px-0 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
+          <i class="pi {{ sistema.icono }} text-gray-400"></i>
+          {{ sistema.nombre }}
+          <i class="pi pi-external-link text-xs text-gray-300 ml-auto"></i>
+        </a>
+      }
+    </div>
+  }
+
   <div class="px-4 py-3 border-t border-gray-200 flex flex-col gap-3">
     <!-- Ayuda automatica: se puede apagar cuando ya se le agarro la mano al sistema. -->
     <div class="flex items-center justify-between gap-2">
