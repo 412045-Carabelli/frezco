@@ -44,6 +44,10 @@ export class CuentasCorrientesComponent {
     this.consultar();
   }
 
+  imprimir(): void {
+    window.print();
+  }
+
   consultar(): void {
     const cuentaId = this.cuentaId();
     if (!cuentaId) {

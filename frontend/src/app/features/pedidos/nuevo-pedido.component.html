@@ -77,11 +77,18 @@
           </div>
         </div>
 
-        @if (sePideAlProveedor(linea)) {
-          <span class="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 self-start">
-            Se pide al proveedor (stock: {{ linea.stockDisponible | number:'1.0-2' }})
-          </span>
-        }
+        <div class="flex flex-wrap gap-2">
+          @if (sePideAlProveedor(linea)) {
+            <span class="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 self-start">
+              Se pide al proveedor (stock: {{ linea.stockDisponible | number:'1.0-2' }})
+            </span>
+          }
+          @if (linea.producto && linea.producto.descuentoPct > 0) {
+            <span class="text-xs text-cyan-700 bg-cyan-50 rounded px-2 py-1 self-start">
+              Dcto propio {{ linea.producto.descuentoPct }}% (reemplaza al del pedido)
+            </span>
+          }
+        </div>
       </div>
     }
 

@@ -18,6 +18,9 @@ public record ProductoDTO(
         @PositiveOrZero(message = "El precio minorista no puede ser negativo") BigDecimal precioMinorista,
         @PositiveOrZero(message = "El precio mayorista no puede ser negativo") BigDecimal precioMayorista,
         @PositiveOrZero(message = "El precio por cantidad no puede ser negativo") BigDecimal precioCantidad,
+        @PositiveOrZero(message = "El descuento no puede ser negativo")
+        @jakarta.validation.constraints.DecimalMax(value = "100.00", message = "El descuento no puede superar el 100%")
+        BigDecimal descuentoPct,
         boolean activo) {
 
     public static ProductoDTO de(Producto producto) {
@@ -31,6 +34,7 @@ public record ProductoDTO(
                 producto.getPrecioMinorista(),
                 producto.getPrecioMayorista(),
                 producto.getPrecioCantidad(),
+                producto.getDescuentoPct(),
                 producto.isActivo());
     }
 }

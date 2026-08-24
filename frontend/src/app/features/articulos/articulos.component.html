@@ -17,6 +17,7 @@
       <th class="text-right">Minorista</th>
       <th class="text-right">Mayorista</th>
       <th class="text-right">Por cantidad</th>
+      <th class="text-right">Dcto %</th>
       <th></th>
     </tr>
   </ng-template>
@@ -29,6 +30,7 @@
       <td class="text-right">{{ producto.precioMinorista | number:'1.2-2' }}</td>
       <td class="text-right">{{ producto.precioMayorista | number:'1.2-2' }}</td>
       <td class="text-right">{{ producto.precioCantidad | number:'1.2-2' }}</td>
+      <td class="text-right">{{ producto.descuentoPct | number:'1.0-2' }}</td>
       <td class="text-right whitespace-nowrap">
         <p-button icon="pi pi-pencil" severity="secondary" [text]="true" size="small"
                   (onClick)="editar(producto)" ariaLabel="Editar" />
@@ -42,7 +44,7 @@
 
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td colspan="7" class="text-center text-gray-500 py-6">No hay articulos cargados.</td>
+      <td colspan="8" class="text-center text-gray-500 py-6">No hay articulos cargados.</td>
     </tr>
   </ng-template>
 </p-table>
@@ -61,8 +63,11 @@
       <div class="grid grid-cols-3 gap-3">
         <div class="flex flex-col gap-1">
           <label class="text-sm text-gray-700">Categoria</label>
-          <input pInputText [ngModel]="producto.categoria"
-                 (ngModelChange)="actualizarCampo('categoria', $event)" />
+          <p-autoComplete [ngModel]="producto.categoria" (completeMethod)="buscarCategorias($event)"
+                          (ngModelChange)="actualizarCampo('categoria', $event)"
+                          [suggestions]="categoriasSugeridas()" [dropdown]="true"
+                          placeholder="Elegi o escribi una nueva" [appendTo]="'body'"
+                          styleClass="w-full" inputStyleClass="w-full" />
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm text-gray-700">Kg</label>
@@ -110,6 +115,15 @@
                          styleClass="w-full" inputStyleClass="w-full" />
           <span class="text-xs text-gray-500">Margen {{ margenes().cantidad | number:'1.0-1' }}%</span>
         </div>
+      </div>
+
+      <div class="flex flex-col gap-1 max-w-40">
+        <label class="text-sm text-gray-700">Descuento %</label>
+        <p-inputNumber [ngModel]="producto.descuentoPct"
+                       (ngModelChange)="actualizarCampo('descuentoPct', $event ?? 0)"
+                       [min]="0" [max]="100" [maxFractionDigits]="2"
+                       styleClass="w-full" inputStyleClass="w-full" />
+        <span class="text-xs text-gray-500">Si es mayor a 0, pisa al descuento del pedido</span>
       </div>
     </div>
 

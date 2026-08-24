@@ -40,6 +40,17 @@ class PrecioTest {
     }
 
     @Test
+    @DisplayName("el descuento del articulo pisa al del pedido, no se acumulan")
+    void elDescuentoDelArticuloPisaAlDelPedido() {
+        producto.setDescuentoPct(new BigDecimal("20"));
+
+        BigDecimal precio = precios.para(TipoCuenta.CLIENTE)
+                .precioUnitario(producto, CondicionVenta.MINORISTA, new BigDecimal("10"));
+
+        assertThat(precio).isEqualByComparingTo("13040.00");
+    }
+
+    @Test
     @DisplayName("refuerzo y consumo se valorizan al costo y descartan el descuento")
     void valorizaAlCostoLasCuentasEspeciales() {
         for (TipoCuenta tipo : List.of(TipoCuenta.REFUERZO, TipoCuenta.CONSUMO)) {

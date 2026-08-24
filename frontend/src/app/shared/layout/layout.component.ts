@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { Location, NgTemplateOutlet } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
@@ -32,6 +32,7 @@ export class LayoutComponent {
 
   private readonly sesion = inject(SesionService);
   private readonly router = inject(Router);
+  private readonly ubicacion = inject(Location);
 
   readonly tutorial = inject(TutorialService);
   readonly marca = MARCA;
@@ -46,6 +47,7 @@ export class LayoutComponent {
     { etiqueta: 'Stock', icono: 'pi-box', ruta: '/stock' },
     { etiqueta: 'Cuentas corrientes', icono: 'pi-book', ruta: '/cuentas-corrientes' },
     { etiqueta: 'Remito proveedor', icono: 'pi-file', ruta: '/remito-proveedor' },
+    { etiqueta: 'Análisis comercial', icono: 'pi-chart-bar', ruta: '/analisis-comercial' },
     { etiqueta: 'Articulos', icono: 'pi-tag', ruta: '/articulos' },
     { etiqueta: 'Cuentas', icono: 'pi-users', ruta: '/cuentas' }
   ];
@@ -71,6 +73,15 @@ export class LayoutComponent {
 
   hayAyuda(): boolean {
     return this.tutorial.hayAyudaPara(this.rutaActual());
+  }
+
+  /** En el inicio no hay "atras" util: es la primera pantalla del flujo. */
+  hayAtras(): boolean {
+    return this.rutaActual() !== '/resumen' && this.rutaActual() !== '';
+  }
+
+  volverAtras(): void {
+    this.ubicacion.back();
   }
 
   salir(): void {

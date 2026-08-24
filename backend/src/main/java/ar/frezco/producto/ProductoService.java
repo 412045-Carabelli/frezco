@@ -80,6 +80,7 @@ public class ProductoService {
         producto.setPrecioMinorista(valorOCero(dto.precioMinorista()));
         producto.setPrecioMayorista(valorOCero(dto.precioMayorista()));
         producto.setPrecioCantidad(valorOCero(dto.precioCantidad()));
+        producto.setDescuentoPct(valorOCero(dto.descuentoPct()));
         producto.setActivo(dto.activo());
     }
 
