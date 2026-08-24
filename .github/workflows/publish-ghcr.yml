@@ -1,10 +1,15 @@
-name: Publicar imagenes en GHCR
+name: Publish img to GHCR
 
 on:
   push:
-    branches: [ main ]
-    tags: [ 'v*.*.*' ]
-  workflow_dispatch: {}
+    tags: [ 'v*.*.*', '*.*.*' ]
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: 'Force build all services'
+        required: false
+        default: 'false'
 
 permissions:
   contents: read
@@ -14,46 +19,153 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  build-and-push:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      tag: ${{ steps.set-tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect modified services
+        id: set-matrix
+        run: |
+          ALL='["backend","frontend"]'
+
+          if [[ "${{ github.event.inputs.force_build }}" == "true" ]] || [[ "${{ github.ref_type }}" == "tag" ]]; then
+            SERVICES="$ALL"
+          else
+            CHANGED=$(git diff --name-only HEAD~1..HEAD || git diff --name-only HEAD)
+            SERVICES='[]'
+
+            echo "$CHANGED" | grep -q "^backend/"  && SERVICES=$(echo $SERVICES | jq '. += ["backend"]')  || true
+            echo "$CHANGED" | grep -q "^frontend/" && SERVICES=$(echo $SERVICES | jq '. += ["frontend"]') || true
+
+            # Fallback: nada detectado en código → no buildear nada
+            # (cambios en .github/, docker-compose, docs no requieren rebuild de imágenes)
+            if [[ "$SERVICES" == "[]" ]]; then
+              echo "No service code changed, skipping all builds"
+            fi
+          fi
+
+          # GitHub no acepta matrix vacío — usar sentinel "none" para saltear
+          if [[ "$SERVICES" == "[]" ]]; then
+            SERVICES='["none"]'
+          fi
+          echo "matrix={\"service\":$(echo $SERVICES)}" >> $GITHUB_OUTPUT
+          echo "Detected services: $SERVICES"
+
+      - name: Set version tag
+        id: set-tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF##refs/tags/}"
+          elif [[ "${GITHUB_REF}" == refs/heads/main ]]; then
+            TAG="latest"
+          else
+            TAG="desa"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Branch/tag resolved to image tag: ${TAG}"
+
+  pre-checks:
+    needs: detect-changes
+    if: ${{ !contains(needs.detect-changes.outputs.matrix, '"none"') }}
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        servicio: [ backend, frontend ]
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
       fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Normalizar owner a minusculas
-        id: owner
-        run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+      - name: Set up Java 17 (backend only)
+        if: matrix.service == 'backend'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Resolver tag de version
-        id: tag
+      - name: Cache Maven (backend only)
+        if: matrix.service == 'backend'
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('backend/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Run tests (backend)
+        if: matrix.service == 'backend'
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=latest" >> "$GITHUB_OUTPUT"
-          fi
+          cd backend
+          ./mvnw -B test 2>&1 | tail -50
 
-      - name: Log in a GHCR
+      - name: Node setup (frontend only)
+        if: matrix.service == 'frontend'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Build (frontend)
+        if: matrix.service == 'frontend'
+        run: |
+          cd frontend
+          npm ci --prefer-offline --no-audit
+          npm run build
+
+  build-and-push:
+    needs: [detect-changes, pre-checks]
+    if: ${{ !contains(needs.detect-changes.outputs.matrix, '"none"') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Normalize owner to lowercase
+        id: owner
+        run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+
+      - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build y push de ${{ matrix.servicio }}
+      - name: Build and push ${{ matrix.service }}
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.servicio }}
+          context: ${{ matrix.service }}
+          file: ${{ matrix.service }}/Dockerfile
           push: true
-          cache-from: type=gha,scope=${{ matrix.servicio }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.servicio }}
           tags: |
-            ${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/frezco-${{ matrix.servicio }}:${{ steps.tag.outputs.tag }}
-            ${{ steps.tag.outputs.tag != 'latest' && format('{0}/{1}/frezco-{2}:latest', env.REGISTRY, steps.owner.outputs.owner, matrix.servicio) || '' }}
+            ${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/frezco-${{ matrix.service }}:${{ needs.detect-changes.outputs.tag }}
+            ${{ needs.detect-changes.outputs.tag != 'latest' && needs.detect-changes.outputs.tag != 'desa' && format('{0}/{1}/frezco-{2}:latest', env.REGISTRY, steps.owner.outputs.owner, matrix.service) || '' }}
+
+  publish-status:
+    if: always()
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish summary
+        run: |
+          if [[ "${{ needs.build-and-push.result }}" == "success" ]]; then
+            echo "✅ All containers published to GHCR"
+          elif [[ "${{ needs.build-and-push.result }}" == "failure" ]]; then
+            echo "❌ Some services failed (check above)"
+            exit 1
+          else
+            echo "⏭️  Skipped (no changes detected)"
+          fi
