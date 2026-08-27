@@ -24,7 +24,7 @@ public interface AnalisisRepository extends Repository<Pedido, Long> {
             WHERE ped.anulado = false AND c.tipo = ar.frezco.cuenta.TipoCuenta.CLIENTE
               AND ped.fecha BETWEEN :desde AND :hasta
             GROUP BY p.id, p.nombre
-            ORDER BY SUM(l.unidades * l.precioUnitario) DESC
+            ORDER BY SUM(l.unidades) DESC
             """)
     List<RankingProducto> porProducto(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta,
                                       Pageable pageable);

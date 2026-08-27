@@ -126,15 +126,17 @@ export const PASOS: Record<string, PasoTutorial[]> = {
     }
   ],
 
-  '/remito-proveedor': [
+  '/remitos': [
     {
-      titulo: 'Lo que hay que pedirle al proveedor',
-      texto: 'Elegí el período, por ejemplo la semana, y te arma la lista agrupada por día.'
+      titulo: 'Remitos de clientes y de proveedor',
+      texto: 'Una pestaña para ver e imprimir el remito de cada venta, otra con lo que hay que ' +
+        'pedirle al proveedor en un período.'
     },
     {
       titulo: 'Junta todo',
-      texto: 'Incluye lo que no tenías en stock de las ventas, los refuerzos y los consumos. ' +
-        'Con Imprimir lo mandás o lo guardás como PDF.',
+      texto: 'El remito de proveedor incluye lo que no tenías en stock de las ventas, los refuerzos ' +
+        'y los consumos, sumado por artículo en todo el período. Con Imprimir lo mandás o lo guardás ' +
+        'como PDF.',
       selector: '[data-tutorial="acciones-remito"]'
     }
   ],

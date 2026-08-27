@@ -29,7 +29,7 @@
           <tr>
             <td>{{ i + 1 }}. {{ fila.nombre }}</td>
             <td class="text-right">{{ fila.unidades | number:'1.0-2' }}</td>
-            <td class="text-right">{{ fila.importe | number:'1.2-2' }}</td>
+            <td class="text-right">$ {{ fila.importe | number:'1.2-2' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -54,7 +54,7 @@
           <tr>
             <td>{{ i + 1 }}. {{ fila.nombre }}</td>
             <td class="text-right">{{ fila.cantidadPedidos }}</td>
-            <td class="text-right">{{ fila.importe | number:'1.2-2' }}</td>
+            <td class="text-right">$ {{ fila.importe | number:'1.2-2' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -77,7 +77,7 @@
         <ng-template pTemplate="body" let-fila>
           <tr>
             <td>{{ fila.zona }}</td>
-            <td class="text-right">{{ fila.importe | number:'1.2-2' }}</td>
+            <td class="text-right">$ {{ fila.importe | number:'1.2-2' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

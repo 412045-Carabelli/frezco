@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, output, QueryList, signal, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -32,6 +32,9 @@ export class NuevoPedidoComponent {
 
   private readonly api = inject(ApiService);
   private readonly mensajes = inject(MessageService);
+
+  @ViewChildren('productoWrap') private productoWraps!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('unidadesWrap') private unidadesWraps!: QueryList<ElementRef<HTMLElement>>;
 
   /** El padre decide que hacer despues de guardar: cerrar el modal, refrescar, navegar. */
   readonly guardado = output<Pedido>();
@@ -89,6 +92,7 @@ export class NuevoPedidoComponent {
       ...lineas,
       { producto: null, unidades: 1, precioUnitario: 0, stockDisponible: 0 }
     ]);
+    this.enfocarProducto(this.lineas().length - 1);
   }
 
   quitarLinea(indice: number): void {
@@ -98,6 +102,14 @@ export class NuevoPedidoComponent {
   elegirProducto(indice: number, producto: Producto): void {
     this.actualizarLinea(indice, { producto });
     this.consultarPrecio(indice, producto);
+    this.enfocarUnidades(indice);
+  }
+
+  /** Enter en Unidades: si es la ultima linea, agrega una nueva y salta al articulo. */
+  onEnterUnidades(indice: number): void {
+    if (indice === this.lineas().length - 1) {
+      this.agregarLinea();
+    }
   }
 
   cambiarUnidades(indice: number, unidades: number): void {
@@ -149,6 +161,16 @@ export class NuevoPedidoComponent {
     });
   }
 
+  /** Deja el formulario listo para cargar el siguiente pedido sin cerrar la pantalla. */
+  reset(): void {
+    this.fecha.set(new Date());
+    this.cuenta.set(null);
+    this.condicion.set('MINORISTA');
+    this.descuentoPct.set(0);
+    this.observacion.set('');
+    this.lineas.set([]);
+  }
+
   private recalcularPrecios(): void {
     this.lineas().forEach((linea, indice) => {
       if (linea.producto) {
@@ -171,5 +193,18 @@ export class NuevoPedidoComponent {
   private actualizarLinea(indice: number, cambios: Partial<LineaEnEdicion>): void {
     this.lineas.update(lineas =>
       lineas.map((linea, i) => (i === indice ? { ...linea, ...cambios } : linea)));
+  }
+
+  private enfocarProducto(indice: number): void {
+    setTimeout(() => this.enfocarInput(this.productoWraps, indice));
+  }
+
+  private enfocarUnidades(indice: number): void {
+    setTimeout(() => this.enfocarInput(this.unidadesWraps, indice));
+  }
+
+  private enfocarInput(wraps: QueryList<ElementRef<HTMLElement>>, indice: number): void {
+    const wrap = wraps?.toArray()[indice];
+    wrap?.nativeElement.querySelector<HTMLInputElement>('input')?.focus();
   }
 }

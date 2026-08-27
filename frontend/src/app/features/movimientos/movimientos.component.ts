@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -12,8 +12,8 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
-import { aTexto, primerDiaDelMes } from '../../core/fechas';
-import { Cuenta, Movimiento, TipoMovimiento } from '../../core/modelos';
+import { aTexto } from '../../core/fechas';
+import { Cuenta, Movimiento, Saldo, TipoMovimiento } from '../../core/modelos';
 
 @Component({
   selector: 'app-movimientos',
@@ -35,7 +35,7 @@ export class MovimientosComponent {
   readonly cargando = signal(false);
   readonly guardando = signal(false);
 
-  readonly desde = signal<Date>(primerDiaDelMes());
+  readonly desde = signal<Date | null>(null);
   readonly hasta = signal<Date | null>(null);
 
   readonly fecha = signal<Date>(new Date());
@@ -46,6 +46,8 @@ export class MovimientosComponent {
   readonly saldoCuenta = signal<number | null>(null);
 
   readonly cuentasSugeridas = signal<Cuenta[]>([]);
+  readonly deudas = signal<Saldo[]>([]);
+  readonly saldoProveedor = signal<Saldo | null>(null);
   readonly tipos: { label: string; value: TipoMovimiento }[] = [
     { label: 'Cobro', value: 'COBRO' },
     { label: 'Pago', value: 'PAGO' }
@@ -60,8 +62,19 @@ export class MovimientosComponent {
     return this.tipo() === 'COBRO' ? cuenta.tipo === 'CLIENTE' : cuenta.tipo === 'PROVEEDOR';
   });
 
+  /** No se puede cobrar ni pagar mas de lo que la cuenta debe actualmente. */
+  readonly importeValido = computed(() => {
+    const saldo = this.saldoCuenta();
+    return saldo === null || this.importe() <= saldo;
+  });
+
   constructor() {
-    this.cargar();
+    effect(() => {
+      this.desde();
+      this.hasta();
+      this.cargar();
+    });
+    this.cargarDeudas();
   }
 
   cargar(): void {
@@ -94,6 +107,29 @@ export class MovimientosComponent {
     });
   }
 
+  /** Deudas pendientes: clientes que deben y el saldo del proveedor, para pagar/cobrar en un click. */
+  cargarDeudas(): void {
+    this.api.saldos('CLIENTE', true).subscribe(saldos =>
+      this.deudas.set(saldos.filter(s => s.saldo > 0)));
+    this.api.saldos('PROVEEDOR', true).subscribe(saldos =>
+      this.saldoProveedor.set(saldos.find(s => s.saldo > 0) ?? null));
+  }
+
+  /** Precarga el formulario con la cuenta y el saldo total, lista para confirmar. */
+  cobrarDeuda(saldo: Saldo): void {
+    this.tipo.set('COBRO');
+    this.elegirCuenta({ id: saldo.cuentaId, nombre: saldo.nombre, tipo: 'CLIENTE',
+      zona: null, descuentoPct: 0, activo: true });
+    this.importe.set(saldo.saldo);
+  }
+
+  pagarDeuda(saldo: Saldo): void {
+    this.tipo.set('PAGO');
+    this.elegirCuenta({ id: saldo.cuentaId, nombre: saldo.nombre, tipo: 'PROVEEDOR',
+      zona: null, descuentoPct: 0, activo: true });
+    this.importe.set(saldo.saldo);
+  }
+
   cambiarTipo(tipo: TipoMovimiento): void {
     this.tipo.set(tipo);
     this.cuenta.set(null);
@@ -108,6 +144,10 @@ export class MovimientosComponent {
     }
     if (!this.importe() || this.importe() <= 0) {
       this.mensajes.add({ severity: 'warn', summary: 'El importe tiene que ser mayor a cero' });
+      return;
+    }
+    if (!this.importeValido()) {
+      this.mensajes.add({ severity: 'warn', summary: 'El importe no puede superar la deuda actual' });
       return;
     }
 
@@ -125,6 +165,7 @@ export class MovimientosComponent {
         this.mensajes.add({ severity: 'success', summary: 'Movimiento registrado' });
         this.limpiar();
         this.cargar();
+        this.cargarDeudas();
       },
       error: respuesta => {
         this.guardando.set(false);
@@ -151,6 +192,7 @@ export class MovimientosComponent {
       next: () => {
         this.mensajes.add({ severity: 'success', summary: 'Movimiento borrado' });
         this.cargar();
+        this.cargarDeudas();
       },
       error: () => this.mensajes.add({ severity: 'error', summary: 'No se pudo borrar' })
     });

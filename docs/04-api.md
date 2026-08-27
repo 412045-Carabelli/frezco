@@ -176,6 +176,9 @@ DELETE /api/movimientos/{id}
 A diferencia de los pedidos, los movimientos **sí se pueden borrar**: son registros
 simples sin efectos derivados sobre stock.
 
+Un `COBRO`/`PAGO` cuyo `importe` supere el saldo actual (deuda) de la cuenta devuelve
+`409`.
+
 ---
 
 ## Stock
@@ -262,7 +265,8 @@ GET /api/remitos/proveedor               ?desde=&hasta=
 Devuelven JSON con los datos armados. El render y la impresión son responsabilidad del
 frontend. **No generar PDF en el backend.**
 
-Remito de proveedor:
+Remito de proveedor, consolidado por producto en todo el período (no se agrupa por
+fecha):
 
 ```json
 {
@@ -270,22 +274,20 @@ Remito de proveedor:
   "hasta": "2026-08-07",
   "proveedor": "Ercoli SRL",
   "totalPeriodo": 48500.00,
-  "dias": [
+  "lineas": [
     {
-      "fecha": "2026-08-05",
-      "subtotal": 23400.00,
-      "lineas": [
-        {
-          "producto": "Arándano 1kg",
-          "unidades": 2,
-          "costoUnitario": 11700.00,
-          "importe": 23400.00
-        }
-      ]
+      "producto": "Arándano 1kg",
+      "unidades": 5,
+      "costoUnitario": 11700.00,
+      "importe": 58500.00
     }
   ]
 }
 ```
+
+`costoUnitario` es un promedio (`importe / unidades`): si el costo cambió entre
+pedidos del período, cada línea original ya tiene su costo congelado, acá solo se
+agrega.
 
 ---
 
@@ -294,6 +296,9 @@ Remito de proveedor:
 ```
 GET /api/resumen                         ?desde=&hasta=
 ```
+
+Sin `desde`/`hasta`, calcula sobre todos los pedidos no anulados (sin acotar por
+fecha); la respuesta devuelve `desde`/`hasta` en `null` en ese caso.
 
 ```json
 {

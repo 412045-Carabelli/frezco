@@ -12,31 +12,28 @@ import java.util.List;
 public interface RemitoRepository extends Repository<PedidoLinea, Long> {
 
     /**
-     * Lineas a pedirle al proveedor en el periodo, de cualquier pedido. Se consolidan por
-     * fecha, producto y costo: dos pedidos del mismo dia con el mismo articulo salen en una
-     * sola linea. Si el costo cambio entre pedidos, salen separadas, que es lo correcto.
+     * Lineas a pedirle al proveedor en el periodo, de cualquier pedido, consolidadas por
+     * producto en todo el rango (sin separar por dia): una sola fila por articulo con el
+     * total de unidades y el importe acumulado.
      */
     @Query("""
-            SELECT ped.fecha AS fecha,
-                   p.nombre AS producto,
-                   l.costoUnitario AS costoUnitario,
-                   SUM(l.unidadesProveedor) AS unidades
+            SELECT p.nombre AS producto,
+                   SUM(l.unidadesProveedor) AS unidades,
+                   SUM(l.unidadesProveedor * l.costoUnitario) AS importe
             FROM PedidoLinea l JOIN l.pedido ped JOIN l.producto p
             WHERE ped.anulado = false AND l.unidadesProveedor > 0
               AND ped.fecha BETWEEN :desde AND :hasta
-            GROUP BY ped.fecha, p.nombre, l.costoUnitario
-            ORDER BY ped.fecha, p.nombre
+            GROUP BY p.nombre
+            ORDER BY p.nombre
             """)
-    List<LineaProveedor> lineasParaProveedor(@Param("desde") LocalDate desde,
-                                             @Param("hasta") LocalDate hasta);
+    List<LineaConsolidadaProveedor> lineasConsolidadasParaProveedor(@Param("desde") LocalDate desde,
+                                                                    @Param("hasta") LocalDate hasta);
 
-    interface LineaProveedor {
-        LocalDate getFecha();
-
+    interface LineaConsolidadaProveedor {
         String getProducto();
 
-        BigDecimal getCostoUnitario();
-
         BigDecimal getUnidades();
+
+        BigDecimal getImporte();
     }
 }

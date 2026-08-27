@@ -27,9 +27,7 @@ public class ResumenService {
     }
 
     public ResumenDTO calcular(LocalDate desde, LocalDate hasta) {
-        Periodo periodo = (desde == null && hasta == null)
-                ? Periodo.mesDe(LocalDate.now())
-                : Periodo.de(desde, hasta);
+        Periodo periodo = Periodo.de(desde, hasta);
 
         ResumenRepository.TotalesDeVenta totales =
                 repositorio.totalesDeVenta(periodo.desde(), periodo.hasta());
@@ -40,8 +38,8 @@ public class ResumenService {
         BigDecimal margen = ventas.subtract(costo);
 
         return new ResumenDTO(
-                periodo.desde(),
-                periodo.hasta(),
+                desde,
+                hasta,
                 ventas,
                 costo,
                 margen,

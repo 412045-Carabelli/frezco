@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
-import { aFecha, aTexto } from '../../core/fechas';
+import { aTexto } from '../../core/fechas';
 import { Resumen } from '../../core/modelos';
 
 @Component({
@@ -28,16 +28,12 @@ export class ResumenComponent {
     this.cargar();
   }
 
-  /** Sin fechas, el backend devuelve el mes en curso y de ahi salen los filtros. */
+  /** Sin fechas, el backend calcula sobre todos los pedidos, sin filtrar por periodo. */
   cargar(): void {
     this.cargando.set(true);
     this.api.resumen(aTexto(this.desde()), aTexto(this.hasta())).subscribe({
       next: resumen => {
         this.resumen.set(resumen);
-        if (!this.desde()) {
-          this.desde.set(aFecha(resumen.desde));
-          this.hasta.set(aFecha(resumen.hasta));
-        }
         this.cargando.set(false);
       },
       error: () => {
