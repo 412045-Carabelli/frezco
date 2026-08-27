@@ -98,6 +98,10 @@ Tomados de la operación real, sirven como tests:
 Cada cuenta tiene un estado de cuenta con movimientos en orden cronológico, columnas
 debe / haber y saldo acumulado.
 
+**Tope de cobros y pagos:** un `COBRO` no puede superar el saldo actual (deuda) de la
+cuenta `CLIENTE`, ni un `PAGO` el saldo actual de la cuenta `PROVEEDOR`. El backend lo
+rechaza con `409` si se intenta. Ver `MovimientoService.crear()`.
+
 ### Cuenta de tipo CLIENTE
 
 | Origen | Debe | Haber |
@@ -159,14 +163,16 @@ generan remito de cliente.
 
 ### Remito de proveedor
 
-Se emite por período (no por pedido), agrupado por fecha. Incluye **solo las líneas
-con `unidades_proveedor > 0`**, de cualquier pedido: ventas, refuerzos y consumos.
+Se emite por período (no por pedido), **consolidado por producto en todo el rango**
+(no se agrupa por fecha). Incluye **solo las líneas con `unidades_proveedor > 0`**, de
+cualquier pedido: ventas, refuerzos y consumos.
 
-Por cada línea: producto, `unidades_proveedor`, `costo_unitario`, importe.
-Subtotal por fecha y total general del período.
+Por cada producto del período: una sola línea con la suma de `unidades_proveedor`, el
+importe acumulado (`SUM(unidades_proveedor * costo_unitario)`) y un costo unitario
+promedio (`importe / unidades`). Total general del período.
 
-Si dos pedidos del mismo día piden el mismo producto, las líneas se consolidan en una
-sola con la suma de unidades.
+Todas las líneas del mismo producto en el rango `desde-hasta` se consolidan en una
+sola, sin importar de qué pedido ni de qué día vengan.
 
 ---
 
@@ -188,7 +194,8 @@ disponible, el excedente va a `unidades_proveedor`.
 ## 6. Resumen (dashboard)
 
 Todos los indicadores sobre pedidos con `anulado = 0`, filtrados por el período
-seleccionado (por defecto el mes en curso).
+seleccionado. Sin filtro (pantalla recién abierta), se calculan sobre todos los
+pedidos, sin acotar por fecha.
 
 | Indicador | Cálculo |
 |---|---|

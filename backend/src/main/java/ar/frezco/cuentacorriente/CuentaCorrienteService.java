@@ -86,6 +86,11 @@ public class CuentaCorrienteService {
         return saldoDe(proveedor, estrategiaPara(TipoCuenta.PROVEEDOR), Periodo.de(null, null));
     }
 
+    /** Saldo actual (histórico completo) de una cuenta puntual. */
+    public BigDecimal saldoActual(Cuenta cuenta) {
+        return saldoDe(cuenta, estrategiaPara(cuenta.getTipo()), Periodo.de(null, null));
+    }
+
     private BigDecimal saldoPrevio(Cuenta cuenta, EstrategiaCuentaCorriente estrategia, Periodo periodo) {
         if (periodo.sinInicio()) {
             return BigDecimal.ZERO;

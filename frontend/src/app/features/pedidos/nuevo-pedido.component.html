@@ -46,7 +46,7 @@
     @for (linea of lineas(); track $index) {
       <div class="tarjeta p-3 flex flex-col gap-2">
         <div class="flex items-start gap-2">
-          <div class="flex-1 flex flex-col gap-1">
+          <div class="flex-1 flex flex-col gap-1" #productoWrap>
             <label class="text-sm text-gray-700">Articulo</label>
             <p-autoComplete [ngModel]="linea.producto" (completeMethod)="buscarProductos($event)"
                             (onSelect)="elegirProducto($index, $event.value)"
@@ -59,20 +59,21 @@
         </div>
 
         <div class="grid grid-cols-3 gap-2 items-end">
-          <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-1" #unidadesWrap>
             <label class="text-sm text-gray-700">Unidades</label>
             <p-inputNumber [ngModel]="linea.unidades" (ngModelChange)="cambiarUnidades($index, $event)"
+                           (keydown.enter)="onEnterUnidades($index)"
                            [showButtons]="true" [min]="0" [maxFractionDigits]="2"
                            inputmode="decimal" styleClass="w-full" inputStyleClass="w-full text-center" />
           </div>
           <div class="flex flex-col gap-1">
             <span class="text-sm text-gray-700">Precio</span>
-            <span class="py-2">{{ linea.precioUnitario | number:'1.2-2' }}</span>
+            <span class="py-2">$ {{ linea.precioUnitario | number:'1.2-2' }}</span>
           </div>
           <div class="flex flex-col gap-1">
             <span class="text-sm text-gray-700">Importe</span>
             <span class="py-2 font-medium">
-              {{ linea.unidades * linea.precioUnitario | number:'1.2-2' }}
+              $ {{ linea.unidades * linea.precioUnitario | number:'1.2-2' }}
             </span>
           </div>
         </div>

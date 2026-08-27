@@ -4,9 +4,11 @@ import ar.frezco.config.ExcepcionesNegocio;
 import ar.frezco.config.Periodo;
 import ar.frezco.cuenta.Cuenta;
 import ar.frezco.cuenta.CuentaService;
+import ar.frezco.cuentacorriente.CuentaCorrienteService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,10 +18,13 @@ public class MovimientoService {
 
     private final MovimientoRepository repositorio;
     private final CuentaService cuentas;
+    private final CuentaCorrienteService cuentasCorrientes;
 
-    public MovimientoService(MovimientoRepository repositorio, CuentaService cuentas) {
+    public MovimientoService(MovimientoRepository repositorio, CuentaService cuentas,
+                             CuentaCorrienteService cuentasCorrientes) {
         this.repositorio = repositorio;
         this.cuentas = cuentas;
+        this.cuentasCorrientes = cuentasCorrientes;
     }
 
     public List<MovimientoDTO> listar(LocalDate desde, LocalDate hasta, Long cuentaId,
@@ -37,6 +42,7 @@ public class MovimientoService {
     public MovimientoDTO crear(MovimientoDTO dto) {
         Cuenta cuenta = cuentas.obtener(dto.cuentaId());
         validarCombinacion(cuenta, dto.tipo());
+        validarTope(cuenta, dto.importe());
 
         Movimiento movimiento = new Movimiento();
         movimiento.setFecha(dto.fecha());
@@ -71,6 +77,16 @@ public class MovimientoService {
             throw new ExcepcionesNegocio.Conflicto(
                     "No se puede registrar un %s en una cuenta de tipo %s"
                             .formatted(tipo.name().toLowerCase(), cuenta.getTipo()));
+        }
+    }
+
+    /** No se puede cobrar ni pagar más de lo que la cuenta debe actualmente. */
+    private void validarTope(Cuenta cuenta, BigDecimal importe) {
+        BigDecimal saldoActual = cuentasCorrientes.saldoActual(cuenta);
+        if (importe.compareTo(saldoActual) > 0) {
+            throw new ExcepcionesNegocio.Conflicto(
+                    "El importe (%s) supera la deuda actual de la cuenta (%s)"
+                            .formatted(importe, saldoActual));
         }
     }
 }

@@ -25,42 +25,35 @@
       </div>
     </header>
 
-    @for (dia of datos.dias; track dia.fecha) {
-      <section class="mb-4">
-        <p class="text-sm font-semibold text-gray-700 mb-1">{{ dia.fecha }}</p>
-        <table class="w-full text-sm">
-          <thead>
-          <tr class="border-b border-gray-300 text-left">
-            <th class="py-1">Articulo</th>
-            <th class="py-1 text-right">Unid.</th>
-            <th class="py-1 text-right">Costo</th>
-            <th class="py-1 text-right">Importe</th>
+    <table class="w-full text-sm">
+      <thead>
+      <tr class="border-b border-gray-300 text-left">
+        <th class="py-1">Articulo</th>
+        <th class="py-1 text-right">Unid.</th>
+        <th class="py-1 text-right">Costo</th>
+        <th class="py-1 text-right">Importe</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (linea of datos.lineas; track linea.producto) {
+          <tr class="border-b border-gray-100">
+            <td class="py-1">{{ linea.producto }}</td>
+            <td class="py-1 text-right">{{ linea.unidades | number:'1.0-2' }}</td>
+            <td class="py-1 text-right">$ {{ linea.costoUnitario | number:'1.2-2' }}</td>
+            <td class="py-1 text-right">$ {{ linea.importe | number:'1.2-2' }}</td>
           </tr>
-          </thead>
-          <tbody>
-            @for (linea of dia.lineas; track linea.producto) {
-              <tr class="border-b border-gray-100">
-                <td class="py-1">{{ linea.producto }}</td>
-                <td class="py-1 text-right">{{ linea.unidades | number:'1.0-2' }}</td>
-                <td class="py-1 text-right">{{ linea.costoUnitario | number:'1.2-2' }}</td>
-                <td class="py-1 text-right">{{ linea.importe | number:'1.2-2' }}</td>
-              </tr>
-            }
-          </tbody>
-          <tfoot>
+        } @empty {
           <tr>
-            <td colspan="3" class="py-1 text-right text-gray-500">Subtotal del dia</td>
-            <td class="py-1 text-right">{{ dia.subtotal | number:'1.2-2' }}</td>
+            <td colspan="4" class="py-3 text-center text-gray-500">
+              No hay mercaderia para pedir en el periodo.
+            </td>
           </tr>
-          </tfoot>
-        </table>
-      </section>
-    } @empty {
-      <p class="text-gray-500 text-sm">No hay mercaderia para pedir en el periodo.</p>
-    }
+        }
+      </tbody>
+    </table>
 
-    <p class="text-right font-semibold border-t border-gray-300 pt-3">
-      Total del periodo: {{ datos.totalPeriodo | number:'1.2-2' }}
+    <p class="text-right font-semibold border-t border-gray-300 pt-3 mt-3">
+      Total del periodo: $ {{ datos.totalPeriodo | number:'1.2-2' }}
     </p>
   </article>
 }

@@ -11,11 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -58,32 +57,23 @@ public class RemitoService {
                 pedido.getCuenta().getNombre(), pedido.getObservacion(), total, lineas);
     }
 
-    /** Remito de proveedor: por periodo, agrupado por fecha, con subtotal por dia. */
+    /** Remito de proveedor: por periodo, consolidado por producto (sin separar por dia). */
     public RemitoProveedorDTO deProveedor(LocalDate desde, LocalDate hasta) {
         Periodo periodo = Periodo.de(desde, hasta);
 
-        Map<LocalDate, List<RemitoProveedorDTO.LineaDTO>> porFecha = new LinkedHashMap<>();
+        List<RemitoProveedorDTO.LineaDTO> lineas = new ArrayList<>();
         BigDecimal totalPeriodo = BigDecimal.ZERO;
 
-        for (RemitoRepository.LineaProveedor fila
-                : repositorio.lineasParaProveedor(periodo.desde(), periodo.hasta())) {
-            BigDecimal importe = fila.getUnidades().multiply(fila.getCostoUnitario());
+        for (RemitoRepository.LineaConsolidadaProveedor fila
+                : repositorio.lineasConsolidadasParaProveedor(periodo.desde(), periodo.hasta())) {
+            BigDecimal importe = fila.getImporte();
+            BigDecimal costoUnitario = importe.divide(fila.getUnidades(), 2, RoundingMode.HALF_UP);
             totalPeriodo = totalPeriodo.add(importe);
-            porFecha.computeIfAbsent(fila.getFecha(), fecha -> new ArrayList<>())
-                    .add(new RemitoProveedorDTO.LineaDTO(fila.getProducto(), fila.getUnidades(),
-                            fila.getCostoUnitario(), importe));
+            lineas.add(new RemitoProveedorDTO.LineaDTO(fila.getProducto(), fila.getUnidades(),
+                    costoUnitario, importe));
         }
 
-        List<RemitoProveedorDTO.DiaDTO> dias = porFecha.entrySet().stream()
-                .map(entrada -> new RemitoProveedorDTO.DiaDTO(
-                        entrada.getKey(),
-                        entrada.getValue().stream()
-                                .map(RemitoProveedorDTO.LineaDTO::importe)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add),
-                        entrada.getValue()))
-                .toList();
-
         return new RemitoProveedorDTO(periodo.desde(), periodo.hasta(),
-                cuentas.obtenerPorTipo(TipoCuenta.PROVEEDOR).getNombre(), totalPeriodo, dias);
+                cuentas.obtenerPorTipo(TipoCuenta.PROVEEDOR).getNombre(), totalPeriodo, lineas);
     }
 }

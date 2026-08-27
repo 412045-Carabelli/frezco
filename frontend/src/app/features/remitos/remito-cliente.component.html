@@ -31,15 +31,15 @@
           <tr class="border-b border-gray-100">
             <td class="py-2">{{ linea.producto }}</td>
             <td class="py-2 text-right">{{ linea.unidades | number:'1.0-2' }}</td>
-            <td class="py-2 text-right">{{ linea.precioUnitario | number:'1.2-2' }}</td>
-            <td class="py-2 text-right">{{ linea.importe | number:'1.2-2' }}</td>
+            <td class="py-2 text-right">$ {{ linea.precioUnitario | number:'1.2-2' }}</td>
+            <td class="py-2 text-right">$ {{ linea.importe | number:'1.2-2' }}</td>
           </tr>
         }
       </tbody>
       <tfoot>
       <tr>
         <td colspan="3" class="py-3 text-right font-semibold">Total</td>
-        <td class="py-3 text-right font-semibold">{{ datos.total | number:'1.2-2' }}</td>
+        <td class="py-3 text-right font-semibold">$ {{ datos.total | number:'1.2-2' }}</td>
       </tr>
       </tfoot>
     </table>

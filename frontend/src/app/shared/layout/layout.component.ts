@@ -46,7 +46,7 @@ export class LayoutComponent {
     { etiqueta: 'Cobros y pagos', icono: 'pi-wallet', ruta: '/movimientos' },
     { etiqueta: 'Stock', icono: 'pi-box', ruta: '/stock' },
     { etiqueta: 'Cuentas corrientes', icono: 'pi-book', ruta: '/cuentas-corrientes' },
-    { etiqueta: 'Remito proveedor', icono: 'pi-file', ruta: '/remito-proveedor' },
+    { etiqueta: 'Remitos', icono: 'pi-file', ruta: '/remitos' },
     { etiqueta: 'Análisis comercial', icono: 'pi-chart-bar', ruta: '/analisis-comercial' },
     { etiqueta: 'Articulos', icono: 'pi-tag', ruta: '/articulos' },
     { etiqueta: 'Cuentas', icono: 'pi-users', ruta: '/cuentas' }

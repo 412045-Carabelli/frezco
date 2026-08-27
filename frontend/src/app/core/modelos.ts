@@ -134,11 +134,7 @@ export interface RemitoProveedor {
   hasta: string;
   proveedor: string;
   totalPeriodo: number;
-  dias: {
-    fecha: string;
-    subtotal: number;
-    lineas: { producto: string; unidades: number; costoUnitario: number; importe: number }[];
-  }[];
+  lineas: { producto: string; unidades: number; costoUnitario: number; importe: number }[];
 }
 
 export interface Resumen {

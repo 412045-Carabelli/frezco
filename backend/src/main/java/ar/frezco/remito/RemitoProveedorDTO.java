@@ -9,10 +9,7 @@ public record RemitoProveedorDTO(
         LocalDate hasta,
         String proveedor,
         BigDecimal totalPeriodo,
-        List<DiaDTO> dias) {
-
-    public record DiaDTO(LocalDate fecha, BigDecimal subtotal, List<LineaDTO> lineas) {
-    }
+        List<LineaDTO> lineas) {
 
     public record LineaDTO(
             String producto,

@@ -1,8 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
+import { DialogModule } from 'primeng/dialog';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -15,7 +18,8 @@ import { Cuenta, CuentaCorriente, Saldo } from '../../core/modelos';
   selector: 'app-cuentas-corrientes',
   standalone: true,
   imports: [
-    FormsModule, DecimalPipe, ButtonModule, DatePickerModule, MessageModule, SelectModule, TableModule
+    FormsModule, DecimalPipe, ButtonModule, DatePickerModule, DialogModule, InputNumberModule,
+    InputTextModule, MessageModule, SelectModule, TableModule
   ],
   templateUrl: './cuentas-corrientes.component.html'
 })
@@ -33,6 +37,22 @@ export class CuentasCorrientesComponent {
 
   readonly saldosClientes = signal<Saldo[]>([]);
   readonly saldoProveedor = signal<Saldo | null>(null);
+
+  readonly lineasConMes = computed(() =>
+    (this.estado()?.lineas ?? []).map(linea => ({ ...linea, mesLabel: this.mesLabelDe(linea.fecha) })));
+
+  /** Cuenta actualmente vista, si admite cancelar deuda (CLIENTE o PROVEEDOR con saldo != 0). */
+  readonly puedePagarCobrar = computed(() => {
+    const estado = this.estado();
+    return !!estado && estado.saldoFinal !== 0
+      && (estado.cuenta.tipo === 'CLIENTE' || estado.cuenta.tipo === 'PROVEEDOR');
+  });
+
+  readonly dialogoAbierto = signal(false);
+  readonly fechaPago = signal<Date>(new Date());
+  readonly importePago = signal<number>(0);
+  readonly observacionPago = signal('');
+  readonly guardandoPago = signal(false);
 
   constructor() {
     this.api.cuentas(undefined, undefined, true).subscribe(cuentas => this.cuentas.set(cuentas));
@@ -68,6 +88,65 @@ export class CuentasCorrientesComponent {
         });
       }
     });
+  }
+
+  abrirPagoCobro(): void {
+    const estado = this.estado();
+    if (!estado) {
+      return;
+    }
+    this.fechaPago.set(new Date());
+    this.importePago.set(Math.abs(estado.saldoFinal));
+    this.observacionPago.set('');
+    this.dialogoAbierto.set(true);
+  }
+
+  cerrarPagoCobro(): void {
+    this.dialogoAbierto.set(false);
+  }
+
+  confirmarPagoCobro(): void {
+    const estado = this.estado();
+    if (!estado) {
+      return;
+    }
+
+    this.guardandoPago.set(true);
+    this.api.crearMovimiento({
+      id: null,
+      fecha: aTexto(this.fechaPago())!,
+      tipo: estado.cuenta.tipo === 'CLIENTE' ? 'COBRO' : 'PAGO',
+      cuentaId: estado.cuenta.id,
+      importe: this.importePago(),
+      observacion: this.observacionPago() || null
+    }).subscribe({
+      next: () => {
+        this.guardandoPago.set(false);
+        this.dialogoAbierto.set(false);
+        this.mensajes.add({ severity: 'success', summary: 'Movimiento registrado' });
+        this.consultar();
+        this.cargarSaldos();
+      },
+      error: respuesta => {
+        this.guardandoPago.set(false);
+        this.mensajes.add({
+          severity: 'error',
+          summary: respuesta.error?.mensaje ?? 'No se pudo registrar el movimiento'
+        });
+      }
+    });
+  }
+
+  subtotalMes(mesLabel: string, campo: 'debe' | 'haber'): number {
+    return this.lineasConMes()
+      .filter(linea => linea.mesLabel === mesLabel)
+      .reduce((suma, linea) => suma + linea[campo], 0);
+  }
+
+  private mesLabelDe(fecha: string): string {
+    const etiqueta = new Date(fecha + 'T00:00:00')
+      .toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+    return etiqueta.charAt(0).toUpperCase() + etiqueta.slice(1);
   }
 
   private cargarSaldos(): void {

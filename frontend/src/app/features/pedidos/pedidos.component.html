@@ -26,7 +26,6 @@
                     inputId="anulados" />
     <label for="anulados" class="text-sm text-gray-700">Incluir anulados</label>
   </div>
-  <p-button label="Filtrar" icon="pi pi-filter" severity="secondary" (onClick)="cargar()" />
 </div>
 
 <p-table data-tutorial="tabla-pedidos" [value]="pedidos()" [loading]="cargando()" [paginator]="pedidos().length > 25" [rows]="25"
@@ -48,7 +47,7 @@
       <td>{{ pedido.fecha }}</td>
       <td>{{ pedido.cuenta.nombre }}</td>
       <td class="text-gray-500">{{ pedido.cuenta.tipo === 'CLIENTE' ? pedido.condicion : '-' }}</td>
-      <td class="text-right">{{ pedido.total | number:'1.2-2' }}</td>
+      <td class="text-right">$ {{ pedido.total | number:'1.2-2' }}</td>
       <td class="text-right whitespace-nowrap">
         <p-button icon="pi pi-eye" severity="secondary" [text]="true" size="small"
                   (onClick)="verDetalle(pedido)" ariaLabel="Ver detalle" />
@@ -96,8 +95,8 @@
         <tr>
           <td>{{ linea.productoNombre }}</td>
           <td class="text-right">{{ linea.unidades | number:'1.0-2' }}</td>
-          <td class="text-right">{{ linea.precioUnitario | number:'1.2-2' }}</td>
-          <td class="text-right">{{ linea.importe | number:'1.2-2' }}</td>
+          <td class="text-right">$ {{ linea.precioUnitario | number:'1.2-2' }}</td>
+          <td class="text-right">$ {{ linea.importe | number:'1.2-2' }}</td>
           <td class="text-right">{{ linea.salidaStock | number:'1.0-2' }}</td>
           <td class="text-right">{{ linea.unidadesProveedor | number:'1.0-2' }}</td>
         </tr>
@@ -105,9 +104,9 @@
     </p-table>
 
     <div class="flex justify-end gap-6 mt-3 text-sm">
-      <span>Total <strong>{{ pedido.total | number:'1.2-2' }}</strong></span>
-      <span class="text-gray-500">Costo {{ pedido.totalCosto | number:'1.2-2' }}</span>
-      <span class="text-gray-500">Margen {{ pedido.margen | number:'1.2-2' }}</span>
+      <span>Total <strong>$ {{ pedido.total | number:'1.2-2' }}</strong></span>
+      <span class="text-gray-500">Costo $ {{ pedido.totalCosto | number:'1.2-2' }}</span>
+      <span class="text-gray-500">Margen $ {{ pedido.margen | number:'1.2-2' }}</span>
     </div>
   </p-dialog>
 }
@@ -116,13 +115,13 @@
   <p-dialog [visible]="true" (visibleChange)="cerrarNuevoPedido()" [modal]="true"
             [style]="{ width: '52rem' }" [breakpoints]="{ '960px': '92vw', '640px': '100vw' }"
             header="Nuevo pedido">
-    <app-nuevo-pedido #formNuevoPedido (guardado)="alGuardarPedido($event)" />
+    <app-nuevo-pedido #formNuevoPedido (guardado)="alGuardarPedido()" />
 
     <ng-template pTemplate="footer">
       <div data-tutorial="pie-total" class="flex items-center gap-3 w-full">
         <div class="flex-1 text-left">
           <p class="text-xs text-gray-500 m-0">Total</p>
-          <p class="text-lg font-semibold m-0">{{ formNuevoPedido.total() | number:'1.2-2' }}</p>
+          <p class="text-lg font-semibold m-0">$ {{ formNuevoPedido.total() | number:'1.2-2' }}</p>
         </div>
         <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrarNuevoPedido()" />
         <p-button label="Guardar" icon="pi pi-check" [loading]="formNuevoPedido.guardando()"

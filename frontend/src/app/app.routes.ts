@@ -28,10 +28,9 @@ export const routes: Routes = [
           import('./features/remitos/remito-cliente.component').then(c => c.RemitoClienteComponent)
       },
       {
-        path: 'remito-proveedor',
+        path: 'remitos',
         loadComponent: () =>
-          import('./features/remitos/remito-proveedor.component')
-            .then(c => c.RemitoProveedorComponent)
+          import('./features/remitos/remitos.component').then(c => c.RemitosComponent)
       },
       {
         path: 'stock',

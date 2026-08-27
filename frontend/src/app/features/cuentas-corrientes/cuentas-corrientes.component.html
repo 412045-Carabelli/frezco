@@ -8,7 +8,7 @@
         <li class="flex justify-between py-1.5 cursor-pointer hover:bg-gray-50"
             (click)="elegirCuenta(saldo.cuentaId)">
           <span>{{ saldo.nombre }}</span>
-          <span class="font-medium">{{ saldo.saldo | number:'1.2-2' }}</span>
+          <span class="font-medium">$ {{ saldo.saldo | number:'1.2-2' }}</span>
         </li>
       } @empty {
         <li class="py-1.5 text-gray-500">Nadie debe nada.</li>
@@ -22,7 +22,7 @@
       <p class="text-sm cursor-pointer" (click)="elegirCuenta(proveedor.cuentaId)">
         {{ proveedor.nombre }}
       </p>
-      <p class="text-2xl font-semibold mt-1">{{ proveedor.saldo | number:'1.2-2' }}</p>
+      <p class="text-2xl font-semibold mt-1">$ {{ proveedor.saldo | number:'1.2-2' }}</p>
       <p class="text-xs text-gray-500">saldo a pagar</p>
     }
   </section>
@@ -48,6 +48,10 @@
   @if (estado()) {
     <p-button label="Imprimir" icon="pi pi-print" (onClick)="imprimir()" />
   }
+  @if (puedePagarCobrar()) {
+    <p-button [label]="estado()!.cuenta.tipo === 'CLIENTE' ? 'Cobrar' : 'Pagar'"
+              icon="pi pi-dollar" severity="success" (onClick)="abrirPagoCobro()" />
+  }
 </div>
 
 @if (estado(); as cuenta) {
@@ -58,7 +62,8 @@
                text="Vista informativa: estos importes ya estan incluidos en el saldo del proveedor." />
   }
 
-  <p-table [value]="cuenta.lineas" styleClass="tarjeta overflow-hidden">
+  <p-table [value]="lineasConMes()" styleClass="tarjeta overflow-hidden"
+           rowGroupMode="subheader" groupRowsBy="mesLabel">
     <ng-template pTemplate="header">
       <tr>
         <th>Fecha</th>
@@ -70,23 +75,42 @@
       </tr>
     </ng-template>
 
+    <ng-template pTemplate="groupheader" let-linea>
+      <tr class="bg-gray-50">
+        <td colspan="6" class="font-medium text-gray-600">{{ linea.mesLabel }}</td>
+      </tr>
+    </ng-template>
+
     <ng-template pTemplate="body" let-linea>
       <tr>
         <td>{{ linea.fecha }}</td>
         <td class="text-gray-500">{{ linea.origen }}</td>
         <td>{{ linea.detalle }}</td>
-        <td class="text-right">{{ linea.debe | number:'1.2-2' }}</td>
-        <td class="text-right">{{ linea.haber | number:'1.2-2' }}</td>
-        <td class="text-right font-medium">{{ linea.saldo | number:'1.2-2' }}</td>
+        <td class="text-right">$ {{ linea.debe | number:'1.2-2' }}</td>
+        <td class="text-right">$ {{ linea.haber | number:'1.2-2' }}</td>
+        <td class="text-right font-medium">$ {{ linea.saldo | number:'1.2-2' }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="groupfooter" let-linea>
+      <tr class="bg-gray-50">
+        <td colspan="3" class="text-right text-gray-600">Subtotal {{ linea.mesLabel }}</td>
+        <td class="text-right text-gray-600">
+          $ {{ subtotalMes(linea.mesLabel, 'debe') | number:'1.2-2' }}
+        </td>
+        <td class="text-right text-gray-600">
+          $ {{ subtotalMes(linea.mesLabel, 'haber') | number:'1.2-2' }}
+        </td>
+        <td></td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="3" class="text-right font-medium">Totales</td>
-        <td class="text-right font-medium">{{ cuenta.totalDebe | number:'1.2-2' }}</td>
-        <td class="text-right font-medium">{{ cuenta.totalHaber | number:'1.2-2' }}</td>
-        <td class="text-right font-semibold">{{ cuenta.saldoFinal | number:'1.2-2' }}</td>
+        <td class="text-right font-medium">$ {{ cuenta.totalDebe | number:'1.2-2' }}</td>
+        <td class="text-right font-medium">$ {{ cuenta.totalHaber | number:'1.2-2' }}</td>
+        <td class="text-right font-semibold">$ {{ cuenta.saldoFinal | number:'1.2-2' }}</td>
       </tr>
     </ng-template>
 
@@ -96,4 +120,30 @@
       </tr>
     </ng-template>
   </p-table>
+}
+
+@if (dialogoAbierto()) {
+  <p-dialog [visible]="true" (visibleChange)="cerrarPagoCobro()" [modal]="true"
+            [style]="{ width: '28rem' }" [header]="estado()!.cuenta.tipo === 'CLIENTE' ? 'Cobrar' : 'Pagar'">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Fecha</label>
+        <p-datepicker [ngModel]="fechaPago()" (ngModelChange)="fechaPago.set($event)" dateFormat="dd/mm/yy" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Importe</label>
+        <p-inputNumber [ngModel]="importePago()" (ngModelChange)="importePago.set($event)"
+                       mode="decimal" [minFractionDigits]="2" [prefix]="'$ '" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Observacion</label>
+        <input pInputText [ngModel]="observacionPago()" (ngModelChange)="observacionPago.set($event)" />
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrarPagoCobro()" />
+      <p-button label="Confirmar" icon="pi pi-check" [loading]="guardandoPago()"
+                (onClick)="confirmarPagoCobro()" />
+    </ng-template>
+  </p-dialog>
 }

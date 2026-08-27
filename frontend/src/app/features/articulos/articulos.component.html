@@ -26,10 +26,10 @@
     <tr [class.opacity-50]="!producto.activo">
       <td>{{ producto.nombre }}</td>
       <td class="text-gray-500">{{ producto.categoria }}</td>
-      <td class="text-right">{{ producto.costo | number:'1.2-2' }}</td>
-      <td class="text-right">{{ producto.precioMinorista | number:'1.2-2' }}</td>
-      <td class="text-right">{{ producto.precioMayorista | number:'1.2-2' }}</td>
-      <td class="text-right">{{ producto.precioCantidad | number:'1.2-2' }}</td>
+      <td class="text-right">$ {{ producto.costo | number:'1.2-2' }}</td>
+      <td class="text-right">$ {{ producto.precioMinorista | number:'1.2-2' }}</td>
+      <td class="text-right">$ {{ producto.precioMayorista | number:'1.2-2' }}</td>
+      <td class="text-right">$ {{ producto.precioCantidad | number:'1.2-2' }}</td>
       <td class="text-right">{{ producto.descuentoPct | number:'1.0-2' }}</td>
       <td class="text-right whitespace-nowrap">
         <p-button icon="pi pi-pencil" severity="secondary" [text]="true" size="small"
@@ -86,7 +86,7 @@
       <div class="flex flex-col gap-1">
         <label class="text-sm text-gray-700">Costo</label>
         <p-inputNumber [ngModel]="producto.costo" (ngModelChange)="actualizarCampo('costo', $event)"
-                       mode="decimal" [minFractionDigits]="2"
+                       mode="decimal" [minFractionDigits]="2" [prefix]="'$ '"
                        styleClass="w-full" inputStyleClass="w-full" />
       </div>
 
@@ -95,7 +95,7 @@
           <label class="text-sm text-gray-700">Minorista</label>
           <p-inputNumber [ngModel]="producto.precioMinorista"
                          (ngModelChange)="actualizarCampo('precioMinorista', $event)"
-                         mode="decimal" [minFractionDigits]="2"
+                         mode="decimal" [minFractionDigits]="2" [prefix]="'$ '"
                          styleClass="w-full" inputStyleClass="w-full" />
           <span class="text-xs text-gray-500">Margen {{ margenes().minorista | number:'1.0-1' }}%</span>
         </div>
@@ -103,7 +103,7 @@
           <label class="text-sm text-gray-700">Mayorista</label>
           <p-inputNumber [ngModel]="producto.precioMayorista"
                          (ngModelChange)="actualizarCampo('precioMayorista', $event)"
-                         mode="decimal" [minFractionDigits]="2"
+                         mode="decimal" [minFractionDigits]="2" [prefix]="'$ '"
                          styleClass="w-full" inputStyleClass="w-full" />
           <span class="text-xs text-gray-500">Margen {{ margenes().mayorista | number:'1.0-1' }}%</span>
         </div>
@@ -111,7 +111,7 @@
           <label class="text-sm text-gray-700">Por cantidad</label>
           <p-inputNumber [ngModel]="producto.precioCantidad"
                          (ngModelChange)="actualizarCampo('precioCantidad', $event)"
-                         mode="decimal" [minFractionDigits]="2"
+                         mode="decimal" [minFractionDigits]="2" [prefix]="'$ '"
                          styleClass="w-full" inputStyleClass="w-full" />
           <span class="text-xs text-gray-500">Margen {{ margenes().cantidad | number:'1.0-1' }}%</span>
         </div>

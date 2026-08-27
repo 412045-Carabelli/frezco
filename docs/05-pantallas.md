@@ -13,7 +13,8 @@ Pedidos          <- pantalla principal
 Cobros y pagos
 Stock
 Cuentas corrientes
-Remito proveedor
+Remitos
+Análisis comercial
 Artículos
 Cuentas
 ```
@@ -66,15 +67,18 @@ tapada por el teclado.
 
 ### Al guardar
 
-`POST /api/pedidos`. Si sale bien, navegar directo al remito de cliente del pedido
-recién creado. Ese es el flujo natural: cargo la venta, mando el remito.
+`POST /api/pedidos`. Si sale bien, el formulario se limpia y queda listo para cargar el
+siguiente pedido, sin navegar a ningún lado. El remito se consulta después desde el
+módulo Remitos.
 
 ---
 
 ## 2. Listado de pedidos
 
 Tabla con filtro de período y de cuenta. Columnas: número, fecha, cuenta, condición,
-total, estado.
+total, estado. Sin filtro de fecha por defecto: muestra todos los pedidos. Cualquier
+cambio en los filtros (fecha, cuenta, incluir anulados) refiltra automáticamente, sin
+botón "Filtrar".
 
 Acciones por fila: ver detalle, ver remito, anular (con confirmación).
 
@@ -83,10 +87,20 @@ activo.
 
 ---
 
-## 3. Remito de cliente
+## 3. Remitos
 
-Vista de impresión. Encabezado con nombre del negocio, número de comprobante, fecha y
-cliente. Tabla de líneas con unidades, precio unitario e importe. Total al pie.
+Módulo con dos pestañas, "Clientes" y "Proveedor". Reemplaza el antiguo ítem de menú
+"Remito proveedor".
+
+### Pestaña Clientes
+
+Listado de pedidos de venta en el período (filtro de fecha y cuenta, columnas
+ordenables), cada uno con un botón "Ver / Imprimir" que abre el remito de ese pedido.
+
+### Remito de cliente (vista de impresión)
+
+Encabezado con nombre del negocio, número de comprobante, fecha y cliente. Tabla de
+líneas con unidades, precio unitario e importe. Total al pie.
 
 Botón "Imprimir" que dispara `window.print()`.
 
@@ -96,16 +110,15 @@ fijo, márgenes de página. **No usar librerías de PDF.**
 En mobile, el usuario puede compartir usando el diálogo nativo de impresión →
 "Guardar como PDF" → compartir por WhatsApp.
 
+### Pestaña Proveedor
+
+Filtro de período. Consolidado por producto en todo el rango (sin separar por día):
+una fila por artículo con el total de unidades e importe. Muestra costos, no precios
+de venta.
+
 ---
 
-## 4. Remito de proveedor
-
-Igual concepto, pero con filtro de período. Agrupado por fecha con subtotal por día y
-total del período. Muestra costos, no precios de venta.
-
----
-
-## 5. Stock
+## 4. Stock
 
 Tabla: producto, categoría, entradas, salidas, stock actual, última entrada, última
 venta.
@@ -117,11 +130,12 @@ cuenta, entrada, salida, saldo).
 
 ---
 
-## 6. Cuentas corrientes
+## 5. Cuentas corrientes
 
 Selector de cuenta arriba (`p-dropdown` agrupado por tipo) y filtro de período.
 
-Tabla: fecha, origen, detalle, debe, haber, saldo. Fila de totales al pie.
+Tabla: fecha, origen, detalle, debe, haber, saldo, con subtotal mensual (cuando el
+período abarca más de un mes) y fila de totales al pie.
 
 Para las cuentas `REFUERZO` y `CONSUMO`, mostrar un aviso arriba aclarando que es una
 vista informativa y que esos importes ya están incluidos en el saldo del proveedor.
@@ -129,21 +143,31 @@ vista informativa y que esos importes ya están incluidos en el saldo del provee
 Arriba de todo, una vista rápida de saldos: lista de clientes con saldo pendiente,
 ordenada de mayor a menor, y el saldo del proveedor.
 
+Si la cuenta vista es `CLIENTE` o `PROVEEDOR` y tiene saldo distinto de cero, un botón
+"Cobrar"/"Pagar" abre un diálogo chico con el importe precargado con el saldo total,
+para cancelar la deuda sin ir a Cobros y pagos.
+
 ---
 
-## 7. Cobros y pagos
+## 6. Cobros y pagos
 
 Formulario simple arriba (fecha, tipo, cuenta, importe, observación) y listado abajo
-con filtro de período.
+con filtro de período. Sin fecha por defecto: muestra todos los movimientos, y
+refiltra automáticamente al cambiar desde/hasta.
 
 Al elegir la cuenta, mostrar el saldo actual al lado del campo de importe, para que la
-usuaria sepa cuánto le deben antes de cargar el cobro.
+usuaria sepa cuánto le deben antes de cargar el cobro. El importe no puede superar ese
+saldo: el botón "Registrar" se deshabilita si se supera.
+
+Arriba del formulario, una lista de "Deudas pendientes" (clientes que deben y el
+proveedor si corresponde) con un botón "Cobrar"/"Pagar" por fila que precarga la
+cuenta y el importe total adeudado.
 
 Borrar con confirmación.
 
 ---
 
-## 8. Artículos y 9. Cuentas
+## 7. Artículos y Cuentas
 
 ABMs estándar. Tabla con búsqueda, botón nuevo, edición en `p-dialog`, baja lógica con
 confirmación.
@@ -153,15 +177,23 @@ porcentaje. Ayuda a decidir el precio sin calculadora.
 
 ---
 
-## 10. Resumen
+## 8. Resumen
 
-Pantalla inicial. Selector de período (por defecto mes en curso).
+Pantalla inicial. Selector de período, sin filtro por defecto: muestra todos los
+indicadores sobre el histórico completo hasta que se filtra un período puntual.
 
 Cuatro tarjetas grandes: Ventas, Margen, A cobrar, A pagar.
 Debajo, dos datos secundarios: cantidad de pedidos y ticket promedio.
 Al final, lista corta de productos sin stock.
 
 Sin gráficos. No aportan con este volumen y suman peso.
+
+---
+
+## 9. Análisis comercial
+
+Rankings por producto (ordenado por unidades vendidas), por cliente y por zona
+(ordenados por importe), con filtro de período.
 
 ---
 
