@@ -10,6 +10,4 @@ export interface SistemaDelEcosistema {
   icono: string;
 }
 
-export const ECOSISTEMA: SistemaDelEcosistema[] = [
-  { nombre: 'Sistema de Obras', url: 'https://obras.tudominio.com', icono: 'pi-building' }
-];
+export const ECOSISTEMA: SistemaDelEcosistema[] = [];
