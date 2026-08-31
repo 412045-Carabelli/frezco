@@ -159,16 +159,20 @@ Formato: prefijo, espacio, número con 3 dígitos y ceros a la izquierda. Se cal
 guardar con `MAX(numero)` filtrado por prefijo. Al ser un solo usuario no hay
 concurrencia real, pero igual conviene resolverlo dentro de la transacción de guardado.
 
-### Proveedor por artículo
+### Proveedor por línea de pedido
 
-`producto.proveedor_id` (agregada en `V4__proveedor_por_articulo.sql`) define a qué
-cuenta de tipo `PROVEEDOR` corresponde ese artículo. El reparto stock/proveedor
-(`unidades_proveedor` en `pedido_linea`) sigue calculándose igual que siempre; lo único
-que cambia es que la cuenta corriente y el remito de proveedor filtran por
-`producto.proveedor_id` en vez de asumir una única cuenta `PROVEEDOR`.
+`pedido_linea.proveedor_id` (agregada en `V5__proveedor_por_linea_pedido.sql`) define a
+qué proveedor se le pidió esa línea. Se elige al cargar el pedido y se congela ahí,
+igual que `precio_unitario` y `costo_unitario`: nunca se recalcula ni se vuelve a leer
+del artículo después. Es `NULL` cuando la línea sale entera de stock (no se le pidió
+nada a nadie).
 
-Cada artículo tiene un solo proveedor fijo (no varía por pedido ni por línea): encaja
-con el negocio real y evita agregar un campo más a cargar en Nuevo Pedido.
+`producto.proveedor_id` (agregada antes, en `V4__proveedor_por_articulo.sql`) sigue
+existiendo pero cambió de rol: ya **no** es lo que usan la cuenta corriente ni el
+remito de proveedor (que ahora filtran por `pedido_linea.proveedor_id`). Es solo el
+valor sugerido con el que el frontend precarga la línea al elegir el artículo en Nuevo
+Pedido — la usuaria lo puede cambiar ahí mismo, porque un mismo artículo se le puede
+terminar pidiendo a proveedores distintos según el momento.
 
 ## Datos semilla
 

@@ -17,6 +17,7 @@ interface LineaEnEdicion {
   unidades: number;
   precioUnitario: number;
   stockDisponible: number;
+  proveedor: Cuenta | null;
 }
 
 @Component({
@@ -49,6 +50,7 @@ export class NuevoPedidoComponent {
 
   readonly cuentasSugeridas = signal<Cuenta[]>([]);
   readonly productosSugeridos = signal<Producto[]>([]);
+  readonly proveedoresSugeridos = signal<Cuenta[]>([]);
 
   readonly condiciones: { label: string; value: CondicionVenta }[] = [
     { label: 'Minorista', value: 'MINORISTA' },
@@ -90,7 +92,7 @@ export class NuevoPedidoComponent {
   agregarLinea(): void {
     this.lineas.update(lineas => [
       ...lineas,
-      { producto: null, unidades: 1, precioUnitario: 0, stockDisponible: 0 }
+      { producto: null, unidades: 1, precioUnitario: 0, stockDisponible: 0, proveedor: null }
     ]);
     this.enfocarProducto(this.lineas().length - 1);
   }
@@ -100,9 +102,21 @@ export class NuevoPedidoComponent {
   }
 
   elegirProducto(indice: number, producto: Producto): void {
-    this.actualizarLinea(indice, { producto });
+    const proveedorDefault: Cuenta | null = producto.proveedorId
+      ? { id: producto.proveedorId, nombre: producto.proveedorNombre ?? '', tipo: 'PROVEEDOR',
+          zona: null, descuentoPct: 0, activo: true }
+      : null;
+    this.actualizarLinea(indice, { producto, proveedor: proveedorDefault });
     this.consultarPrecio(indice, producto);
     this.enfocarUnidades(indice);
+  }
+
+  buscarProveedores(evento: { query: string }): void {
+    this.api.cuentas('PROVEEDOR', evento.query, true).subscribe(cuentas => this.proveedoresSugeridos.set(cuentas));
+  }
+
+  elegirProveedorLinea(indice: number, proveedor: Cuenta): void {
+    this.actualizarLinea(indice, { proveedor });
   }
 
   /** Enter en Unidades: si es la ultima linea, agrega una nueva y salta al articulo. */
@@ -116,9 +130,13 @@ export class NuevoPedidoComponent {
     this.actualizarLinea(indice, { unidades: unidades ?? 0 });
   }
 
-  /** Aviso informativo: el reparto real lo hace el backend al guardar. */
+  /** Aviso informativo: el reparto real lo hace el backend al guardar. Refuerzo siempre
+   *  pide el 100% al proveedor, sin importar el stock existente (ver RepartoDeEntrada). */
   sePideAlProveedor(linea: LineaEnEdicion): boolean {
-    return !!linea.producto && linea.unidades > linea.stockDisponible;
+    if (!linea.producto) {
+      return false;
+    }
+    return this.cuenta()?.tipo === 'REFUERZO' || linea.unidades > linea.stockDisponible;
   }
 
   guardar(): void {
@@ -133,6 +151,14 @@ export class NuevoPedidoComponent {
       this.mensajes.add({ severity: 'warn', summary: 'Agrega al menos un articulo' });
       return;
     }
+    const sinProveedor = lineasCargadas.find(linea => this.sePideAlProveedor(linea) && !linea.proveedor);
+    if (sinProveedor) {
+      this.mensajes.add({
+        severity: 'warn',
+        summary: `Elegi el proveedor para ${sinProveedor.producto!.nombre}`
+      });
+      return;
+    }
 
     this.guardando.set(true);
     this.api.crearPedido({
@@ -143,7 +169,8 @@ export class NuevoPedidoComponent {
       observacion: this.observacion() || null,
       lineas: lineasCargadas.map(linea => ({
         productoId: linea.producto!.id!,
-        unidades: linea.unidades
+        unidades: linea.unidades,
+        proveedorId: linea.proveedor?.id ?? null
       }))
     }).subscribe({
       next: pedido => {

@@ -14,7 +14,8 @@ public interface RemitoRepository extends Repository<PedidoLinea, Long> {
     /**
      * Lineas a pedirle a un proveedor puntual en el periodo, de cualquier pedido, consolidadas
      * por producto en todo el rango (sin separar por dia): una sola fila por articulo con el
-     * total de unidades y el importe acumulado.
+     * total de unidades y el importe acumulado. El proveedor es el elegido en la linea, no el
+     * del articulo (que es solo un default en el momento de cargar el pedido).
      */
     @Query("""
             SELECT p.nombre AS producto,
@@ -22,7 +23,7 @@ public interface RemitoRepository extends Repository<PedidoLinea, Long> {
                    SUM(l.unidadesProveedor * l.costoUnitario) AS importe
             FROM PedidoLinea l JOIN l.pedido ped JOIN l.producto p
             WHERE ped.anulado = false AND l.unidadesProveedor > 0
-              AND p.proveedor.id = :proveedorId
+              AND l.proveedor.id = :proveedorId
               AND ped.fecha BETWEEN :desde AND :hasta
             GROUP BY p.nombre
             ORDER BY p.nombre

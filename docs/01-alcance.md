@@ -25,9 +25,10 @@ Volumen de referencia (5 semanas de operación real):
 ABM de productos. Campos: nombre, categoría, proveedor, kg, litros, costo, y tres precios
 de venta (minorista, mayorista, por cantidad). Baja lógica con `activo`.
 
-El proveedor es el que le vende ese artículo a la usuaria: define a quién se le pide la
-mercadería que no sale de stock (ver reparto stock/proveedor) y de quién es la deuda que
-se acumula en la cuenta corriente correspondiente.
+El proveedor del artículo es solo un valor sugerido: al agregarlo a un pedido se
+precarga ese proveedor, pero se puede elegir otro ahí mismo. El proveedor real de cada
+línea (y de quién es la deuda que se acumula en la cuenta corriente) se define al
+cargar el pedido, no acá.
 
 Los precios los carga la usuaria a mano. **No hay motor de reglas de precios**: son
 tres columnas editables. El sistema puede sugerir el precio calculado a partir del
@@ -72,8 +73,8 @@ Cada pedido genera dos remitos imprimibles:
 
 - **Remito de cliente**: las líneas del pedido con precios de venta y total.
 - **Remito de proveedor**: solo las líneas (o partes de líneas) que hay que pedirle,
-  con costos, filtrado por un proveedor a la vez (lo define el artículo). Se puede ver
-  por pedido individual o consolidado por período.
+  con costos, filtrado por un proveedor a la vez (el elegido al cargar cada línea). Se
+  puede ver por pedido individual o consolidado por período.
 
 Ambos son pantallas HTML con estilos de impresión. La usuaria imprime o guarda como
 PDF desde el navegador, o comparte desde el celular.

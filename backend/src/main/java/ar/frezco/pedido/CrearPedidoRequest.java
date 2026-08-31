@@ -27,6 +27,8 @@ public record CrearPedidoRequest(
             @NotNull(message = "El articulo es obligatorio") Long productoId,
             @NotNull(message = "Las unidades son obligatorias")
             @Positive(message = "Las unidades tienen que ser mayores a cero")
-            BigDecimal unidades) {
+            BigDecimal unidades,
+            /** Puede venir null: recien se sabe si hace falta despues de repartir la linea. */
+            Long proveedorId) {
     }
 }

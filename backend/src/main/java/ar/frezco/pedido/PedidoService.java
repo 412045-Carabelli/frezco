@@ -100,6 +100,7 @@ public class PedidoService {
         for (CrearPedidoRequest.LineaRequest lineaPedida : peticion.lineas()) {
             PedidoLinea linea = armarLinea(lineaPedida, condicion, descuento, politica);
             reparto.repartir(linea, disponible);
+            confirmarProveedor(linea);
             pedido.agregarLinea(linea);
         }
 
@@ -147,6 +148,7 @@ public class PedidoService {
         linea.setUnidades(lineaPedida.unidades());
         linea.setPrecioUnitario(politica.precioUnitario(producto, condicion, descuento));
         linea.setCostoUnitario(producto.getCosto());
+        linea.setProveedor(obtenerProveedor(lineaPedida.proveedorId()));
         return linea;
     }
 
@@ -154,5 +156,28 @@ public class PedidoService {
         return productos.findById(productoId)
                 .orElseThrow(() -> new ExcepcionesNegocio.NoEncontrado(
                         "No existe el articulo " + productoId));
+    }
+
+    private Cuenta obtenerProveedor(Long proveedorId) {
+        if (proveedorId == null) {
+            return null;
+        }
+        Cuenta cuenta = cuentas.obtener(proveedorId);
+        if (cuenta.getTipo() != TipoCuenta.PROVEEDOR) {
+            throw new ExcepcionesNegocio.Conflicto(cuenta.getNombre() + " no es una cuenta de proveedor");
+        }
+        return cuenta;
+    }
+
+    /** Recien despues de repartir se sabe si la linea le pide algo a un proveedor. */
+    private void confirmarProveedor(PedidoLinea linea) {
+        if (linea.getUnidadesProveedor().signum() > 0) {
+            if (linea.getProveedor() == null) {
+                throw new ExcepcionesNegocio.Conflicto(
+                        "Elegi el proveedor para " + linea.getProducto().getNombre());
+            }
+        } else {
+            linea.setProveedor(null);
+        }
     }
 }

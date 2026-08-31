@@ -60,7 +60,7 @@ export interface CrearPedido {
   condicion: CondicionVenta;
   descuentoPct: number;
   observacion: string | null;
-  lineas: { productoId: number; unidades: number }[];
+  lineas: { productoId: number; unidades: number; proveedorId: number | null }[];
 }
 
 export interface PrecioPreview {
