@@ -1,5 +1,6 @@
 package ar.frezco.pedido;
 
+import ar.frezco.cuenta.Cuenta;
 import ar.frezco.producto.Producto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -57,4 +58,10 @@ public class PedidoLinea {
 
     @Column(name = "unidades_proveedor", nullable = false)
     private BigDecimal unidadesProveedor = BigDecimal.ZERO;
+
+    /** A que proveedor se le pide esta linea. Null si sale entera de stock: no corresponde
+     *  ninguno. Se elige al cargar el pedido y se congela igual que precio y costo. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proveedor_id")
+    private Cuenta proveedor;
 }

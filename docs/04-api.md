@@ -104,14 +104,18 @@ Request:
   "descuentoPct": 0,
   "observacion": null,
   "lineas": [
-    { "productoId": 3, "unidades": 2 },
-    { "productoId": 7, "unidades": 1 }
+    { "productoId": 3, "unidades": 2, "proveedorId": 5 },
+    { "productoId": 7, "unidades": 1, "proveedorId": null }
   ]
 }
 ```
 
 El cliente **no manda precios**. El backend los resuelve según la condición y el
 descuento, y ejecuta el reparto stock/proveedor. Ver `03-reglas-negocio.md`.
+
+`proveedorId` por línea es opcional: si el backend calcula que la línea no le pide nada
+al proveedor (sale entera de stock), se ignora. Si le pide algo y no vino `proveedorId`,
+devuelve `409` ("Elegí el proveedor para &lt;artículo&gt;").
 
 Response `201`:
 

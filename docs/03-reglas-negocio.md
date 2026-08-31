@@ -125,7 +125,9 @@ Saldo positivo = se le debe al proveedor.
 
 **Nota:** el pedido puede ser de cualquier cuenta (un cliente, refuerzo o consumo).
 Lo que define si impacta en el proveedor es `unidades_proveedor > 0`, no la cuenta
-del pedido.
+del pedido. A **cuál** proveedor impacta lo define `pedido_linea.proveedor_id`, elegido
+al cargar la línea (puede haber varios proveedores; el del artículo es solo un default
+sugerido, no ata la línea).
 
 ### Cuenta de tipo REFUERZO
 
@@ -204,7 +206,7 @@ pedidos, sin acotar por fecha.
 | Margen | Ventas − Costo |
 | Margen % | Margen / Ventas |
 | Saldo a cobrar | Suma de saldos positivos de todas las cuentas `CLIENTE` |
-| Saldo a pagar | Saldo de la cuenta `PROVEEDOR` |
+| Saldo a pagar | Suma de saldos de todas las cuentas `PROVEEDOR` |
 
 Los pedidos de refuerzo y consumo **no** entran en ventas, costo ni margen.
 
