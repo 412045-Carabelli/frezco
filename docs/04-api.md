@@ -41,6 +41,8 @@ DELETE /api/productos/{id}               baja lógica (activo = false)
   "id": 1,
   "nombre": "Arándano 1kg",
   "categoria": "Frutas 1kg",
+  "proveedorId": 5,
+  "proveedorNombre": "Frigorífico Sur",
   "kg": 1.0,
   "lt": null,
   "costo": 11700.00,
@@ -259,7 +261,7 @@ GET /api/cuentas-corrientes/saldos       ?tipo=CLIENTE&soloConSaldo=true
 
 ```
 GET /api/remitos/cliente/{pedidoId}
-GET /api/remitos/proveedor               ?desde=&hasta=
+GET /api/remitos/proveedor               ?proveedorId=&desde=&hasta=
 ```
 
 Devuelven JSON con los datos armados. El render y la impresión son responsabilidad del

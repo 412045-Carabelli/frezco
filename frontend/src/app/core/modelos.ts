@@ -6,6 +6,8 @@ export interface Producto {
   id: number | null;
   nombre: string;
   categoria: string | null;
+  proveedorId: number | null;
+  proveedorNombre?: string;
   kg: number | null;
   lt: number | null;
   costo: number;

@@ -47,7 +47,7 @@ public class CuentaService {
     @Transactional
     public CuentaDTO crear(CuentaDTO dto) {
         validarNombreLibre(dto.nombre(), null);
-        if (dto.tipo().esEspecial() && repositorio.existsByTipo(dto.tipo())) {
+        if (dto.tipo().esUnica() && repositorio.existsByTipo(dto.tipo())) {
             throw new ExcepcionesNegocio.Conflicto(
                     "Ya existe la cuenta de tipo " + dto.tipo() + " y solo puede haber una");
         }
@@ -66,7 +66,7 @@ public class CuentaService {
         if (cuenta.getTipo() != dto.tipo()) {
             throw new ExcepcionesNegocio.Conflicto("No se puede cambiar el tipo de una cuenta");
         }
-        if (cuenta.getTipo().esEspecial() && !dto.activo()) {
+        if (cuenta.getTipo().esUnica() && !dto.activo()) {
             throw new ExcepcionesNegocio.Conflicto(
                     "La cuenta " + cuenta.getNombre() + " es del sistema y no se puede dar de baja");
         }
@@ -79,7 +79,7 @@ public class CuentaService {
     @Transactional
     public void desactivar(Long id) {
         Cuenta cuenta = obtener(id);
-        if (cuenta.getTipo().esEspecial()) {
+        if (cuenta.getTipo().esUnica()) {
             throw new ExcepcionesNegocio.Conflicto(
                     "La cuenta " + cuenta.getNombre() + " es del sistema y no se puede dar de baja");
         }

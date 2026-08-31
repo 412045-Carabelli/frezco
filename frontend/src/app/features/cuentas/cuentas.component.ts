@@ -118,7 +118,12 @@ export class CuentasComponent {
     });
   }
 
-  /** Las cuentas del sistema no se editan como tipo ni se dan de baja. */
+  /** REFUERZO y CONSUMO son fijas del sistema: no se dan de baja. PROVEEDOR y CLIENTE si. */
+  esUnica(cuenta: Cuenta): boolean {
+    return cuenta.tipo === 'REFUERZO' || cuenta.tipo === 'CONSUMO';
+  }
+
+  /** El tag de tipo se muestra para todo lo que no sea Cliente. */
   esEspecial(cuenta: Cuenta): boolean {
     return cuenta.tipo !== 'CLIENTE';
   }

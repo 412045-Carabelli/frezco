@@ -1,6 +1,6 @@
 <h1 class="titulo-pantalla mb-4">Cobros y pagos</h1>
 
-@if (deudas().length > 0 || saldoProveedor()) {
+@if (deudas().length > 0 || deudasProveedores().length > 0) {
   <section class="tarjeta mb-4 p-3">
     <h2 class="text-sm font-medium text-gray-700 mb-2">Deudas pendientes</h2>
     <div class="flex flex-wrap gap-2">
@@ -11,7 +11,7 @@
           <p-button label="Cobrar" size="small" [text]="true" (onClick)="cobrarDeuda(deuda)" />
         </div>
       }
-      @if (saldoProveedor(); as proveedor) {
+      @for (proveedor of deudasProveedores(); track proveedor.cuentaId) {
         <div class="flex items-center gap-2 rounded border border-gray-200 px-3 py-2">
           <span class="text-sm">{{ proveedor.nombre }}</span>
           <span class="text-sm font-medium">$ {{ proveedor.saldo | number:'1.2-2' }}</span>

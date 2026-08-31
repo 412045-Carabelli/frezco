@@ -1,6 +1,9 @@
 package ar.frezco.producto;
 
 import ar.frezco.config.ExcepcionesNegocio;
+import ar.frezco.cuenta.Cuenta;
+import ar.frezco.cuenta.CuentaService;
+import ar.frezco.cuenta.TipoCuenta;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,9 +16,11 @@ import java.util.Optional;
 public class ProductoService {
 
     private final ProductoRepository repositorio;
+    private final CuentaService cuentas;
 
-    public ProductoService(ProductoRepository repositorio) {
+    public ProductoService(ProductoRepository repositorio, CuentaService cuentas) {
         this.repositorio = repositorio;
+        this.cuentas = cuentas;
     }
 
     public List<ProductoDTO> listar(String busqueda, boolean soloActivos) {
@@ -74,6 +79,7 @@ public class ProductoService {
     private void copiar(ProductoDTO dto, Producto producto) {
         producto.setNombre(dto.nombre().trim());
         producto.setCategoria(dto.categoria());
+        producto.setProveedor(obtenerProveedor(dto.proveedorId()));
         producto.setKg(dto.kg());
         producto.setLt(dto.lt());
         producto.setCosto(valorOCero(dto.costo()));
@@ -86,5 +92,13 @@ public class ProductoService {
 
     private BigDecimal valorOCero(BigDecimal valor) {
         return valor == null ? BigDecimal.ZERO : valor;
+    }
+
+    private Cuenta obtenerProveedor(Long proveedorId) {
+        Cuenta cuenta = cuentas.obtener(proveedorId);
+        if (cuenta.getTipo() != TipoCuenta.PROVEEDOR) {
+            throw new ExcepcionesNegocio.Conflicto(cuenta.getNombre() + " no es una cuenta de proveedor");
+        }
+        return cuenta;
     }
 }

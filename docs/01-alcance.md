@@ -3,7 +3,8 @@
 ## Contexto del negocio
 
 Emprendimiento de reventa de productos congelados (frutas, pulpas, verduras).
-Compra a **un único proveedor** y vende a clientes finales de dos zonas geográficas.
+Compra a **varios proveedores** (cada artículo tiene el suyo fijo) y vende a clientes
+finales de dos zonas geográficas.
 
 Modo de operación particular y central para entender el sistema: **no trabaja con
 stock permanente**. La mayoría de las ventas se piden al proveedor a medida que
@@ -21,8 +22,12 @@ Volumen de referencia (5 semanas de operación real):
 
 ### Artículos
 
-ABM de productos. Campos: nombre, categoría, kg, litros, costo, y tres precios de
-venta (minorista, mayorista, por cantidad). Baja lógica con `activo`.
+ABM de productos. Campos: nombre, categoría, proveedor, kg, litros, costo, y tres precios
+de venta (minorista, mayorista, por cantidad). Baja lógica con `activo`.
+
+El proveedor es el que le vende ese artículo a la usuaria: define a quién se le pide la
+mercadería que no sale de stock (ver reparto stock/proveedor) y de quién es la deuda que
+se acumula en la cuenta corriente correspondiente.
 
 Los precios los carga la usuaria a mano. **No hay motor de reglas de precios**: son
 tres columnas editables. El sistema puede sugerir el precio calculado a partir del
@@ -36,7 +41,7 @@ ABM de cuentas. Una cuenta puede ser de cuatro tipos:
 | Tipo | Descripción |
 |---|---|
 | `CLIENTE` | Cliente final |
-| `PROVEEDOR` | El proveedor único |
+| `PROVEEDOR` | Un proveedor (puede haber varios) |
 | `REFUERZO` | Cuenta especial "Refuerzo Stock" |
 | `CONSUMO` | Cuenta especial "Consumo Propio" |
 
@@ -66,9 +71,9 @@ Los pedidos no se editan. Si hay un error, se anulan y se cargan de nuevo.
 Cada pedido genera dos remitos imprimibles:
 
 - **Remito de cliente**: las líneas del pedido con precios de venta y total.
-- **Remito de proveedor**: solo las líneas (o partes de líneas) que hay que pedirle
-  al proveedor, con costos. Se puede ver por pedido individual o consolidado por
-  período, agrupado por fecha.
+- **Remito de proveedor**: solo las líneas (o partes de líneas) que hay que pedirle,
+  con costos, filtrado por un proveedor a la vez (lo define el artículo). Se puede ver
+  por pedido individual o consolidado por período.
 
 Ambos son pantallas HTML con estilos de impresión. La usuaria imprime o guarda como
 PDF desde el navegador, o comparte desde el celular.
@@ -88,9 +93,9 @@ Estado de cuenta por cuenta seleccionada, con filtro de período:
 - Detalle cronológico de movimientos (debe / haber / saldo acumulado)
 - Saldo final
 
-Aplica a clientes (deben por ventas, pagan con cobros), al proveedor (se le debe por
-mercadería, se le paga con pagos) y a la cuenta Refuerzo Stock (muestra acumulado
-todo lo pedido de más al proveedor).
+Aplica a clientes (deben por ventas, pagan con cobros), a cada proveedor (se le debe
+por la mercadería de sus artículos, se le paga con pagos) y a la cuenta Refuerzo Stock
+(muestra acumulado todo lo pedido de más, sin distinguir proveedor).
 
 ### Cobros y pagos
 
@@ -104,7 +109,7 @@ Pantalla inicial con los indicadores del mes en curso:
 - Ventas del período
 - Margen del período (ventas − costos)
 - Saldo total a cobrar de clientes
-- Saldo a pagar al proveedor
+- Saldo a pagar a proveedores (suma de todos)
 - Productos con stock bajo (opcional, umbral fijo)
 
 ## Fuera de alcance
@@ -120,7 +125,6 @@ que no se cuelen por accidente:
 | Edición de pedidos guardados | Se anula y se recarga |
 | Facturación electrónica AFIP | Fuera de presupuesto |
 | Múltiples usuarios, roles, permisos | Un solo usuario |
-| Múltiples proveedores | El negocio tiene uno solo |
 | Listas de precios con vigencia histórica | Tres columnas editables alcanzan |
 
 ## Restricciones no funcionales

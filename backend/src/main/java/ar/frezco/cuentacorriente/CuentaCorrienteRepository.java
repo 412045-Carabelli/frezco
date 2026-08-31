@@ -29,18 +29,21 @@ public interface CuentaCorrienteRepository extends Repository<PedidoLinea, Long>
                                     @Param("desde") LocalDate desde,
                                     @Param("hasta") LocalDate hasta);
 
-    /** Mercaderia pedida al proveedor, venga del pedido que venga. */
+    /** Mercaderia pedida a un proveedor puntual, venga del pedido que venga: lo define el
+     *  proveedor del articulo, no la cuenta del pedido. */
     @Query("""
             SELECT ped.fecha AS fecha,
                    CONCAT(ped.numero, ' - ', c.nombre) AS numero,
                    SUM(l.unidadesProveedor * l.costoUnitario) AS importe
             FROM PedidoLinea l JOIN l.pedido ped JOIN ped.cuenta c
             WHERE ped.anulado = false AND l.unidadesProveedor > 0
+              AND l.producto.proveedor.id = :proveedorId
               AND ped.fecha BETWEEN :desde AND :hasta
             GROUP BY ped.id, ped.fecha, ped.numero, c.nombre
             ORDER BY ped.fecha, ped.id
             """)
-    List<ImportePorPedido> pedidosAlProveedor(@Param("desde") LocalDate desde,
+    List<ImportePorPedido> pedidosAlProveedor(@Param("proveedorId") Long proveedorId,
+                                              @Param("desde") LocalDate desde,
                                               @Param("hasta") LocalDate hasta);
 
     /** Refuerzos: lo que se pidio de mas al proveedor para tener stock. */

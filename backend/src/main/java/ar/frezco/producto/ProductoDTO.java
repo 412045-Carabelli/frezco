@@ -1,6 +1,7 @@
 package ar.frezco.producto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
@@ -12,6 +13,8 @@ public record ProductoDTO(
         @Size(max = 120, message = "El nombre no puede superar los 120 caracteres")
         String nombre,
         @Size(max = 60) String categoria,
+        @NotNull(message = "El proveedor es obligatorio") Long proveedorId,
+        String proveedorNombre,
         BigDecimal kg,
         BigDecimal lt,
         @PositiveOrZero(message = "El costo no puede ser negativo") BigDecimal costo,
@@ -28,6 +31,8 @@ public record ProductoDTO(
                 producto.getId(),
                 producto.getNombre(),
                 producto.getCategoria(),
+                producto.getProveedor().getId(),
+                producto.getProveedor().getNombre(),
                 producto.getKg(),
                 producto.getLt(),
                 producto.getCosto(),

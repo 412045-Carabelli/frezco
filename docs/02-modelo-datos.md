@@ -140,9 +140,10 @@ El documento del cliente los describe como "clientes" especiales. Modelarlos com
 cuentas permite reutilizar la misma pantalla de carga, la misma tabla de pedidos y la
 misma vista de cuenta corriente, en lugar de tener tres flujos separados.
 
-Restricción de negocio: debe existir **exactamente una** cuenta de tipo `REFUERZO`,
-una de tipo `CONSUMO` y una de tipo `PROVEEDOR`. Se crean en la migración de datos
-semilla y no se pueden dar de baja desde la UI.
+Restricción de negocio: debe existir **exactamente una** cuenta de tipo `REFUERZO` y
+una de tipo `CONSUMO`. Se crean en la migración de datos semilla y no se pueden dar de
+baja desde la UI. `PROVEEDOR` no tiene esa restricción: el negocio le compra a varios
+(ver "Proveedor por artículo" más abajo).
 
 ### Numeración de comprobantes
 
@@ -158,11 +159,23 @@ Formato: prefijo, espacio, número con 3 dígitos y ceros a la izquierda. Se cal
 guardar con `MAX(numero)` filtrado por prefijo. Al ser un solo usuario no hay
 concurrencia real, pero igual conviene resolverlo dentro de la transacción de guardado.
 
+### Proveedor por artículo
+
+`producto.proveedor_id` (agregada en `V4__proveedor_por_articulo.sql`) define a qué
+cuenta de tipo `PROVEEDOR` corresponde ese artículo. El reparto stock/proveedor
+(`unidades_proveedor` en `pedido_linea`) sigue calculándose igual que siempre; lo único
+que cambia es que la cuenta corriente y el remito de proveedor filtran por
+`producto.proveedor_id` en vez de asumir una única cuenta `PROVEEDOR`.
+
+Cada artículo tiene un solo proveedor fijo (no varía por pedido ni por línea): encaja
+con el negocio real y evita agregar un campo más a cargar en Nuevo Pedido.
+
 ## Datos semilla
 
 La migración `V2__datos_semilla.sql` debe crear:
 
-- La cuenta del proveedor (`tipo = 'PROVEEDOR'`)
+- La cuenta del proveedor (`tipo = 'PROVEEDOR'`) — la primera; después se pueden agregar más
+  desde la pantalla de Cuentas.
 - La cuenta `Refuerzo Stock` (`tipo = 'REFUERZO'`)
 - La cuenta `Consumo Propio` (`tipo = 'CONSUMO'`)
 

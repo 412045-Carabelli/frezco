@@ -139,9 +139,9 @@ export class ApiService {
     return this.http.get<RemitoCliente>(`${this.base}/remitos/cliente/${pedidoId}`);
   }
 
-  remitoProveedor(desde?: string, hasta?: string): Observable<RemitoProveedor> {
+  remitoProveedor(proveedorId: number, desde?: string, hasta?: string): Observable<RemitoProveedor> {
     return this.http.get<RemitoProveedor>(`${this.base}/remitos/proveedor`,
-      { params: this.parametros({ desde, hasta }) });
+      { params: this.parametros({ desde, hasta, proveedorId }) });
   }
 
   resumen(desde?: string, hasta?: string): Observable<Resumen> {

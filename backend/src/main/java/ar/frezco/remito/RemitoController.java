@@ -27,7 +27,8 @@ public class RemitoController {
     @GetMapping("/proveedor")
     public RemitoProveedorDTO proveedor(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
-        return servicio.deProveedor(desde, hasta);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam Long proveedorId) {
+        return servicio.deProveedor(desde, hasta, proveedorId);
     }
 }
