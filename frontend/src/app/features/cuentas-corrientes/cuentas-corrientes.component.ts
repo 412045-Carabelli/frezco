@@ -151,6 +151,6 @@ export class CuentasCorrientesComponent {
 
   private cargarSaldos(): void {
     this.api.saldos('CLIENTE', true).subscribe(saldos => this.saldosClientes.set(saldos));
-    this.api.saldos('PROVEEDOR', true).subscribe(saldos => this.saldosProveedores.set(saldos));
+    this.api.saldos('PROVEEDOR', false).subscribe(saldos => this.saldosProveedores.set(saldos));
   }
 }
