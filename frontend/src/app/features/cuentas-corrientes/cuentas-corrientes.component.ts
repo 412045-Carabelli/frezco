@@ -36,7 +36,7 @@ export class CuentasCorrientesComponent {
   readonly cargando = signal(false);
 
   readonly saldosClientes = signal<Saldo[]>([]);
-  readonly saldoProveedor = signal<Saldo | null>(null);
+  readonly saldosProveedores = signal<Saldo[]>([]);
 
   readonly lineasConMes = computed(() =>
     (this.estado()?.lineas ?? []).map(linea => ({ ...linea, mesLabel: this.mesLabelDe(linea.fecha) })));
@@ -151,7 +151,6 @@ export class CuentasCorrientesComponent {
 
   private cargarSaldos(): void {
     this.api.saldos('CLIENTE', true).subscribe(saldos => this.saldosClientes.set(saldos));
-    this.api.saldos('PROVEEDOR', false)
-      .subscribe(saldos => this.saldoProveedor.set(saldos[0] ?? null));
+    this.api.saldos('PROVEEDOR', true).subscribe(saldos => this.saldosProveedores.set(saldos));
   }
 }
