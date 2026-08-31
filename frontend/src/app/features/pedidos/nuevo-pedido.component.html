@@ -52,7 +52,14 @@
                             (onSelect)="elegirProducto($index, $event.value)"
                             [suggestions]="productosSugeridos()" optionLabel="nombre"
                             placeholder="Buscar articulo" [minLength]="1"
-                            [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full" />
+                            [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full">
+              <ng-template let-producto pTemplate="item">
+                <div class="flex justify-between gap-3">
+                  <span>{{ producto.nombre }}</span>
+                  <span class="text-xs text-gray-400">{{ producto.proveedorNombre }}</span>
+                </div>
+              </ng-template>
+            </p-autoComplete>
           </div>
           <p-button icon="pi pi-times" severity="danger" [text]="true" class="mt-6"
                     (onClick)="quitarLinea($index)" ariaLabel="Quitar linea" />
