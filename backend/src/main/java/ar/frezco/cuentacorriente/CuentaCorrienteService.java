@@ -80,10 +80,11 @@ public class CuentaCorrienteService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    /** Saldo de la cuenta del proveedor, para el resumen. */
+    /** Suma de lo que se debe a todos los proveedores, para el resumen. */
     public BigDecimal saldoAPagar() {
-        Cuenta proveedor = cuentas.obtenerPorTipo(TipoCuenta.PROVEEDOR);
-        return saldoDe(proveedor, estrategiaPara(TipoCuenta.PROVEEDOR), Periodo.de(null, null));
+        return saldos(TipoCuenta.PROVEEDOR, false).stream()
+                .map(SaldoDTO::saldo)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /** Saldo actual (histórico completo) de una cuenta puntual. */

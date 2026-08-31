@@ -34,7 +34,7 @@
       <td class="text-right whitespace-nowrap">
         <p-button icon="pi pi-pencil" severity="secondary" [text]="true" size="small"
                   (onClick)="editar(cuenta)" ariaLabel="Editar" />
-        @if (cuenta.activo && !esEspecial(cuenta)) {
+        @if (cuenta.activo && !esUnica(cuenta)) {
           <p-button icon="pi pi-trash" severity="danger" [text]="true" size="small"
                     (onClick)="confirmarBaja(cuenta)" ariaLabel="Dar de baja" />
         }
@@ -63,7 +63,7 @@
         <p-select [options]="tipos" optionLabel="label" optionValue="value"
                   [ngModel]="cuenta.tipo" (ngModelChange)="actualizarCampo('tipo', $event)"
                   [disabled]="!!cuenta.id" [appendTo]="'body'" styleClass="w-full" />
-        @if (cuenta.id && esEspecial(cuenta)) {
+        @if (cuenta.id && esUnica(cuenta)) {
           <span class="text-xs text-gray-500">
             Cuenta del sistema: no se puede cambiar de tipo ni dar de baja.
           </span>

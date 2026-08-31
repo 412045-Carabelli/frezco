@@ -47,7 +47,7 @@ export class MovimientosComponent {
 
   readonly cuentasSugeridas = signal<Cuenta[]>([]);
   readonly deudas = signal<Saldo[]>([]);
-  readonly saldoProveedor = signal<Saldo | null>(null);
+  readonly deudasProveedores = signal<Saldo[]>([]);
   readonly tipos: { label: string; value: TipoMovimiento }[] = [
     { label: 'Cobro', value: 'COBRO' },
     { label: 'Pago', value: 'PAGO' }
@@ -107,12 +107,12 @@ export class MovimientosComponent {
     });
   }
 
-  /** Deudas pendientes: clientes que deben y el saldo del proveedor, para pagar/cobrar en un click. */
+  /** Deudas pendientes: clientes que deben y proveedores a los que se les debe, para pagar/cobrar en un click. */
   cargarDeudas(): void {
     this.api.saldos('CLIENTE', true).subscribe(saldos =>
       this.deudas.set(saldos.filter(s => s.saldo > 0)));
     this.api.saldos('PROVEEDOR', true).subscribe(saldos =>
-      this.saldoProveedor.set(saldos.find(s => s.saldo > 0) ?? null));
+      this.deudasProveedores.set(saldos.filter(s => s.saldo > 0)));
   }
 
   /** Precarga el formulario con la cuenta y el saldo total, lista para confirmar. */

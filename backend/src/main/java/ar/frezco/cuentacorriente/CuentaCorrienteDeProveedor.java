@@ -37,7 +37,7 @@ public class CuentaCorrienteDeProveedor implements EstrategiaCuentaCorriente {
     public List<Asiento> asientos(Cuenta cuenta, Periodo periodo) {
         List<Asiento> asientos = new ArrayList<>();
 
-        repositorio.pedidosAlProveedor(periodo.desde(), periodo.hasta())
+        repositorio.pedidosAlProveedor(cuenta.getId(), periodo.desde(), periodo.hasta())
                 .forEach(pedido -> asientos.add(Asiento.debe(
                         pedido.getFecha(), Asiento.Origen.PEDIDO, pedido.getNumero(), pedido.getImporte())));
 

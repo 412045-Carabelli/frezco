@@ -3,7 +3,7 @@ package ar.frezco.cuenta;
 /**
  * REFUERZO y CONSUMO no son clientes reales: son etiquetas que permiten cargar
  * movimientos de mercaderia con la misma pantalla de pedidos. Debe existir exactamente
- * una cuenta de cada tipo distinto de CLIENTE.
+ * una cuenta de cada una. PROVEEDOR puede tener varias: el negocio le compra a mas de uno.
  */
 public enum TipoCuenta {
     CLIENTE,
@@ -24,5 +24,11 @@ public enum TipoCuenta {
 
     public boolean esEspecial() {
         return this != CLIENTE;
+    }
+
+    /** REFUERZO y CONSUMO son cuentas fijas del sistema: debe existir exactamente una y no
+     *  se dan de baja. PROVEEDOR ya no lo es: el negocio puede tener varios. */
+    public boolean esUnica() {
+        return this == REFUERZO || this == CONSUMO;
     }
 }

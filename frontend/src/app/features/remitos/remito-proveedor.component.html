@@ -1,16 +1,27 @@
 <div class="no-imprimir flex flex-wrap items-end gap-3 mb-4" data-tutorial="acciones-remito">
   <div class="flex flex-col gap-1">
+    <label class="text-sm text-gray-700">Proveedor</label>
+    <p-autoComplete [ngModel]="proveedor()" (completeMethod)="buscarProveedores($event)"
+                    (onSelect)="elegirProveedor($event.value)"
+                    [suggestions]="proveedoresSugeridos()" optionLabel="nombre"
+                    placeholder="Buscar proveedor" [minLength]="1" [appendTo]="'body'" />
+  </div>
+  <div class="flex flex-col gap-1">
     <label class="text-sm text-gray-700">Desde</label>
-    <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
+    <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" [appendTo]="'body'" />
   </div>
   <div class="flex flex-col gap-1">
     <label class="text-sm text-gray-700">Hasta</label>
-    <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
+    <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" [appendTo]="'body'" />
   </div>
   <p-button label="Actualizar" icon="pi pi-refresh" severity="secondary" [loading]="cargando()"
-            (onClick)="cargar()" />
-  <p-button label="Imprimir" icon="pi pi-print" (onClick)="imprimir()" />
+            [disabled]="!proveedor()" (onClick)="cargar()" />
+  <p-button label="Imprimir" icon="pi pi-print" [disabled]="!remito()" (onClick)="imprimir()" />
 </div>
+
+@if (!proveedor()) {
+  <p class="text-sm text-gray-500">Elegi un proveedor para ver su remito.</p>
+}
 
 @if (remito(); as datos) {
   <article class="remito tarjeta p-6 mx-auto">

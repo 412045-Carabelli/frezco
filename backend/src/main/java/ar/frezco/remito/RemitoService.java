@@ -2,6 +2,7 @@ package ar.frezco.remito;
 
 import ar.frezco.config.ExcepcionesNegocio;
 import ar.frezco.config.Periodo;
+import ar.frezco.cuenta.Cuenta;
 import ar.frezco.cuenta.CuentaService;
 import ar.frezco.cuenta.TipoCuenta;
 import ar.frezco.pedido.Pedido;
@@ -57,15 +58,20 @@ public class RemitoService {
                 pedido.getCuenta().getNombre(), pedido.getObservacion(), total, lineas);
     }
 
-    /** Remito de proveedor: por periodo, consolidado por producto (sin separar por dia). */
-    public RemitoProveedorDTO deProveedor(LocalDate desde, LocalDate hasta) {
+    /** Remito de un proveedor puntual: por periodo, consolidado por producto (sin separar por dia). */
+    public RemitoProveedorDTO deProveedor(LocalDate desde, LocalDate hasta, Long proveedorId) {
         Periodo periodo = Periodo.de(desde, hasta);
+
+        Cuenta proveedor = cuentas.obtener(proveedorId);
+        if (proveedor.getTipo() != TipoCuenta.PROVEEDOR) {
+            throw new ExcepcionesNegocio.Conflicto(proveedor.getNombre() + " no es una cuenta de proveedor");
+        }
 
         List<RemitoProveedorDTO.LineaDTO> lineas = new ArrayList<>();
         BigDecimal totalPeriodo = BigDecimal.ZERO;
 
         for (RemitoRepository.LineaConsolidadaProveedor fila
-                : repositorio.lineasConsolidadasParaProveedor(periodo.desde(), periodo.hasta())) {
+                : repositorio.lineasConsolidadasParaProveedor(proveedorId, periodo.desde(), periodo.hasta())) {
             BigDecimal importe = fila.getImporte();
             BigDecimal costoUnitario = importe.divide(fila.getUnidades(), 2, RoundingMode.HALF_UP);
             totalPeriodo = totalPeriodo.add(importe);
@@ -74,6 +80,6 @@ public class RemitoService {
         }
 
         return new RemitoProveedorDTO(periodo.desde(), periodo.hasta(),
-                cuentas.obtenerPorTipo(TipoCuenta.PROVEEDOR).getNombre(), totalPeriodo, lineas);
+                proveedor.getNombre(), totalPeriodo, lineas);
     }
 }

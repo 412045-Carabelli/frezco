@@ -11,10 +11,10 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ApiService } from '../../core/api.service';
-import { Producto } from '../../core/modelos';
+import { Cuenta, Producto } from '../../core/modelos';
 
 const PRODUCTO_NUEVO: Producto = {
-  id: null, nombre: '', categoria: null, kg: null, lt: null,
+  id: null, nombre: '', categoria: null, proveedorId: null, kg: null, lt: null,
   costo: 0, precioMinorista: 0, precioMayorista: 0, precioCantidad: 0, descuentoPct: 0, activo: true
 };
 
@@ -45,6 +45,7 @@ export class ArticulosComponent {
   readonly editando = signal<Producto | null>(null);
   readonly guardando = signal(false);
   readonly categoriasSugeridas = signal<string[]>([]);
+  readonly proveedoresSugeridos = signal<Cuenta[]>([]);
 
   /** Margen porcentual de cada precio contra el costo. Ayuda a decidir sin calculadora. */
   readonly margenes = computed(() => {
@@ -89,10 +90,18 @@ export class ArticulosComponent {
     this.editando.set(null);
   }
 
+  buscarProveedores(evento: { query: string }): void {
+    this.api.cuentas('PROVEEDOR', evento.query, true).subscribe(cuentas => this.proveedoresSugeridos.set(cuentas));
+  }
+
   guardar(): void {
     const producto = this.editando();
     if (!producto || !producto.nombre.trim()) {
       this.mensajes.add({ severity: 'warn', summary: 'El nombre es obligatorio' });
+      return;
+    }
+    if (!producto.proveedorId) {
+      this.mensajes.add({ severity: 'warn', summary: 'Elegi un proveedor' });
       return;
     }
 
@@ -136,6 +145,13 @@ export class ArticulosComponent {
     const producto = this.editando();
     if (producto) {
       this.editando.set({ ...producto, [campo]: valor });
+    }
+  }
+
+  elegirProveedor(cuenta: Cuenta): void {
+    const producto = this.editando();
+    if (producto) {
+      this.editando.set({ ...producto, proveedorId: cuenta.id, proveedorNombre: cuenta.nombre });
     }
   }
 
