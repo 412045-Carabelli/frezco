@@ -174,6 +174,12 @@ valor sugerido con el que el frontend precarga la línea al elegir el artículo 
 Pedido — la usuaria lo puede cambiar ahí mismo, porque un mismo artículo se le puede
 terminar pidiendo a proveedores distintos según el momento.
 
+### Nombre de artículo no único
+
+`V6__nombre_producto_no_unico.sql` saca el `UNIQUE (nombre)` de `producto` (estaba en
+`V1`). Con varios proveedores puede haber artículos parecidos de origen distinto (ej.
+"Brócoli 1 Kg" de dos proveedores) sin recurrir a sufijos artificiales para el nombre.
+
 ## Datos semilla
 
 La migración `V2__datos_semilla.sql` debe crear:

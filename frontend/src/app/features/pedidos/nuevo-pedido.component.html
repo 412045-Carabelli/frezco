@@ -54,7 +54,7 @@
                             placeholder="Buscar articulo" [minLength]="1"
                             [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full">
               <ng-template let-producto pTemplate="item">
-                <div class="flex justify-between gap-3">
+                <div class="flex items-center justify-between gap-3">
                   <span>{{ producto.nombre }}</span>
                   <span class="text-xs text-gray-400">{{ producto.proveedorNombre }}</span>
                 </div>

@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -45,17 +44,14 @@ public class ProductoService {
 
     @Transactional
     public ProductoDTO crear(ProductoDTO dto) {
-        validarNombreLibre(dto.nombre(), null);
-
         Producto producto = new Producto();
         copiar(dto, producto);
         return ProductoDTO.de(repositorio.save(producto));
     }
 
+    /** El nombre puede repetirse: hay articulos parecidos de proveedores distintos. */
     @Transactional
     public ProductoDTO actualizar(Long id, ProductoDTO dto) {
-        validarNombreLibre(dto.nombre(), id);
-
         Producto producto = obtener(id);
         copiar(dto, producto);
         return ProductoDTO.de(repositorio.save(producto));
@@ -67,13 +63,6 @@ public class ProductoService {
         Producto producto = obtener(id);
         producto.setActivo(false);
         repositorio.save(producto);
-    }
-
-    private void validarNombreLibre(String nombre, Long idPropio) {
-        Optional<Producto> existente = repositorio.findByNombreIgnoreCase(nombre.trim());
-        if (existente.isPresent() && !existente.get().getId().equals(idPropio)) {
-            throw new ExcepcionesNegocio.Conflicto("Ya existe un articulo con ese nombre");
-        }
     }
 
     private void copiar(ProductoDTO dto, Producto producto) {
