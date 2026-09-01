@@ -37,6 +37,11 @@ export class LoginComponent {
     this.sesion.login(this.usuario(), this.clave()).subscribe({
       next: () => {
         this.cargando.set(false);
+        if (!this.sesion.tieneAccesoFrezco()) {
+          this.sesion.descartarSesion();
+          this.error.set('Este usuario no tiene acceso a Frezco');
+          return;
+        }
         this.router.navigate(['/resumen']);
       },
       error: (respuesta) => {

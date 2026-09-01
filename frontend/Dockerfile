@@ -12,10 +12,10 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /app/dist/frezco/browser /usr/share/nginx/html
 
 # Template en vez de config fija: el entrypoint oficial de nginx corre envsubst sobre
-# /etc/nginx/templates/*.template al arrancar. BACKEND_UPSTREAM se puede sobreescribir
-# por variable de entorno cuando el nombre del servicio backend no es "backend"
-# (por ejemplo, al mezclar este frontend en el compose de otro stack).
+# /etc/nginx/templates/*.template al arrancar. GATEWAY_UPSTREAM es el nombre del API
+# Gateway compartido en la red buildr_shared. Sin ese enganche, ni /api ni /auth resuelven:
+# ver docker-compose.dev.yml.
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
-ENV BACKEND_UPSTREAM=backend:8090
+ENV GATEWAY_UPSTREAM=api-gateway:8080
 
 EXPOSE 80

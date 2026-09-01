@@ -1,0 +1,31 @@
+# =======================
+# Overlay de desarrollo: engancha el backend de Frezco a los servicios
+# compartidos de buildr-platform (auth-service, documentos-service) para poder
+# probar la integración en local sin desplegar nada.
+#
+# Prerequisito: levantar primero buildr-platform (crea la red `buildr_shared`):
+#   cd ../buildr-platform && docker compose up -d
+#
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# En producción NO se usa este archivo: el backend de Frezco no conoce estas
+# variables y sigue funcionando con su config actual (sin auth compartido).
+# =======================
+services:
+  backend:
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8089
+      - DOCUMENTOS_SERVICE_URL=http://documentos-service:8087
+    networks:
+      - buildr_shared
+
+  # El frontend le pega a /api y /auth por nginx, que reenvia al Gateway (GATEWAY_UPSTREAM
+  # en su Dockerfile) — necesita la misma red para resolverlo por nombre.
+  frontend:
+    networks:
+      - buildr_shared
+
+networks:
+  buildr_shared:
+    external: true

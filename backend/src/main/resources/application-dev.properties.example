@@ -4,7 +4,10 @@ spring.datasource.url=jdbc:sqlserver://HOST:1433;databaseName=frezco;encrypt=fal
 spring.datasource.username=sa
 spring.datasource.password=
 
-app.seguridad.usuario=admin
-app.seguridad.clave=admin
+# El Gateway compartido (repo buildr-platform, application-dev.properties) rutea
+# /api/frezco/** a localhost:8091, no al 8090 default — 8090 ya lo usa la tiquetera en ese
+# mismo Gateway de dev. Si corres el backend suelto desde el IDE junto con el resto del
+# ecosistema, tenes que pisar el puerto:
+# server.port=8091
 
 logging.level.ar.frezco=DEBUG

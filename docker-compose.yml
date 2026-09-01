@@ -46,8 +46,6 @@ services:
       - DB_NAME=${DB_NAME:-frezco}
       - DB_USER=${DB_USER:-sa}
       - DB_PASSWORD=${DB_PASSWORD}
-      - APP_USER=${APP_USER:-admin}
-      - APP_PASSWORD=${APP_PASSWORD}
       - JAVA_OPTS=-Xms64m -Xmx256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200
     depends_on:
       crear-base:

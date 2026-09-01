@@ -118,8 +118,15 @@ cambia el precio, los pedidos viejos tienen que seguir mostrando lo que se cobr�
 **Anulación, no borrado.** Los pedidos no se eliminan ni se editan. Se marcan
 `anulado = true`. Todos los cálculos ignoran los anulados.
 
-**Sin usuarios.** Usuario y contraseña únicos en variables de entorno. Autenticación
-básica con sesión. Sin tabla de usuarios, sin roles, sin recuperación de contraseña.
+**Autenticación.** Frezco no tiene login propio: delega en el Auth Service compartido del
+ecosistema Buildr (junto a SGO y la Tiquetera), vía el API Gateway común. El frontend
+loguea contra el Gateway (`/auth/login`) y manda el JWT como `Authorization: Bearer` en
+cada request. El Gateway valida el JWT e inyecta headers de identidad
+(`X-User-Id`, `X-Username`, `X-User-Rol`, `X-Organizacion-Id`); `GatewayAuthFilter`
+(`backend/.../config/`) solo lee esos headers, nunca valida el JWT ni ve la contraseña.
+Frezco es tenant único en esa base compartida: organización fija `id = 1`, validada en
+el mismo filtro. Sin tabla de usuarios ni roles propios en este repo — eso vive en
+`auth-service` (repo `buildr-platform`).
 
 ## Comandos
 

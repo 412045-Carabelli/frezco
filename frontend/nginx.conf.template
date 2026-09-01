@@ -16,12 +16,24 @@ server {
   resolver 127.0.0.11 valid=10s ipv6=off;
 
   location /api/ {
-    # BACKEND_UPSTREAM se resuelve via envsubst al arrancar el contenedor (ver Dockerfile).
-    # Default "backend:8090" para el compose standalone; en un stack compartido (por
-    # ejemplo el del Sistema de Gestion de Obras) se sobreescribe con el nombre real
-    # del servicio, para no depender de que se llame justo "backend".
-    set $upstream http://${BACKEND_UPSTREAM};
-    proxy_pass $upstream;
+    # Va al API Gateway compartido (Path=/api/frezco/** alla), no directo al backend de
+    # Frezco: el Gateway valida el JWT e inyecta los headers de identidad que el backend
+    # necesita (GatewayAuthFilter). GATEWAY_UPSTREAM se resuelve via envsubst; solo
+    # funciona si este contenedor esta en la misma red Docker que el Gateway.
+    set $upstream_gateway http://${GATEWAY_UPSTREAM};
+    proxy_pass $upstream_gateway;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $proxy_forwarded_proto;
+  }
+
+  location /auth/ {
+    # El login pega contra el API Gateway compartido de Buildr (auth-service detras),
+    # no contra el backend de Frezco. GATEWAY_UPSTREAM se resuelve via envsubst; solo
+    # funciona si este contenedor esta en la misma red Docker que el Gateway.
+    set $upstream_gateway http://${GATEWAY_UPSTREAM};
+    proxy_pass $upstream_gateway;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
