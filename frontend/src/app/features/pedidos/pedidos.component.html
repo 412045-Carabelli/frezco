@@ -1,35 +1,34 @@
-<h1 class="titulo-pantalla mb-4">Pedidos</h1>
-
-<div class="flex flex-wrap items-center gap-2 mb-4">
-  <p-button label="Nuevo pedido" icon="pi pi-plus" (onClick)="abrirNuevoPedido()"
+<app-layout-header titulo="Pedidos" subtitulo="Carga de pedidos e historial" tipo="listado">
+  <p-button membrete-acciones label="Nuevo pedido" icon="pi pi-plus" (onClick)="abrirNuevoPedido()"
             data-tutorial="nuevo-pedido" />
-</div>
+</app-layout-header>
 
-<div class="tarjeta barra-filtros mb-4">
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Desde</label>
-    <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
-  </div>
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Hasta</label>
-    <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
-  </div>
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Cuenta</label>
-    <p-autoComplete [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
-                    (onSelect)="cuenta.set($event.value)" (onClear)="limpiarCuenta()"
-                    [suggestions]="cuentasSugeridas()" optionLabel="nombre"
-                    placeholder="Todas" [minLength]="1" />
-  </div>
-  <div class="flex items-center gap-2">
-    <p-toggleswitch [ngModel]="incluirAnulados()" (ngModelChange)="incluirAnulados.set($event)"
-                    inputId="anulados" />
-    <label for="anulados" class="text-sm text-gray-700">Incluir anulados</label>
-  </div>
-</div>
+<div class="p-4">
+  <app-barra-filtros>
+    <div filtros class="flex flex-col gap-1">
+      <label>Desde</label>
+      <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
+    </div>
+    <div filtros class="flex flex-col gap-1">
+      <label>Hasta</label>
+      <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
+    </div>
+    <div filtros class="flex flex-col gap-1">
+      <label>Cuenta</label>
+      <p-autoComplete [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
+                      (onSelect)="cuenta.set($event.value)" (onClear)="limpiarCuenta()"
+                      [suggestions]="cuentasSugeridas()" optionLabel="nombre"
+                      placeholder="Todas" [minLength]="1" />
+    </div>
+    <div filtros class="flex items-center gap-2">
+      <p-toggleswitch [ngModel]="incluirAnulados()" (ngModelChange)="incluirAnulados.set($event)"
+                      inputId="anulados" />
+      <label for="anulados">Incluir anulados</label>
+    </div>
+  </app-barra-filtros>
 
-<p-table data-tutorial="tabla-pedidos" [value]="pedidos()" [loading]="cargando()" [paginator]="pedidos().length > 25" [rows]="25"
-         styleClass="tarjeta overflow-hidden">
+  <p-table data-tutorial="tabla-pedidos" [value]="pedidos()" [loading]="cargando()" [paginator]="pedidos().length > 25" [rows]="25"
+           styleClass="tarjeta overflow-hidden">
   <ng-template pTemplate="header">
     <tr>
       <th>Numero</th>
@@ -69,10 +68,11 @@
     </tr>
   </ng-template>
 </p-table>
+</div>
 
 @if (detalle(); as pedido) {
   <p-dialog [visible]="true" (visibleChange)="detalle.set(null)" [modal]="true"
-            [style]="{ width: '40rem' }" [header]="'Pedido ' + pedido.numero">
+            [style]="{ width: '40rem', maxHeight: '90vh' }" [header]="'Pedido ' + pedido.numero">
     <p class="text-sm text-gray-500 mb-3">
       {{ pedido.fecha }} · {{ pedido.cuenta.nombre }}
       @if (pedido.descuentoPct > 0) {
@@ -113,7 +113,8 @@
 
 @if (nuevoPedidoAbierto()) {
   <p-dialog [visible]="true" (visibleChange)="cerrarNuevoPedido()" [modal]="true"
-            [style]="{ width: '52rem' }" [breakpoints]="{ '960px': '92vw', '640px': '100vw' }"
+            [style]="{ width: '52rem', maxHeight: '90vh' }"
+            [breakpoints]="{ '960px': '92vw', '640px': '100vw' }"
             header="Nuevo pedido">
     <app-nuevo-pedido #formNuevoPedido (guardado)="alGuardarPedido()" />
 

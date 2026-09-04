@@ -1,17 +1,18 @@
-<h1 class="titulo-pantalla mb-4">Análisis comercial</h1>
+<app-layout-header titulo="Análisis comercial" subtitulo="Ventas y margenes por articulo" tipo="listado" />
 
-<div class="flex flex-wrap items-end gap-3 mb-4">
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Desde</label>
+<div class="p-4">
+<app-barra-filtros>
+  <div filtros class="flex flex-col gap-1">
+    <label>Desde</label>
     <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
   </div>
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Hasta</label>
+  <div filtros class="flex flex-col gap-1">
+    <label>Hasta</label>
     <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
   </div>
-  <p-button label="Actualizar" icon="pi pi-refresh" severity="secondary" [loading]="cargando()"
+  <p-button acciones label="Actualizar" icon="pi pi-refresh" severity="secondary" [loading]="cargando()"
             (onClick)="cargar()" />
-</div>
+</app-barra-filtros>
 
 @if (analisis(); as datos) {
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -22,14 +23,14 @@
           <tr>
             <th>Articulo</th>
             <th class="text-right">Unid.</th>
-            <th class="text-right">$</th>
+            <th class="text-right">Importe</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-fila let-i="rowIndex">
           <tr>
             <td>{{ i + 1 }}. {{ fila.nombre }}</td>
             <td class="text-right">{{ fila.unidades | number:'1.0-2' }}</td>
-            <td class="text-right">$ {{ fila.importe | number:'1.2-2' }}</td>
+            <td class="text-right whitespace-nowrap">$ {{ fila.importe | number:'1.2-2' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -47,14 +48,14 @@
           <tr>
             <th>Cliente</th>
             <th class="text-right">Pedidos</th>
-            <th class="text-right">$</th>
+            <th class="text-right">Importe</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-fila let-i="rowIndex">
           <tr>
             <td>{{ i + 1 }}. {{ fila.nombre }}</td>
             <td class="text-right">{{ fila.cantidadPedidos }}</td>
-            <td class="text-right">$ {{ fila.importe | number:'1.2-2' }}</td>
+            <td class="text-right whitespace-nowrap">$ {{ fila.importe | number:'1.2-2' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -71,13 +72,13 @@
         <ng-template pTemplate="header">
           <tr>
             <th>Zona</th>
-            <th class="text-right">$</th>
+            <th class="text-right">Importe</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-fila>
           <tr>
             <td>{{ fila.zona }}</td>
-            <td class="text-right">$ {{ fila.importe | number:'1.2-2' }}</td>
+            <td class="text-right whitespace-nowrap">$ {{ fila.importe | number:'1.2-2' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -89,3 +90,4 @@
     </section>
   </div>
 }
+</div>

@@ -1,20 +1,20 @@
-<div class="tarjeta barra-filtros mb-4">
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Desde</label>
+<app-barra-filtros>
+  <div filtros class="flex flex-col gap-1">
+    <label>Desde</label>
     <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
   </div>
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Hasta</label>
+  <div filtros class="flex flex-col gap-1">
+    <label>Hasta</label>
     <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
   </div>
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Cuenta</label>
+  <div filtros class="flex flex-col gap-1">
+    <label>Cuenta</label>
     <p-autoComplete [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
                     (onSelect)="cuenta.set($event.value)" (onClear)="limpiarCuenta()"
                     [suggestions]="cuentasSugeridas()" optionLabel="nombre"
                     placeholder="Todas" [minLength]="1" />
   </div>
-</div>
+</app-barra-filtros>
 
 <p-table [value]="pedidos()" [loading]="cargando()" [paginator]="pedidos().length > 25" [rows]="25"
          styleClass="tarjeta overflow-hidden">

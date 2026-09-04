@@ -9,11 +9,12 @@ import { ApiService } from '../../core/api.service';
 import { aTexto, primerDiaDelMes } from '../../core/fechas';
 import { MARCA } from '../../config/marca';
 import { Cuenta, RemitoProveedor } from '../../core/modelos';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
 @Component({
   selector: 'app-remito-proveedor',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, AutoCompleteModule, ButtonModule, DatePickerModule],
+  imports: [FormsModule, DecimalPipe, AutoCompleteModule, ButtonModule, DatePickerModule, BarraFiltrosComponent],
   templateUrl: './remito-proveedor.component.html',
   styleUrl: './remito.css'
 })

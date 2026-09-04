@@ -24,6 +24,9 @@ export interface Cuenta {
   tipo: TipoCuenta;
   zona: string | null;
   descuentoPct: number;
+  telefono: string | null;
+  direccion: string | null;
+  email: string | null;
   activo: boolean;
 }
 

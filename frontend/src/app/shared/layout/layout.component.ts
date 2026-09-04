@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { Location, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
@@ -32,7 +32,6 @@ export class LayoutComponent {
 
   private readonly sesion = inject(SesionService);
   private readonly router = inject(Router);
-  private readonly ubicacion = inject(Location);
 
   readonly tutorial = inject(TutorialService);
   readonly marca = MARCA;
@@ -73,15 +72,6 @@ export class LayoutComponent {
 
   hayAyuda(): boolean {
     return this.tutorial.hayAyudaPara(this.rutaActual());
-  }
-
-  /** En el inicio no hay "atras" util: es la primera pantalla del flujo. */
-  hayAtras(): boolean {
-    return this.rutaActual() !== '/resumen' && this.rutaActual() !== '';
-  }
-
-  volverAtras(): void {
-    this.ubicacion.back();
   }
 
   salir(): void {

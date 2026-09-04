@@ -8,11 +8,16 @@ import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { aFecha, aTexto } from '../../core/fechas';
 import { AnalisisComercial } from '../../core/modelos';
+import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
 @Component({
   selector: 'app-analisis-comercial',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, ButtonModule, DatePickerModule, TableModule],
+  imports: [
+    FormsModule, DecimalPipe, ButtonModule, DatePickerModule, TableModule,
+    LayoutHeaderComponent, BarraFiltrosComponent
+  ],
   templateUrl: './analisis-comercial.component.html'
 })
 export class AnalisisComercialComponent {

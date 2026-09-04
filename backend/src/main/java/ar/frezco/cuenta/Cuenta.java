@@ -38,6 +38,15 @@ public class Cuenta {
     @Column(name = "descuento_pct", nullable = false)
     private BigDecimal descuentoPct = BigDecimal.ZERO;
 
+    @Column(length = 30)
+    private String telefono;
+
+    @Column(length = 160)
+    private String direccion;
+
+    @Column(length = 120)
+    private String email;
+
     @Column(nullable = false)
     private boolean activo = true;
 }

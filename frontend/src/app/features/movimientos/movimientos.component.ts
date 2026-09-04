@@ -14,13 +14,18 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { aTexto } from '../../core/fechas';
 import { Cuenta, Movimiento, Saldo, TipoMovimiento } from '../../core/modelos';
+import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
+
+const porNombre = (a: Saldo, b: Saldo): number => a.nombre.localeCompare(b.nombre);
 
 @Component({
   selector: 'app-movimientos',
   standalone: true,
   imports: [
     FormsModule, DecimalPipe, AutoCompleteModule, ButtonModule, DatePickerModule, InputNumberModule,
-    InputTextModule, SelectButtonModule, TableModule, TagModule, ConfirmDialogModule
+    InputTextModule, SelectButtonModule, TableModule, TagModule, ConfirmDialogModule,
+    LayoutHeaderComponent, BarraFiltrosComponent
   ],
   providers: [ConfirmationService],
   templateUrl: './movimientos.component.html'
@@ -110,23 +115,23 @@ export class MovimientosComponent {
   /** Deudas pendientes: clientes que deben y proveedores a los que se les debe, para pagar/cobrar en un click. */
   cargarDeudas(): void {
     this.api.saldos('CLIENTE', true).subscribe(saldos =>
-      this.deudas.set(saldos.filter(s => s.saldo > 0)));
+      this.deudas.set(saldos.filter(s => s.saldo > 0).sort(porNombre)));
     this.api.saldos('PROVEEDOR', true).subscribe(saldos =>
-      this.deudasProveedores.set(saldos.filter(s => s.saldo > 0)));
+      this.deudasProveedores.set(saldos.filter(s => s.saldo > 0).sort(porNombre)));
   }
 
   /** Precarga el formulario con la cuenta y el saldo total, lista para confirmar. */
   cobrarDeuda(saldo: Saldo): void {
     this.tipo.set('COBRO');
     this.elegirCuenta({ id: saldo.cuentaId, nombre: saldo.nombre, tipo: 'CLIENTE',
-      zona: null, descuentoPct: 0, activo: true });
+      zona: null, descuentoPct: 0, telefono: null, direccion: null, email: null, activo: true });
     this.importe.set(saldo.saldo);
   }
 
   pagarDeuda(saldo: Saldo): void {
     this.tipo.set('PAGO');
     this.elegirCuenta({ id: saldo.cuentaId, nombre: saldo.nombre, tipo: 'PROVEEDOR',
-      zona: null, descuentoPct: 0, activo: true });
+      zona: null, descuentoPct: 0, telefono: null, direccion: null, email: null, activo: true });
     this.importe.set(saldo.saldo);
   }
 

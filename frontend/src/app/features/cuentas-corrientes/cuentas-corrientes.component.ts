@@ -13,13 +13,16 @@ import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { aTexto } from '../../core/fechas';
 import { Cuenta, CuentaCorriente, Saldo } from '../../core/modelos';
+import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
 @Component({
   selector: 'app-cuentas-corrientes',
   standalone: true,
   imports: [
     FormsModule, DecimalPipe, ButtonModule, DatePickerModule, DialogModule, InputNumberModule,
-    InputTextModule, MessageModule, SelectModule, TableModule
+    InputTextModule, MessageModule, SelectModule, TableModule, LayoutHeaderComponent,
+    BarraFiltrosComponent
   ],
   templateUrl: './cuentas-corrientes.component.html'
 })

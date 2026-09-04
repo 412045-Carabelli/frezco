@@ -4,9 +4,11 @@ import { DecimalPipe } from '@angular/common';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
+import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { aTexto } from '../../core/fechas';
@@ -24,8 +26,8 @@ interface LineaEnEdicion {
   selector: 'app-nuevo-pedido',
   standalone: true,
   imports: [
-    FormsModule, DecimalPipe, AutoCompleteModule, ButtonModule, DatePickerModule,
-    InputNumberModule, InputTextModule, SelectButtonModule
+    FormsModule, DecimalPipe, AutoCompleteModule, ButtonModule, DatePickerModule, DialogModule,
+    InputNumberModule, InputTextModule, SelectButtonModule, TooltipModule
   ],
   templateUrl: './nuevo-pedido.component.html'
 })
@@ -51,6 +53,14 @@ export class NuevoPedidoComponent {
   readonly cuentasSugeridas = signal<Cuenta[]>([]);
   readonly productosSugeridos = signal<Producto[]>([]);
   readonly proveedoresSugeridos = signal<Cuenta[]>([]);
+
+  /** Alta rapida de cliente sin salir del pedido. */
+  readonly nuevoClienteAbierto = signal(false);
+  readonly nuevoClienteNombre = signal('');
+  readonly nuevoClienteTelefono = signal('');
+  readonly nuevoClienteDireccion = signal('');
+  readonly nuevoClienteEmail = signal('');
+  readonly guardandoCliente = signal(false);
 
   readonly condiciones: { label: string; value: CondicionVenta }[] = [
     { label: 'Minorista', value: 'MINORISTA' },
@@ -104,11 +114,57 @@ export class NuevoPedidoComponent {
   elegirProducto(indice: number, producto: Producto): void {
     const proveedorDefault: Cuenta | null = producto.proveedorId
       ? { id: producto.proveedorId, nombre: producto.proveedorNombre ?? '', tipo: 'PROVEEDOR',
-          zona: null, descuentoPct: 0, activo: true }
+          zona: null, descuentoPct: 0, telefono: null, direccion: null, email: null, activo: true }
       : null;
     this.actualizarLinea(indice, { producto, proveedor: proveedorDefault });
     this.consultarPrecio(indice, producto);
     this.enfocarUnidades(indice);
+  }
+
+  abrirNuevoCliente(nombre: string): void {
+    this.nuevoClienteNombre.set(nombre ?? '');
+    this.nuevoClienteTelefono.set('');
+    this.nuevoClienteDireccion.set('');
+    this.nuevoClienteEmail.set('');
+    this.nuevoClienteAbierto.set(true);
+  }
+
+  cerrarNuevoCliente(): void {
+    this.nuevoClienteAbierto.set(false);
+  }
+
+  guardarNuevoCliente(): void {
+    if (!this.nuevoClienteNombre().trim()) {
+      this.mensajes.add({ severity: 'warn', summary: 'El nombre es obligatorio' });
+      return;
+    }
+
+    this.guardandoCliente.set(true);
+    this.api.guardarCuenta({
+      id: null,
+      nombre: this.nuevoClienteNombre().trim(),
+      tipo: 'CLIENTE',
+      zona: null,
+      descuentoPct: 0,
+      telefono: this.nuevoClienteTelefono() || null,
+      direccion: this.nuevoClienteDireccion() || null,
+      email: this.nuevoClienteEmail() || null,
+      activo: true
+    }).subscribe({
+      next: cuenta => {
+        this.guardandoCliente.set(false);
+        this.nuevoClienteAbierto.set(false);
+        this.mensajes.add({ severity: 'success', summary: `Cliente ${cuenta.nombre} creado` });
+        this.elegirCuenta(cuenta);
+      },
+      error: respuesta => {
+        this.guardandoCliente.set(false);
+        this.mensajes.add({
+          severity: 'error',
+          summary: respuesta.error?.mensaje ?? 'No se pudo crear el cliente'
+        });
+      }
+    });
   }
 
   buscarProveedores(evento: { query: string }): void {

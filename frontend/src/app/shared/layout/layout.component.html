@@ -1,84 +1,85 @@
 <!-- El contenido del menu se escribe una vez y se usa en las dos versiones. -->
 <ng-template #contenidoMenu>
-  <nav class="flex-1 overflow-y-auto py-2">
-    @for (item of items; track item.ruta) {
-      <a [routerLink]="item.ruta"
-         routerLinkActive="activo"
-         (click)="cerrarMenu()"
-         class="item-menu flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50">
-        <i class="pi {{ item.icono }} text-gray-400"></i>
-        {{ item.etiqueta }}
-      </a>
-    }
-  </nav>
-
-  @if (ecosistema.length) {
-    <div class="px-4 py-2 border-t border-gray-200">
-      <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Otros sistemas</p>
-      @for (sistema of ecosistema; track sistema.url) {
-        <a [href]="sistema.url" target="_blank" rel="noopener"
-           class="item-menu flex items-center gap-3 px-0 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
-          <i class="pi {{ sistema.icono }} text-gray-400"></i>
-          {{ sistema.nombre }}
-          <i class="pi pi-external-link text-xs text-gray-300 ml-auto"></i>
+  <div class="flex flex-col h-full bg-gray-200">
+    <nav class="flex-1 flex flex-col gap-1 p-4 overflow-y-auto">
+      @for (item of items; track item.ruta; let i = $index) {
+        <a [routerLink]="item.ruta"
+           routerLinkActive="activo"
+           (click)="cerrarMenu()"
+           [style.animation-delay.ms]="i * 40"
+           class="item-menu flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-800">
+          <i class="pi {{ item.icono }} text-xl text-gray-400"></i>
+          <span class="text-base font-poppins font-semibold">{{ item.etiqueta }}</span>
         </a>
       }
-    </div>
-  }
 
-  <div class="px-4 py-3 border-t border-gray-200 flex flex-col gap-3">
+      @if (ecosistema.length) {
+        <div class="pt-2 mt-2 border-t border-gray-300">
+          <p class="text-xs text-gray-400 uppercase tracking-wide px-3 mb-1">Otros sistemas</p>
+          @for (sistema of ecosistema; track sistema.url) {
+            <a [href]="sistema.url" target="_blank" rel="noopener"
+               class="item-menu flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-800">
+              <i class="pi {{ sistema.icono }} text-xl text-gray-400"></i>
+              <span class="text-base font-poppins font-semibold">{{ sistema.nombre }}</span>
+              <i class="pi pi-external-link text-xs text-gray-400 ml-auto"></i>
+            </a>
+          }
+        </div>
+      }
+    </nav>
+
     <!-- Ayuda automatica: se puede apagar cuando ya se le agarro la mano al sistema. -->
-    <div class="flex items-center justify-between gap-2">
-      <label for="ayuda-auto" class="text-sm text-gray-600">Ayuda automática</label>
-      <p-toggleswitch inputId="ayuda-auto" [ngModel]="tutorial.automatico()"
-                      (ngModelChange)="tutorial.alternarAutomatico($event)" />
-    </div>
+    <div class="pie-menu flex flex-col gap-3 px-4 py-3">
+      <div class="flex items-center justify-between gap-2">
+        <label for="ayuda-auto" class="text-sm text-gray-600">Ayuda automática</label>
+        <p-toggleswitch inputId="ayuda-auto" [ngModel]="tutorial.automatico()"
+                        (ngModelChange)="tutorial.alternarAutomatico($event)" />
+      </div>
 
-    <p-button label="Salir" icon="pi pi-sign-out" severity="secondary"
-              [text]="true" size="small" (onClick)="salir()" />
+      <p-button label="Salir" icon="pi pi-sign-out" severity="secondary"
+                [text]="true" size="small" (onClick)="salir()" />
+    </div>
   </div>
 </ng-template>
 
-<div class="min-h-screen flex">
+<div class="h-screen flex flex-col overflow-hidden">
 
-  <!-- Escritorio: menu fijo a la izquierda -->
-  <aside data-tutorial="menu"
-         class="hidden md:flex fixed inset-y-0 left-0 z-30 w-60 bg-white border-r border-gray-200
-                flex-col no-imprimir">
-    <div class="encabezado-marca px-4 py-4 text-white">
-      <p class="text-lg font-semibold leading-tight">{{ marca.nombre }}</p>
-      <p class="text-xs opacity-90">{{ marca.descripcion }}</p>
+  <!-- Barra superior: fija, misma estructura que el Sistema de Gestion de Obras. -->
+  <header class="sticky top-0 z-40 h-[60px] flex items-center gap-3 bg-white border-b border-gray-200 px-4 no-imprimir">
+    <div class="md:hidden">
+      <p-button icon="pi pi-bars" [rounded]="true" [text]="true" (onClick)="alternarMenu()"
+                styleClass="!text-gray-700" ariaLabel="Abrir menú" />
     </div>
-    <ng-container *ngTemplateOutlet="contenidoMenu" />
-  </aside>
+    <span class="font-poppins font-semibold text-gray-800">{{ marca.nombre }}</span>
+    <span class="text-xs text-gray-400 hidden sm:inline">{{ marca.descripcion }}</span>
+  </header>
 
-  <!-- Mobile: el mismo menu dentro de un drawer de PrimeNG -->
-  <p-drawer [(visible)]="menuAbierto" [style]="{ width: '17rem' }" styleClass="md:hidden no-imprimir"
-            [header]="marca.nombre">
-    <ng-container *ngTemplateOutlet="contenidoMenu" />
-  </p-drawer>
+  <div class="flex flex-1 min-h-0">
 
-  <div class="flex-1 flex flex-col md:ml-60">
-    <header class="encabezado-marca h-14 flex items-center gap-2 px-2 text-white md:hidden no-imprimir">
-      <p-button icon="pi pi-bars" [text]="true" (onClick)="alternarMenu()"
-                ariaLabel="Abrir menú" styleClass="!text-white" />
-      <span class="font-semibold flex-1">{{ marca.nombre }}</span>
-    </header>
+    <!-- Escritorio: menu fijo a la izquierda -->
+    <aside data-tutorial="menu"
+           class="hidden md:flex md:flex-col w-60 shrink-0 overflow-y-auto no-imprimir">
+      <ng-container *ngTemplateOutlet="contenidoMenu" />
+    </aside>
 
-    <!-- Boton de ayuda: redondo, abajo a la derecha, siempre a mano. -->
-    @if (hayAyuda()) {
-      <p-button icon="pi pi-question" [rounded]="true" size="large"
-                (onClick)="ayudaDeEstaPantalla()" ariaLabel="Cómo se usa esta pantalla"
-                pTooltip="Cómo se usa esta pantalla" tooltipPosition="left"
-                styleClass="boton-ayuda no-imprimir" />
-    }
+    <!-- Mobile: el mismo menu dentro de un drawer de PrimeNG -->
+    <p-drawer [(visible)]="menuAbierto" [style]="{ width: '17rem' }" styleClass="md:hidden no-imprimir"
+              [header]="marca.nombre">
+      <ng-container *ngTemplateOutlet="contenidoMenu" />
+    </p-drawer>
 
-    <main class="flex-1 p-4">
-      @if (hayAtras()) {
-        <p-button icon="pi pi-arrow-left" label="Atrás" severity="secondary" [text]="true" size="small"
-                  styleClass="no-imprimir mb-2" (onClick)="volverAtras()" ariaLabel="Volver" />
+    <div class="flex-1 overflow-y-auto">
+      <!-- Boton de ayuda: redondo, abajo a la derecha, siempre a mano. -->
+      @if (hayAyuda()) {
+        <p-button icon="pi pi-question" [rounded]="true" size="large"
+                  (onClick)="ayudaDeEstaPantalla()" ariaLabel="Cómo se usa esta pantalla"
+                  pTooltip="Cómo se usa esta pantalla" tooltipPosition="left"
+                  styleClass="boton-ayuda no-imprimir" />
       }
-      <router-outlet />
-    </main>
+
+      <main>
+        <router-outlet />
+      </main>
+    </div>
   </div>
 </div>

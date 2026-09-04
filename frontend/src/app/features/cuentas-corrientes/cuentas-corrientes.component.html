@@ -1,5 +1,6 @@
-<h1 class="titulo-pantalla mb-4">Cuentas corrientes</h1>
+<app-layout-header titulo="Cuentas corrientes" subtitulo="Saldos y movimientos por cuenta" tipo="listado" />
 
+<div class="p-4">
 <div class="no-imprimir grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
   <section class="tarjeta p-4 lg:col-span-2">
     <p class="text-sm font-medium text-gray-700 mb-2">Clientes con saldo pendiente</p>
@@ -32,31 +33,31 @@
   </section>
 </div>
 
-<div class="tarjeta barra-filtros mb-4 no-imprimir">
-  <div class="flex flex-col gap-1 min-w-56" data-tutorial="selector-cuenta">
-    <label class="text-sm text-gray-700">Cuenta</label>
+<app-barra-filtros class="no-imprimir">
+  <div filtros class="flex flex-col gap-1 min-w-56" data-tutorial="selector-cuenta">
+    <label>Cuenta</label>
     <p-select [options]="cuentas()" optionLabel="nombre" optionValue="id" [group]="false"
               [filter]="true" filterBy="nombre" placeholder="Elegi una cuenta"
               [ngModel]="cuentaId()" (ngModelChange)="elegirCuenta($event)" styleClass="w-full" />
   </div>
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Desde</label>
+  <div filtros class="flex flex-col gap-1">
+    <label>Desde</label>
     <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
   </div>
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Hasta</label>
+  <div filtros class="flex flex-col gap-1">
+    <label>Hasta</label>
     <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
   </div>
-  <p-button label="Consultar" icon="pi pi-search" severity="secondary" [loading]="cargando()"
+  <p-button acciones label="Consultar" icon="pi pi-search" severity="secondary" [loading]="cargando()"
             (onClick)="consultar()" />
   @if (estado()) {
-    <p-button label="Imprimir" icon="pi pi-print" (onClick)="imprimir()" />
+    <p-button acciones label="Imprimir" icon="pi pi-print" (onClick)="imprimir()" />
   }
   @if (puedePagarCobrar()) {
-    <p-button [label]="estado()!.cuenta.tipo === 'CLIENTE' ? 'Cobrar' : 'Pagar'"
+    <p-button acciones [label]="estado()!.cuenta.tipo === 'CLIENTE' ? 'Cobrar' : 'Pagar'"
               icon="pi pi-dollar" severity="success" (onClick)="abrirPagoCobro()" />
   }
-</div>
+</app-barra-filtros>
 
 @if (estado(); as cuenta) {
   <h2 class="text-lg font-semibold mb-2">{{ cuenta.cuenta.nombre }}</h2>
@@ -125,6 +126,7 @@
     </ng-template>
   </p-table>
 }
+</div>
 
 @if (dialogoAbierto()) {
   <p-dialog [visible]="true" (visibleChange)="cerrarPagoCobro()" [modal]="true"

@@ -26,8 +26,8 @@ public class StockController {
     }
 
     @GetMapping("/ranking")
-    public List<RankingProductoDTO> ranking() {
-        return servicio.rankingVentas();
+    public List<RankingProductoDTO> ranking(@RequestParam(defaultValue = "30") int dias) {
+        return servicio.rankingVentas(dias);
     }
 
     @GetMapping("/{productoId}/movimientos")

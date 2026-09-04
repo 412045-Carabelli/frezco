@@ -7,11 +7,17 @@ import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { aTexto } from '../../core/fechas';
 import { Resumen } from '../../core/modelos';
+import { KpiCardComponent } from '../../shared/kpi-card/kpi-card.component';
+import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
 @Component({
   selector: 'app-resumen',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, PercentPipe, ButtonModule, DatePickerModule],
+  imports: [
+    FormsModule, DecimalPipe, PercentPipe, ButtonModule, DatePickerModule,
+    KpiCardComponent, LayoutHeaderComponent, BarraFiltrosComponent
+  ],
   templateUrl: './resumen.component.html'
 })
 export class ResumenComponent {

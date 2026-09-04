@@ -2,6 +2,12 @@
 @import "primeicons/primeicons.css";
 @import "driver.js/dist/driver.css";
 
+/* Tipografia de titulos y componentes normalizados: mismo criterio que el Sistema de Gestion de Obras
+   (clase font-poppins con fallback a system-ui, sin cargar la fuente real). */
+@theme {
+  --font-poppins: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
 /**
  * Escalado de tipografia accesible: mismo criterio que el Sistema de Gestion de Obras.
  * No fijar font-size en html en px, para que el zoom del navegador siga funcionando.
@@ -18,6 +24,7 @@
   --marca: #0891b2;
   --marca-oscuro: #0e7490;
   --marca-texto: #155e75;
+  --marca-rgb: 8, 145, 178;
 
   --superficie: #f5f7f9;
   --borde: #e5e7eb;
@@ -58,19 +65,19 @@ body {
   padding: 0.75rem;
 }
 
-/* Titulo de pantalla, con el filete de color de la marca. */
-.titulo-pantalla {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  padding-left: 0.625rem;
-  border-left: 4px solid var(--marca);
-  line-height: 1.2;
-}
-
 /* Tarjeta de indicador del resumen. */
 .tarjeta-indicador {
   border-top: 3px solid var(--marca);
+}
+
+/* Aparicion suave de los KPI, mismo criterio que el Sistema de Gestion de Obras. */
+@keyframes kpi-aparecer {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.kpi-fade-in {
+  animation: kpi-aparecer 0.3s ease both;
 }
 
 label {

@@ -1,9 +1,14 @@
-<h1 class="titulo-pantalla mb-4">Stock</h1>
+<app-layout-header titulo="Stock" subtitulo="Existencias actuales por articulo" tipo="listado" />
 
+<div class="p-4">
 <section class="tarjeta p-4 mb-4">
-  <p class="text-sm font-medium text-gray-700 mb-2">
-    Ranking de ventas (ultimos 30 dias) y pedido sugerido
-  </p>
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+    <p class="text-sm font-medium text-gray-700">
+      Ranking de ventas (ultimos {{ diasRanking() }} dias) y pedido sugerido
+    </p>
+    <p-selectButton [options]="[15, 30]" [ngModel]="diasRanking()" (ngModelChange)="cambiarDiasRanking($event)"
+                    [allowEmpty]="false" />
+  </div>
   <p class="text-xs text-gray-500 mb-3">
     Sugerido = vendido en el periodo menos el stock actual. No cuenta consumo propio ni refuerzos.
   </p>
@@ -30,13 +35,13 @@
   </p-table>
 </section>
 
-<div class="flex flex-wrap items-center gap-3 mb-4">
-  <div class="flex items-center gap-2">
+<app-barra-filtros>
+  <div filtros class="flex items-center gap-2">
     <p-toggleswitch [ngModel]="soloConStock()" (ngModelChange)="soloConStock.set($event); cargar()"
                     inputId="conStock" />
-    <label for="conStock" class="text-sm text-gray-700">Solo con stock</label>
+    <label for="conStock">Solo con stock</label>
   </div>
-</div>
+</app-barra-filtros>
 
 <p-table data-tutorial="tabla-stock" [value]="items()" [loading]="cargando()" [paginator]="items().length > 25" [rows]="25"
          [sortField]="'stockActual'" [sortOrder]="-1"
@@ -72,6 +77,7 @@
     </tr>
   </ng-template>
 </p-table>
+</div>
 
 @if (detalle(); as item) {
   <p-dialog [visible]="true" (visibleChange)="cerrarDetalle()" [modal]="true"

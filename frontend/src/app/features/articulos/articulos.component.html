@@ -1,11 +1,17 @@
-<h1 class="titulo-pantalla mb-4">Artículos</h1>
+<app-layout-header titulo="Artículos" subtitulo="Catalogo de productos" tipo="listado">
+  <p-button membrete-acciones label="Nuevo" icon="pi pi-plus" data-tutorial="nuevo-articulo" (onClick)="nuevo()" />
+</app-layout-header>
 
-<div class="flex flex-wrap items-center gap-2 mb-4">
-  <input pInputText placeholder="Buscar" class="flex-1 min-w-40" [ngModel]="busqueda()"
-         (ngModelChange)="busqueda.set($event)" (keyup.enter)="cargar()" />
-  <p-button icon="pi pi-search" severity="secondary" (onClick)="cargar()" ariaLabel="Buscar" />
-  <p-button label="Nuevo" icon="pi pi-plus" data-tutorial="nuevo-articulo" (onClick)="nuevo()" />
-</div>
+<div class="p-4">
+<app-barra-filtros>
+  <div filtros class="flex flex-col gap-1">
+    <label>Buscar</label>
+    <div class="flex gap-2">
+      <input pInputText placeholder="Nombre del articulo" class="flex-1 min-w-40" [ngModel]="busqueda()"
+             (ngModelChange)="buscar($event)" />
+    </div>
+  </div>
+</app-barra-filtros>
 
 <p-table [value]="productos()" [loading]="cargando()" [paginator]="productos().length > 20"
          [rows]="20" styleClass="tarjeta overflow-hidden">
@@ -50,6 +56,7 @@
     </tr>
   </ng-template>
 </p-table>
+</div>
 
 @if (editando(); as producto) {
   <p-dialog [visible]="true" (visibleChange)="cerrar()" [modal]="true"
@@ -96,11 +103,21 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-700">Costo</label>
-        <p-inputNumber [ngModel]="producto.costo" (ngModelChange)="actualizarCampo('costo', $event)"
-                       mode="decimal" [minFractionDigits]="2" [prefix]="'$ '"
-                       styleClass="w-full" inputStyleClass="w-full" />
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-700">Costo</label>
+          <p-inputNumber [ngModel]="producto.costo" (ngModelChange)="actualizarCampo('costo', $event)"
+                         mode="decimal" [minFractionDigits]="2" [prefix]="'$ '"
+                         styleClass="w-full" inputStyleClass="w-full" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-700">Descuento %</label>
+          <p-inputNumber [ngModel]="producto.descuentoPct"
+                         (ngModelChange)="actualizarCampo('descuentoPct', $event ?? 0)"
+                         [min]="0" [max]="100" [maxFractionDigits]="2"
+                         styleClass="w-full" inputStyleClass="w-full" />
+          <span class="text-xs text-gray-500">Si es mayor a 0, pisa al descuento del pedido</span>
+        </div>
       </div>
 
       <div class="grid grid-cols-3 gap-3">
@@ -128,15 +145,6 @@
                          styleClass="w-full" inputStyleClass="w-full" />
           <span class="text-xs text-gray-500">Margen {{ margenes().cantidad | number:'1.0-1' }}%</span>
         </div>
-      </div>
-
-      <div class="flex flex-col gap-1 max-w-40">
-        <label class="text-sm text-gray-700">Descuento %</label>
-        <p-inputNumber [ngModel]="producto.descuentoPct"
-                       (ngModelChange)="actualizarCampo('descuentoPct', $event ?? 0)"
-                       [min]="0" [max]="100" [maxFractionDigits]="2"
-                       styleClass="w-full" inputStyleClass="w-full" />
-        <span class="text-xs text-gray-500">Si es mayor a 0, pisa al descuento del pedido</span>
       </div>
     </div>
 
