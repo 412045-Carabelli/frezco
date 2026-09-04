@@ -10,12 +10,16 @@ import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { aTexto } from '../../core/fechas';
 import { Cuenta, Pedido } from '../../core/modelos';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
 /** Listado de remitos de cliente: un pedido de venta = un remito. */
 @Component({
   selector: 'app-remitos-clientes',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, RouterLink, AutoCompleteModule, ButtonModule, DatePickerModule, TableModule],
+  imports: [
+    FormsModule, DecimalPipe, RouterLink, AutoCompleteModule, ButtonModule, DatePickerModule,
+    TableModule, BarraFiltrosComponent
+  ],
   templateUrl: './remitos-clientes.component.html'
 })
 export class RemitosClientesComponent {

@@ -98,6 +98,13 @@ public class CuentaService {
         cuenta.setNombre(dto.nombre().trim());
         cuenta.setZona(dto.zona());
         cuenta.setDescuentoPct(dto.descuentoPct() == null ? BigDecimal.ZERO : dto.descuentoPct());
+        cuenta.setTelefono(vacioComoNulo(dto.telefono()));
+        cuenta.setDireccion(vacioComoNulo(dto.direccion()));
+        cuenta.setEmail(vacioComoNulo(dto.email()));
         cuenta.setActivo(dto.activo());
+    }
+
+    private String vacioComoNulo(String valor) {
+        return valor == null || valor.isBlank() ? null : valor.trim();
     }
 }

@@ -12,6 +12,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ApiService } from '../../core/api.service';
 import { Cuenta, Producto } from '../../core/modelos';
+import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
 const PRODUCTO_NUEVO: Producto = {
   id: null, nombre: '', categoria: null, proveedorId: null, kg: null, lt: null,
@@ -26,7 +28,8 @@ const CATEGORIAS_BASE = ['Frutas', 'Verduras', 'Jugos', 'Postres'];
   standalone: true,
   imports: [
     FormsModule, DecimalPipe, AutoCompleteModule, ButtonModule, DialogModule, InputNumberModule,
-    InputTextModule, TableModule, TagModule, ConfirmDialogModule
+    InputTextModule, TableModule, TagModule, ConfirmDialogModule, LayoutHeaderComponent,
+    BarraFiltrosComponent
   ],
   providers: [ConfirmationService],
   templateUrl: './articulos.component.html'
@@ -60,8 +63,17 @@ export class ArticulosComponent {
     };
   });
 
+  private busquedaTimeout: ReturnType<typeof setTimeout> | undefined;
+
   constructor() {
     this.cargar();
+  }
+
+  /** Filtra a medida que se escribe, sin esperar a apretar el boton. */
+  buscar(texto: string): void {
+    this.busqueda.set(texto);
+    clearTimeout(this.busquedaTimeout);
+    this.busquedaTimeout = setTimeout(() => this.cargar(), 300);
   }
 
   cargar(): void {
@@ -168,10 +180,11 @@ export class ArticulosComponent {
     });
   }
 
+  /** Margen sobre costo (markup): lo que se usa para guiar el precio de venta, no el margen sobre ventas del Resumen. */
   private margen(precio: number, costo: number): number {
-    if (!precio || precio <= 0) {
+    if (!costo || costo <= 0) {
       return 0;
     }
-    return ((precio - costo) / precio) * 100;
+    return ((precio - costo) / costo) * 100;
   }
 }

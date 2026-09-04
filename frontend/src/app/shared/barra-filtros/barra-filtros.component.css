@@ -1,0 +1,8 @@
+/* Etiquetas de campo: chicas y en mayuscula, mismo criterio que el Sistema de Gestion de Obras. */
+:host ::ng-deep label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6b7280;
+}

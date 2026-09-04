@@ -1,4 +1,5 @@
 @if (remito(); as datos) {
+<div class="p-4 print:p-0">
   <div class="no-imprimir flex justify-end mb-3">
     <p-button label="Imprimir" icon="pi pi-print" (onClick)="imprimir()" />
   </div>
@@ -48,6 +49,7 @@
       <p class="text-sm text-gray-500 mt-4">{{ datos.observacion }}</p>
     }
   </article>
+</div>
 } @else {
-  <p class="text-gray-500">Cargando remito...</p>
+  <p class="p-4 text-gray-500">Cargando remito...</p>
 }

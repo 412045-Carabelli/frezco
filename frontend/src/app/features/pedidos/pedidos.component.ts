@@ -16,6 +16,8 @@ import { aTexto } from '../../core/fechas';
 import { Cuenta, Pedido } from '../../core/modelos';
 import { NuevoPedidoComponent } from './nuevo-pedido.component';
 import { TutorialService } from '../../core/tutorial.service';
+import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
 @Component({
   selector: 'app-pedidos',
@@ -23,7 +25,7 @@ import { TutorialService } from '../../core/tutorial.service';
   imports: [
     FormsModule, DecimalPipe, RouterLink, AutoCompleteModule, ButtonModule, DatePickerModule,
     DialogModule, TableModule, TagModule, ToggleSwitchModule, ConfirmDialogModule,
-    NuevoPedidoComponent
+    NuevoPedidoComponent, LayoutHeaderComponent, BarraFiltrosComponent
   ],
   providers: [ConfirmationService],
   templateUrl: './pedidos.component.html'

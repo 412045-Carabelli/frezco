@@ -12,9 +12,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { Cuenta, TipoCuenta } from '../../core/modelos';
+import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
+import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
 const CUENTA_NUEVA: Cuenta = {
-  id: null, nombre: '', tipo: 'CLIENTE', zona: null, descuentoPct: 0, activo: true
+  id: null, nombre: '', tipo: 'CLIENTE', zona: null, descuentoPct: 0,
+  telefono: null, direccion: null, email: null, activo: true
 };
 
 @Component({
@@ -22,7 +25,8 @@ const CUENTA_NUEVA: Cuenta = {
   standalone: true,
   imports: [
     FormsModule, DecimalPipe, ButtonModule, DialogModule, InputNumberModule, InputTextModule,
-    SelectModule, TableModule, TagModule, ConfirmDialogModule
+    SelectModule, TableModule, TagModule, ConfirmDialogModule, LayoutHeaderComponent,
+    BarraFiltrosComponent
   ],
   providers: [ConfirmationService],
   templateUrl: './cuentas.component.html'

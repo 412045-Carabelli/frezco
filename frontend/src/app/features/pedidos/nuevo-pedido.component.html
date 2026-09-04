@@ -8,11 +8,16 @@
 
     <div class="flex flex-col gap-1" data-tutorial="cuenta">
       <label class="text-sm text-gray-700">Cuenta</label>
-      <p-autoComplete [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
-                      (onSelect)="elegirCuenta($event.value)"
-                      [suggestions]="cuentasSugeridas()" optionLabel="nombre"
-                      placeholder="Buscar por nombre" [minLength]="1"
-                      [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full" />
+      <div class="flex gap-2">
+        <p-autoComplete class="flex-1" [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
+                        (onSelect)="elegirCuenta($event.value)"
+                        [suggestions]="cuentasSugeridas()" optionLabel="nombre"
+                        placeholder="Buscar por nombre" [minLength]="1"
+                        [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full" />
+        <p-button icon="pi pi-user-plus" severity="secondary" [outlined]="true"
+                  (onClick)="abrirNuevoCliente('')"
+                  ariaLabel="Cliente nuevo" pTooltip="Cliente nuevo" tooltipPosition="top" />
+      </div>
     </div>
   </div>
 
@@ -24,22 +29,29 @@
                         [ngModel]="condicion()" (ngModelChange)="cambiarCondicion($event)"
                         [allowEmpty]="false" />
       </div>
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-700">Descuento %</label>
-        <p-inputNumber [ngModel]="descuentoPct()" (ngModelChange)="cambiarDescuento($event)"
-                       [min]="0" [max]="100" [maxFractionDigits]="2" styleClass="w-full" />
+
+      <div class="grid grid-cols-2 gap-2">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-700">Observacion</label>
+          <input pInputText [ngModel]="observacion()" (ngModelChange)="observacion.set($event)" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm text-gray-700">Descuento %</label>
+          <p-inputNumber [ngModel]="descuentoPct()" (ngModelChange)="cambiarDescuento($event)"
+                         [min]="0" [max]="100" [maxFractionDigits]="2" styleClass="w-full" />
+        </div>
       </div>
     </div>
   } @else {
     <p class="text-sm text-gray-500">
       Esta cuenta no lleva precio de venta: las lineas se valorizan al costo.
     </p>
-  }
 
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Observacion</label>
-    <input pInputText [ngModel]="observacion()" (ngModelChange)="observacion.set($event)" />
-  </div>
+    <div class="flex flex-col gap-1">
+      <label class="text-sm text-gray-700">Observacion</label>
+      <input pInputText [ngModel]="observacion()" (ngModelChange)="observacion.set($event)" />
+    </div>
+  }
 
   <!-- Lineas apiladas en tarjetas: en un celular una tabla con scroll horizontal no se usa -->
   <div class="flex flex-col gap-3 mt-1">
@@ -73,7 +85,7 @@
                            [showButtons]="true" [min]="0" [maxFractionDigits]="2"
                            inputmode="decimal" styleClass="w-full" inputStyleClass="w-full text-center" />
           </div>
-          <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-1 ml-2">
             <span class="text-sm text-gray-700">Precio</span>
             <span class="py-2">$ {{ linea.precioUnitario | number:'1.2-2' }}</span>
           </div>
@@ -114,3 +126,32 @@
               styleClass="w-full" data-tutorial="agregar-linea" (onClick)="agregarLinea()" />
   </div>
 </div>
+
+@if (nuevoClienteAbierto()) {
+  <p-dialog [visible]="true" (visibleChange)="cerrarNuevoCliente()" [modal]="true"
+            [style]="{ width: '26rem' }" header="Cliente nuevo">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Nombre</label>
+        <input pInputText [ngModel]="nuevoClienteNombre()" (ngModelChange)="nuevoClienteNombre.set($event)" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Telefono</label>
+        <input pInputText [ngModel]="nuevoClienteTelefono()" (ngModelChange)="nuevoClienteTelefono.set($event)" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Direccion</label>
+        <input pInputText [ngModel]="nuevoClienteDireccion()" (ngModelChange)="nuevoClienteDireccion.set($event)" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Email</label>
+        <input pInputText type="email" [ngModel]="nuevoClienteEmail()" (ngModelChange)="nuevoClienteEmail.set($event)" />
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrarNuevoCliente()" />
+      <p-button label="Crear" icon="pi pi-check" [loading]="guardandoCliente()" (onClick)="guardarNuevoCliente()" />
+    </ng-template>
+  </p-dialog>
+}

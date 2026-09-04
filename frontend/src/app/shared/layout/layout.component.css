@@ -1,17 +1,67 @@
-/* Item activo del menu: fondo suave y filete del color de la marca. */
+/* Item del menu: misma estructura y estados que el Sistema de Gestion de Obras. */
+.item-menu {
+  position: relative;
+  overflow: hidden;
+  animation: item-aparecer 0.3s ease backwards;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.item-menu::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  border-radius: 0 3px 3px 0;
+  background-color: var(--marca);
+  transition: height 0.2s ease;
+}
+
+.item-menu:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  transform: translateX(2px);
+}
+
+.item-menu i {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.item-menu:hover i {
+  transform: scale(1.12);
+}
+
+/* Item activo: fondo tintado y barra a la izquierda, color de la marca. */
 .item-menu.activo {
-  background-color: var(--marca-50);
-  color: var(--marca-texto);
+  background-color: rgba(var(--marca-rgb), 0.1);
+  color: #1f2937;
   font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--marca);
+}
+
+.item-menu.activo::before {
+  height: 60%;
 }
 
 .item-menu.activo i {
   color: var(--marca);
 }
 
-.encabezado-marca {
-  background: linear-gradient(135deg, var(--marca) 0%, var(--marca-oscuro) 100%);
+@keyframes item-aparecer {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-menu {
+    animation: none;
+  }
+}
+
+/* Pie del menu: mismo criterio que el sidebar-footer del Sistema de Gestion de Obras. */
+.pie-menu {
+  border-top: 1px solid #9ca3af;
+  background-color: #e5e7eb;
 }
 
 /* El drawer trae su propio padding; el menu lo maneja por item. */
@@ -19,6 +69,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
+  background-color: #e5e7eb;
 }
 
 /* Boton flotante de ayuda. Se separa del pie fijo de la carga de pedidos. */

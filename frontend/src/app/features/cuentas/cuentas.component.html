@@ -1,11 +1,18 @@
-<h1 class="titulo-pantalla mb-4">Cuentas</h1>
+<app-layout-header titulo="Cuentas" subtitulo="Clientes, proveedores y otras cuentas" tipo="listado">
+  <p-button membrete-acciones label="Nueva" icon="pi pi-plus" (onClick)="nueva()" />
+</app-layout-header>
 
-<div class="flex flex-wrap items-center gap-2 mb-4">
-  <input pInputText placeholder="Buscar" class="flex-1 min-w-40" [ngModel]="busqueda()"
-         (ngModelChange)="busqueda.set($event)" (keyup.enter)="cargar()" />
-  <p-button icon="pi pi-search" severity="secondary" (onClick)="cargar()" ariaLabel="Buscar" />
-  <p-button label="Nueva" icon="pi pi-plus" (onClick)="nueva()" />
-</div>
+<div class="p-4">
+<app-barra-filtros>
+  <div filtros class="flex flex-col gap-1">
+    <label>Buscar</label>
+    <div class="flex gap-2">
+      <input pInputText placeholder="Nombre de la cuenta" class="flex-1 min-w-40" [ngModel]="busqueda()"
+             (ngModelChange)="busqueda.set($event)" (keyup.enter)="cargar()" />
+      <p-button icon="pi pi-search" severity="secondary" (onClick)="cargar()" ariaLabel="Buscar" />
+    </div>
+  </div>
+</app-barra-filtros>
 
 <p-table data-tutorial="tabla-cuentas" [value]="cuentas()" [loading]="cargando()" [paginator]="cuentas().length > 20" [rows]="20"
          styleClass="tarjeta overflow-hidden">
@@ -48,6 +55,7 @@
     </tr>
   </ng-template>
 </p-table>
+</div>
 
 @if (editando(); as cuenta) {
   <p-dialog [visible]="true" (visibleChange)="cerrar()" [modal]="true" [style]="{ width: '28rem' }"
@@ -81,6 +89,21 @@
                          (ngModelChange)="actualizarCampo('descuentoPct', $event)"
                          [min]="0" [max]="100" [maxFractionDigits]="2" />
         </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Telefono</label>
+        <input pInputText [ngModel]="cuenta.telefono" (ngModelChange)="actualizarCampo('telefono', $event)" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Direccion</label>
+        <input pInputText [ngModel]="cuenta.direccion" (ngModelChange)="actualizarCampo('direccion', $event)" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-700">Email</label>
+        <input pInputText type="email" [ngModel]="cuenta.email" (ngModelChange)="actualizarCampo('email', $event)" />
       </div>
     </div>
 

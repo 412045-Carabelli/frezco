@@ -1,6 +1,7 @@
 package ar.frezco.cuenta;
 
 import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -18,6 +19,10 @@ public record CuentaDTO(
         @PositiveOrZero(message = "El descuento no puede ser negativo")
         @DecimalMax(value = "100.00", message = "El descuento no puede superar el 100%")
         BigDecimal descuentoPct,
+        @Size(max = 30, message = "El telefono no puede superar los 30 caracteres") String telefono,
+        @Size(max = 160, message = "La direccion no puede superar los 160 caracteres") String direccion,
+        @Email(message = "El email no es valido")
+        @Size(max = 120, message = "El email no puede superar los 120 caracteres") String email,
         boolean activo) {
 
     public static CuentaDTO de(Cuenta cuenta) {
@@ -27,6 +32,9 @@ public record CuentaDTO(
                 cuenta.getTipo(),
                 cuenta.getZona(),
                 cuenta.getDescuentoPct(),
+                cuenta.getTelefono(),
+                cuenta.getDireccion(),
+                cuenta.getEmail(),
                 cuenta.isActivo());
     }
 }

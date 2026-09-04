@@ -1,10 +1,12 @@
-<h1 class="titulo-pantalla mb-4">Remitos</h1>
+<app-layout-header titulo="Remitos" subtitulo="Remitos de entrega a clientes y proveedores" tipo="listado" />
 
-<p-tabView>
-  <p-tabPanel header="Clientes">
-    <app-remitos-clientes />
-  </p-tabPanel>
-  <p-tabPanel header="Proveedor">
-    <app-remito-proveedor />
-  </p-tabPanel>
-</p-tabView>
+<div class="p-4">
+  <p-tabView>
+    <p-tabPanel header="Clientes">
+      <app-remitos-clientes />
+    </p-tabPanel>
+    <p-tabPanel header="Proveedor">
+      <app-remito-proveedor />
+    </p-tabPanel>
+  </p-tabView>
+</div>

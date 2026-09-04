@@ -1,55 +1,50 @@
-<h1 class="titulo-pantalla mb-4">Resumen</h1>
+<app-layout-header titulo="Resumen" subtitulo="Ventas, margen y cuentas del periodo" tipo="listado"
+                   [mostrarVolver]="false" />
 
-<div class="flex flex-wrap items-end gap-3 mb-4">
-  <div class="flex flex-col gap-1" data-tutorial="periodo">
-    <label class="text-sm text-gray-700">Desde</label>
-    <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
-  </div>
-  <div class="flex flex-col gap-1">
-    <label class="text-sm text-gray-700">Hasta</label>
-    <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
-  </div>
-  <p-button label="Actualizar" icon="pi pi-refresh" severity="secondary" [loading]="cargando()"
-            (onClick)="cargar()" />
+<div class="p-4">
+  <app-barra-filtros>
+    <div filtros class="flex flex-col gap-1" data-tutorial="periodo">
+      <label>Desde</label>
+      <p-datepicker [ngModel]="desde()" (ngModelChange)="desde.set($event)" dateFormat="dd/mm/yy" />
+    </div>
+    <div filtros class="flex flex-col gap-1">
+      <label>Hasta</label>
+      <p-datepicker [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" dateFormat="dd/mm/yy" />
+    </div>
+    <p-button acciones label="Actualizar" icon="pi pi-refresh" severity="secondary" [loading]="cargando()"
+              (onClick)="cargar()" />
+  </app-barra-filtros>
+
+  @if (resumen(); as datos) {
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <app-kpi-card titulo="Ventas" icono="pi-dollar" color="marca"
+                    [valor]="'$ ' + (datos.ventas | number:'1.2-2')" />
+      <app-kpi-card titulo="Margen" icono="pi-chart-line" color="emerald"
+                    [valor]="'$ ' + (datos.margen | number:'1.2-2')"
+                    [descripcion]="(datos.margenPct | percent:'1.0-1') + ' sobre ventas'" />
+      <app-kpi-card titulo="A cobrar" icono="pi-arrow-circle-down" color="amber"
+                    [valor]="'$ ' + (datos.saldoACobrar | number:'1.2-2')" />
+      <app-kpi-card titulo="A pagar" icono="pi-arrow-circle-up" color="rose"
+                    [valor]="'$ ' + (datos.saldoAPagar | number:'1.2-2')" />
+    </div>
+
+    <div class="flex flex-wrap gap-6 mt-4 text-sm text-gray-600">
+      <span>Pedidos: <strong>{{ datos.cantidadPedidos }}</strong></span>
+      <span>Ticket promedio: <strong>$ {{ datos.ticketPromedio | number:'1.2-2' }}</strong></span>
+      <span class="text-gray-400">Costo del periodo: $ {{ datos.costo | number:'1.2-2' }}</span>
+    </div>
+
+    <section class="tarjeta p-4 mt-4">
+      <p class="text-sm font-medium text-gray-700 mb-2">Articulos sin stock</p>
+      @if (datos.productosSinStock.length) {
+        <ul class="text-sm text-gray-600 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6">
+          @for (producto of datos.productosSinStock; track producto) {
+            <li class="py-0.5">{{ producto }}</li>
+          }
+        </ul>
+      } @else {
+        <p class="text-sm text-gray-500">Todos los articulos tienen stock.</p>
+      }
+    </section>
+  }
 </div>
-
-@if (resumen(); as datos) {
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="tarjeta tarjeta-indicador p-4">
-      <p class="text-sm text-gray-500">Ventas</p>
-      <p class="text-2xl font-semibold">$ {{ datos.ventas | number:'1.2-2' }}</p>
-    </div>
-    <div class="tarjeta tarjeta-indicador p-4">
-      <p class="text-sm text-gray-500">Margen</p>
-      <p class="text-2xl font-semibold">$ {{ datos.margen | number:'1.2-2' }}</p>
-      <p class="text-xs text-gray-500">{{ datos.margenPct | percent:'1.0-1' }} sobre ventas</p>
-    </div>
-    <div class="tarjeta tarjeta-indicador p-4">
-      <p class="text-sm text-gray-500">A cobrar</p>
-      <p class="text-2xl font-semibold">$ {{ datos.saldoACobrar | number:'1.2-2' }}</p>
-    </div>
-    <div class="tarjeta tarjeta-indicador p-4">
-      <p class="text-sm text-gray-500">A pagar</p>
-      <p class="text-2xl font-semibold">$ {{ datos.saldoAPagar | number:'1.2-2' }}</p>
-    </div>
-  </div>
-
-  <div class="flex flex-wrap gap-6 mt-4 text-sm text-gray-600">
-    <span>Pedidos: <strong>{{ datos.cantidadPedidos }}</strong></span>
-    <span>Ticket promedio: <strong>$ {{ datos.ticketPromedio | number:'1.2-2' }}</strong></span>
-    <span class="text-gray-400">Costo del periodo: $ {{ datos.costo | number:'1.2-2' }}</span>
-  </div>
-
-  <section class="tarjeta p-4 mt-4">
-    <p class="text-sm font-medium text-gray-700 mb-2">Articulos sin stock</p>
-    @if (datos.productosSinStock.length) {
-      <ul class="text-sm text-gray-600 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6">
-        @for (producto of datos.productosSinStock; track producto) {
-          <li class="py-0.5">{{ producto }}</li>
-        }
-      </ul>
-    } @else {
-      <p class="text-sm text-gray-500">Todos los articulos tienen stock.</p>
-    }
-  </section>
-}
