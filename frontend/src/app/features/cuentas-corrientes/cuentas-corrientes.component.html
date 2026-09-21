@@ -1,4 +1,4 @@
-<app-layout-header titulo="Cuentas corrientes" subtitulo="Saldos y movimientos por cuenta" tipo="listado" />
+<app-layout-header titulo="Cuentas corrientes" subtitulo="Saldos y movimientos por cuenta" tipo="listado" [imprimible]="false" />
 
 <div class="p-4">
 <div class="no-imprimir grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
@@ -15,6 +15,10 @@
         <li class="py-1.5 text-gray-500">Nadie debe nada.</li>
       }
     </ul>
+    <p class="flex justify-between border-t border-gray-200 pt-2 mt-1 text-sm font-semibold">
+      <span>Total clientes</span>
+      <span>$ {{ totalClientes() | number:'1.2-2' }}</span>
+    </p>
   </section>
 
   <section class="tarjeta p-4">
@@ -30,6 +34,10 @@
         <li class="py-1.5 text-gray-500">No hay proveedores cargados.</li>
       }
     </ul>
+    <p class="flex justify-between border-t border-gray-200 pt-2 mt-1 text-sm font-semibold">
+      <span>Total proveedores</span>
+      <span>$ {{ totalProveedores() | number:'1.2-2' }}</span>
+    </p>
   </section>
 </div>
 

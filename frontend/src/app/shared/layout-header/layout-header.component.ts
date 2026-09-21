@@ -1,6 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
-import { Location, NgClass } from '@angular/common';
+import { DatePipe, Location, NgClass } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { ImpresionService } from '../../core/impresion.service';
 
 type TipoMembrete = 'listado' | 'detalle' | 'alta' | 'edicion';
 
@@ -15,17 +16,21 @@ const ESTILOS: Record<TipoMembrete, { fondo: string; subtitulo: string }> = {
 @Component({
   selector: 'app-layout-header',
   standalone: true,
-  imports: [NgClass, ButtonModule],
+  imports: [DatePipe, NgClass, ButtonModule],
   templateUrl: './layout-header.component.html'
 })
 export class LayoutHeaderComponent {
   private readonly ubicacion = inject(Location);
+  protected readonly impresion = inject(ImpresionService);
+  protected readonly hoy = new Date();
 
   @Input() titulo = '';
   @Input() subtitulo = '';
   @Input() tipo: TipoMembrete = 'listado';
   /** La pantalla de inicio no tiene "atras" util. */
   @Input() mostrarVolver = true;
+  /** Boton para imprimir la pantalla. Se apaga donde ya hay una impresion propia (remitos, cta. cte.). */
+  @Input() imprimible = true;
 
   get estilo() {
     return ESTILOS[this.tipo];

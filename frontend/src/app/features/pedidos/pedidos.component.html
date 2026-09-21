@@ -27,7 +27,7 @@
     </div>
   </app-barra-filtros>
 
-  <p-table data-tutorial="tabla-pedidos" [value]="pedidos()" [loading]="cargando()" [paginator]="pedidos().length > 25" [rows]="25"
+  <p-table data-tutorial="tabla-pedidos" [value]="pedidos()" [loading]="cargando()" [paginator]="pedidos().length > 25 && !impresion.imprimiendo()" [rows]="25"
            styleClass="tarjeta overflow-hidden">
   <ng-template pTemplate="header">
     <tr>

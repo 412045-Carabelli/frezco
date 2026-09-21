@@ -69,13 +69,13 @@ public class StockService {
     }
 
     /**
-     * Top 5 mas vendidos en los ultimos N dias, con sugerencia de reposicion. Solo ventas a
+     * Top N mas vendidos en los ultimos N dias, con sugerencia de reposicion. Solo ventas a
      * clientes: no cuenta consumo propio ni refuerzos.
      */
-    public List<RankingProductoDTO> rankingVentas(int dias) {
+    public List<RankingProductoDTO> rankingVentas(int dias, int cantidad) {
         StockDisponible stockActual = disponible();
         LocalDate desde = LocalDate.now().minusDays(dias);
-        return repositorio.rankingVentas(desde, PageRequest.of(0, 5)).stream()
+        return repositorio.rankingVentas(desde, PageRequest.of(0, Math.max(cantidad, 1))).stream()
                 .map(fila -> {
                     BigDecimal vendido = fila.getUnidadesVendidas();
                     BigDecimal disponibleActual = stockActual.de(fila.getProductoId());

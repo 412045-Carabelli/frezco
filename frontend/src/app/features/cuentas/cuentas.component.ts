@@ -11,6 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
+import { ImpresionService } from '../../core/impresion.service';
 import { Cuenta, TipoCuenta } from '../../core/modelos';
 import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
 import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
@@ -34,6 +35,7 @@ const CUENTA_NUEVA: Cuenta = {
 export class CuentasComponent {
 
   private readonly api = inject(ApiService);
+  readonly impresion = inject(ImpresionService);
   private readonly mensajes = inject(MessageService);
   private readonly confirmacion = inject(ConfirmationService);
 

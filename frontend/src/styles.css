@@ -220,12 +220,34 @@ label {
 }
 
 /* ============================================================
-   Impresion: solo el remito.
+   Impresion: solo el contenido de la pantalla, sin menu, filtros ni botones.
    ============================================================ */
 
+.solo-imprimir {
+  display: none;
+}
+
 @media print {
-  .no-imprimir {
+  .no-imprimir,
+  app-barra-filtros,
+  .p-paginator,
+  .p-button,
+  .p-toast {
     display: none !important;
+  }
+
+  .solo-imprimir {
+    display: block;
+  }
+
+  /* El layout es de alto fijo con scroll interno: al imprimir hay que dejarlo fluir. */
+  .h-screen {
+    height: auto !important;
+  }
+
+  .overflow-hidden,
+  .overflow-y-auto {
+    overflow: visible !important;
   }
 
   body {

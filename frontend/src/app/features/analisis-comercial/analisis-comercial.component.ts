@@ -34,6 +34,12 @@ export class AnalisisComercialComponent {
     this.cargar();
   }
 
+  /** Largo de la barra: el importe como porcentaje del mayor de la lista. */
+  porcentaje(importe: number, lista: { importe: number }[]): number {
+    const mayor = Math.max(...lista.map(fila => fila.importe));
+    return mayor > 0 ? (importe / mayor) * 100 : 0;
+  }
+
   /** Sin fechas, el backend devuelve el mes en curso y de ahi salen los filtros. */
   cargar(): void {
     this.cargando.set(true);

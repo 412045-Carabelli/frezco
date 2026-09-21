@@ -13,7 +13,7 @@
   </div>
 </app-barra-filtros>
 
-<p-table [value]="productos()" [loading]="cargando()" [paginator]="productos().length > 20"
+<p-table [value]="productos()" [loading]="cargando()" [paginator]="productos().length > 20 && !impresion.imprimiendo()"
          [rows]="20" styleClass="tarjeta overflow-hidden">
   <ng-template pTemplate="header">
     <tr>
@@ -34,10 +34,10 @@
       <td>{{ producto.nombre }}</td>
       <td class="text-gray-500">{{ producto.categoria }}</td>
       <td class="text-gray-500">{{ producto.proveedorNombre }}</td>
-      <td class="text-right">$ {{ producto.costo | number:'1.2-2' }}</td>
-      <td class="text-right">$ {{ producto.precioMinorista | number:'1.2-2' }}</td>
-      <td class="text-right">$ {{ producto.precioMayorista | number:'1.2-2' }}</td>
-      <td class="text-right">$ {{ producto.precioCantidad | number:'1.2-2' }}</td>
+      <td class="text-right whitespace-nowrap">$ {{ producto.costo | number:'1.2-2' }}</td>
+      <td class="text-right whitespace-nowrap">$ {{ producto.precioMinorista | number:'1.2-2' }}</td>
+      <td class="text-right whitespace-nowrap">$ {{ producto.precioMayorista | number:'1.2-2' }}</td>
+      <td class="text-right whitespace-nowrap">$ {{ producto.precioCantidad | number:'1.2-2' }}</td>
       <td class="text-right">{{ producto.descuentoPct | number:'1.0-2' }}</td>
       <td class="text-right whitespace-nowrap">
         <p-button icon="pi pi-pencil" severity="secondary" [text]="true" size="small"

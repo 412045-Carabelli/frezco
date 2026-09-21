@@ -41,6 +41,9 @@ export class CuentasCorrientesComponent {
   readonly saldosClientes = signal<Saldo[]>([]);
   readonly saldosProveedores = signal<Saldo[]>([]);
 
+  readonly totalClientes = computed(() => this.saldosClientes().reduce((suma, s) => suma + s.saldo, 0));
+  readonly totalProveedores = computed(() => this.saldosProveedores().reduce((suma, s) => suma + s.saldo, 0));
+
   readonly lineasConMes = computed(() =>
     (this.estado()?.lineas ?? []).map(linea => ({ ...linea, mesLabel: this.mesLabelDe(linea.fecha) })));
 

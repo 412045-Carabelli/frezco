@@ -4,26 +4,36 @@
 @if (deudas().length > 0 || deudasProveedores().length > 0) {
   <section class="tarjeta mb-4 p-3">
     <h2 class="text-sm font-medium text-gray-700 mb-2">Deudas pendientes</h2>
-    <div class="flex flex-wrap gap-2">
-      @for (deuda of deudas(); track deuda.cuentaId) {
-        <div class="flex items-center gap-2 rounded border border-gray-200 px-3 py-2">
-          <span class="text-sm">{{ deuda.nombre }}</span>
-          <span class="text-sm font-medium">$ {{ deuda.saldo | number:'1.2-2' }}</span>
-          <p-button label="Cobrar" size="small" [text]="true" (onClick)="cobrarDeuda(deuda)" />
+    <div class="grid gap-4 md:grid-cols-2">
+      @if (deudas().length > 0) {
+        <div>
+          <h3 class="text-xs font-medium uppercase text-gray-500 mb-1">Clientes</h3>
+          <div class="grid grid-cols-[1fr_auto_auto] items-center gap-x-3">
+            @for (deuda of deudas(); track deuda.cuentaId) {
+              <span class="text-sm truncate">{{ deuda.nombre }}</span>
+              <span class="text-sm font-medium text-right whitespace-nowrap">$ {{ deuda.saldo | number:'1.2-2' }}</span>
+              <p-button label="Cobrar" size="small" [text]="true" (onClick)="cobrarDeuda(deuda)" />
+            }
+          </div>
         </div>
       }
-      @for (proveedor of deudasProveedores(); track proveedor.cuentaId) {
-        <div class="flex items-center gap-2 rounded border border-gray-200 px-3 py-2">
-          <span class="text-sm">{{ proveedor.nombre }}</span>
-          <span class="text-sm font-medium">$ {{ proveedor.saldo | number:'1.2-2' }}</span>
-          <p-button label="Pagar" size="small" [text]="true" (onClick)="pagarDeuda(proveedor)" />
+      @if (deudasProveedores().length > 0) {
+        <div>
+          <h3 class="text-xs font-medium uppercase text-gray-500 mb-1">Proveedores</h3>
+          <div class="grid grid-cols-[1fr_auto_auto] items-center gap-x-3">
+            @for (proveedor of deudasProveedores(); track proveedor.cuentaId) {
+              <span class="text-sm truncate">{{ proveedor.nombre }}</span>
+              <span class="text-sm font-medium text-right whitespace-nowrap">$ {{ proveedor.saldo | number:'1.2-2' }}</span>
+              <p-button label="Pagar" size="small" [text]="true" (onClick)="pagarDeuda(proveedor)" />
+            }
+          </div>
         </div>
       }
     </div>
   </section>
 }
 
-<section class="tarjeta barra-filtros mb-4" data-tutorial="formulario-movimiento">
+<section class="tarjeta barra-filtros mb-4 no-imprimir" data-tutorial="formulario-movimiento">
   <div class="flex flex-col gap-1">
     <label class="text-sm text-gray-700">Fecha</label>
     <p-datepicker [ngModel]="fecha()" (ngModelChange)="fecha.set($event)" dateFormat="dd/mm/yy" />
@@ -74,7 +84,7 @@
   </div>
 </app-barra-filtros>
 
-<p-table [value]="movimientos()" [loading]="cargando()" [paginator]="movimientos().length > 25"
+<p-table [value]="movimientos()" [loading]="cargando()" [paginator]="movimientos().length > 25 && !impresion.imprimiendo()"
          [rows]="25" styleClass="tarjeta overflow-hidden">
   <ng-template pTemplate="header">
     <tr>
@@ -95,7 +105,7 @@
                [value]="movimiento.tipo === 'COBRO' ? 'Cobro' : 'Pago'" />
       </td>
       <td>{{ movimiento.cuentaNombre }}</td>
-      <td class="text-right">$ {{ movimiento.importe | number:'1.2-2' }}</td>
+      <td class="text-right whitespace-nowrap">$ {{ movimiento.importe | number:'1.2-2' }}</td>
       <td class="text-gray-500">{{ movimiento.observacion }}</td>
       <td class="text-right">
         <p-button icon="pi pi-trash" severity="danger" [text]="true" size="small"

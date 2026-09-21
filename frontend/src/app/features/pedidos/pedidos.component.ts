@@ -12,6 +12,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
+import { ImpresionService } from '../../core/impresion.service';
 import { aTexto } from '../../core/fechas';
 import { Cuenta, Pedido } from '../../core/modelos';
 import { NuevoPedidoComponent } from './nuevo-pedido.component';
@@ -33,6 +34,7 @@ import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.
 export class PedidosComponent {
 
   private readonly api = inject(ApiService);
+  readonly impresion = inject(ImpresionService);
   private readonly mensajes = inject(MessageService);
   private readonly confirmacion = inject(ConfirmationService);
   private readonly tutorial = inject(TutorialService);
