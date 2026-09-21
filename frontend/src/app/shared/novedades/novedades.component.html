@@ -1,0 +1,29 @@
+<p-dialog [visible]="visible()" (visibleChange)="cerrar()" [modal]="true" [draggable]="false"
+          [style]="{ width: '40rem' }" [breakpoints]="{ '960px': '90vw', '640px': '96vw' }"
+          [header]="'Novedades ' + version">
+  <div class="flex flex-col gap-4 max-h-[60vh] overflow-y-auto">
+    @for (grupo of grupos; track grupo.titulo) {
+      <section class="tarjeta overflow-hidden">
+        <h3 class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 text-sm font-semibold text-gray-800">
+          {{ grupo.titulo }}
+        </h3>
+        <ul class="divide-y divide-gray-100">
+          @for (cambio of grupo.cambios; track cambio.ticket) {
+            <li class="flex items-start gap-3 px-4 py-2.5">
+              <i class="pi pi-check-circle text-green-600 mt-0.5"></i>
+              <span class="text-sm text-gray-700">{{ cambio.texto }}</span>
+              <a [href]="urlTickets + '/' + cambio.ticket" target="_blank" rel="noopener noreferrer"
+                 class="ml-auto shrink-0 text-xs font-semibold underline text-[var(--marca)]">
+                #{{ cambio.ticket }}
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Entendido" icon="pi pi-check" (onClick)="cerrar()" />
+  </ng-template>
+</p-dialog>
