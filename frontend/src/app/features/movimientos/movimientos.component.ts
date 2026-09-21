@@ -12,6 +12,7 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
+import { ImpresionService } from '../../core/impresion.service';
 import { aTexto } from '../../core/fechas';
 import { Cuenta, Movimiento, Saldo, TipoMovimiento } from '../../core/modelos';
 import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
@@ -33,6 +34,7 @@ const porNombre = (a: Saldo, b: Saldo): number => a.nombre.localeCompare(b.nombr
 export class MovimientosComponent {
 
   private readonly api = inject(ApiService);
+  readonly impresion = inject(ImpresionService);
   private readonly mensajes = inject(MessageService);
   private readonly confirmacion = inject(ConfirmationService);
 

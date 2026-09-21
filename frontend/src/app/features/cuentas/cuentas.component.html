@@ -14,7 +14,7 @@
   </div>
 </app-barra-filtros>
 
-<p-table data-tutorial="tabla-cuentas" [value]="cuentas()" [loading]="cargando()" [paginator]="cuentas().length > 20" [rows]="20"
+<p-table data-tutorial="tabla-cuentas" [value]="cuentas()" [loading]="cargando()" [paginator]="cuentas().length > 20 && !impresion.imprimiendo()" [rows]="20"
          styleClass="tarjeta overflow-hidden">
   <ng-template pTemplate="header">
     <tr>

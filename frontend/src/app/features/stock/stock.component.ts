@@ -8,6 +8,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
+import { ImpresionService } from '../../core/impresion.service';
 import { MovimientoStock, RankingProducto, StockItem } from '../../core/modelos';
 import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
 import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
@@ -24,6 +25,7 @@ import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.
 export class StockComponent {
 
   private readonly api = inject(ApiService);
+  readonly impresion = inject(ImpresionService);
   private readonly mensajes = inject(MessageService);
 
   readonly items = signal<StockItem[]>([]);
@@ -34,6 +36,7 @@ export class StockComponent {
   readonly movimientos = signal<MovimientoStock[]>([]);
   readonly ranking = signal<RankingProducto[]>([]);
   readonly diasRanking = signal(30);
+  readonly cantidadRanking = signal(5);
 
   constructor() {
     this.cargar();
@@ -42,6 +45,11 @@ export class StockComponent {
 
   cambiarDiasRanking(dias: number): void {
     this.diasRanking.set(dias);
+    this.cargarRanking();
+  }
+
+  cambiarCantidadRanking(cantidad: number): void {
+    this.cantidadRanking.set(cantidad);
     this.cargarRanking();
   }
 
@@ -73,7 +81,7 @@ export class StockComponent {
   }
 
   private cargarRanking(): void {
-    this.api.rankingStock(this.diasRanking()).subscribe({
+    this.api.rankingStock(this.diasRanking(), this.cantidadRanking()).subscribe({
       next: ranking => this.ranking.set(ranking),
       error: () => this.mensajes.add({ severity: 'error', summary: 'No se pudo cargar el ranking' })
     });

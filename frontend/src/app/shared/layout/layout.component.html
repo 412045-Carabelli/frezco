@@ -36,6 +36,9 @@
                         (ngModelChange)="tutorial.alternarAutomatico($event)" />
       </div>
 
+      <p-button [label]="'Novedades ' + version" icon="pi pi-list" severity="secondary"
+                [text]="true" size="small" (onClick)="novedadesVisibles = true; cerrarMenu()" />
+
       <p-button label="Salir" icon="pi pi-sign-out" severity="secondary"
                 [text]="true" size="small" (onClick)="salir()" />
     </div>
@@ -83,3 +86,5 @@
     </div>
   </div>
 </div>
+
+<app-novedades [(visible)]="novedadesVisibles" />

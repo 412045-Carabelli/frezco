@@ -117,8 +117,8 @@ export class ApiService {
       { params: this.parametros({ desde, hasta }) });
   }
 
-  rankingStock(dias: number): Observable<RankingProducto[]> {
-    return this.http.get<RankingProducto[]>(`${this.base}/stock/ranking`, { params: { dias } });
+  rankingStock(dias: number, cantidad: number): Observable<RankingProducto[]> {
+    return this.http.get<RankingProducto[]>(`${this.base}/stock/ranking`, { params: { dias, cantidad } });
   }
 
   // ---- Cuentas corrientes ----

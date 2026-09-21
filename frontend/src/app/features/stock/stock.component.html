@@ -4,10 +4,14 @@
 <section class="tarjeta p-4 mb-4">
   <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
     <p class="text-sm font-medium text-gray-700">
-      Ranking de ventas (ultimos {{ diasRanking() }} dias) y pedido sugerido
+      Ranking de ventas (top {{ cantidadRanking() }}, ultimos {{ diasRanking() }} dias) y pedido sugerido
     </p>
-    <p-selectButton [options]="[15, 30]" [ngModel]="diasRanking()" (ngModelChange)="cambiarDiasRanking($event)"
-                    [allowEmpty]="false" />
+    <div class="flex flex-wrap items-center gap-2">
+      <p-selectButton [options]="[5, 10, 20, 50]" [ngModel]="cantidadRanking()"
+                      (ngModelChange)="cambiarCantidadRanking($event)" [allowEmpty]="false" />
+      <p-selectButton [options]="[15, 30]" [ngModel]="diasRanking()" (ngModelChange)="cambiarDiasRanking($event)"
+                      [allowEmpty]="false" />
+    </div>
   </div>
   <p class="text-xs text-gray-500 mb-3">
     Sugerido = vendido en el periodo menos el stock actual. No cuenta consumo propio ni refuerzos.
@@ -43,7 +47,7 @@
   </div>
 </app-barra-filtros>
 
-<p-table data-tutorial="tabla-stock" [value]="items()" [loading]="cargando()" [paginator]="items().length > 25" [rows]="25"
+<p-table data-tutorial="tabla-stock" [value]="items()" [loading]="cargando()" [paginator]="items().length > 25 && !impresion.imprimiendo()" [rows]="25"
          [sortField]="'stockActual'" [sortOrder]="-1"
          styleClass="tarjeta overflow-hidden">
   <ng-template pTemplate="header">

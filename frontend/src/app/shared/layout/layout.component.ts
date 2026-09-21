@@ -11,6 +11,7 @@ import { MARCA } from '../../config/marca';
 import { ECOSISTEMA } from '../../config/ecosistema';
 import { SesionService } from '../../core/sesion.service';
 import { TutorialService } from '../../core/tutorial.service';
+import { NovedadesComponent, VERSION } from '../novedades/novedades.component';
 
 interface ItemMenu {
   etiqueta: string;
@@ -23,7 +24,7 @@ interface ItemMenu {
   standalone: true,
   imports: [
     RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, FormsModule, ButtonModule,
-    ToggleSwitchModule, DrawerModule, TooltipModule
+    ToggleSwitchModule, DrawerModule, TooltipModule, NovedadesComponent
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css'
@@ -36,6 +37,8 @@ export class LayoutComponent {
   readonly tutorial = inject(TutorialService);
   readonly marca = MARCA;
   readonly ecosistema = ECOSISTEMA;
+  readonly version = VERSION;
+  novedadesVisibles = false;
   menuAbierto = false;
   readonly rutaActual = signal('');
 
