@@ -21,7 +21,7 @@ services:
 
   crear-base:
     image: mcr.microsoft.com/mssql-tools
-    container_name: frezco_crear_base
+    container_name: frezco_crear_base_standalone
     volumes:
       - ./db:/db:ro
     environment:
@@ -47,7 +47,7 @@ services:
   backend:
     pull_policy: always
     image: ghcr.io/412045-carabelli/frezco-backend:latest
-    container_name: frezco_backend
+    container_name: frezco_backend_standalone
     ports:
       - "${BACKEND_PORT:-8090}:8090"
     environment:
@@ -69,14 +69,22 @@ services:
         limits:
           memory: 512M
     networks:
-      - sgo_backend
+      sgo_backend:
+        # Alias explicito: "backend" (el nombre de servicio, alias default de Compose)
+        # tambien lo usa buildrr-feedback en esta misma red compartida sgo_backend, y
+        # ambos containers colisionarian en esa resolucion DNS. El frontend le pega a
+        # este alias via BACKEND_UPSTREAM, no al default.
+        aliases:
+          - frezco-backend-standalone
 
   frontend:
     pull_policy: always
     image: ghcr.io/412045-carabelli/frezco-frontend:latest
-    container_name: frezco_frontend
+    container_name: frezco_frontend_standalone
     ports:
       - "${FRONTEND_PORT:-4300}:80"
+    environment:
+      - BACKEND_UPSTREAM=frezco-backend-standalone:8090
     depends_on:
       - backend
     restart: unless-stopped
@@ -92,7 +100,7 @@ services:
   # buildea local, es liviano y cambia poco.
   backup:
     build: ./backup
-    container_name: frezco_backup
+    container_name: frezco_backup_standalone
     environment:
       - DB_HOST=${DB_HOST:-sqlserver}
       - DB_PORT=${DB_PORT:-1433}
