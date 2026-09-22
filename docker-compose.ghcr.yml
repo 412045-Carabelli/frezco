@@ -39,7 +39,7 @@ services:
           echo "Esperando SQL Server ($$i)"; sleep 5
         done
         /opt/mssql-tools/bin/sqlcmd -S "$$DB_HOST,$$DB_PORT" -U "$$DB_USER" -P "$$DB_PASSWORD" \
-          -v DB_NAME="$$DB_NAME" -i /db/crear-base.sql
+          -Q "IF DB_ID(N'$$DB_NAME') IS NULL EXEC('CREATE DATABASE [$$DB_NAME]')"
     restart: "no"
     networks:
       - sgo_backend
