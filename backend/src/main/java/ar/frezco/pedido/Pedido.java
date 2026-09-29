@@ -26,8 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Los pedidos no se editan. Ante un error se marcan {@code anulado} y se cargan de nuevo;
- * todos los calculos ignoran los anulados.
+ * Se puede editar o marcar {@code anulado} mientras no tenga un cobro/pago asociado
+ * (ver {@code ar.frezco.movimiento.Movimiento#pedido}). Una vez que lo tiene, queda fijo.
+ * Todos los calculos ignoran los pedidos anulados.
  */
 @Entity
 @Table(name = "pedido")

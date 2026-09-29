@@ -11,7 +11,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
-import { aTexto } from '../../core/fechas';
+import { aFecha, aTexto } from '../../core/fechas';
 import { CondicionVenta, Cuenta, Pedido, Producto } from '../../core/modelos';
 
 interface LineaEnEdicion {
@@ -41,6 +41,9 @@ export class NuevoPedidoComponent {
 
   /** El padre decide que hacer despues de guardar: cerrar el modal, refrescar, navegar. */
   readonly guardado = output<Pedido>();
+
+  /** Si tiene valor, guardar() edita ese pedido en vez de crear uno nuevo. */
+  readonly pedidoIdEnEdicion = signal<number | null>(null);
 
   readonly fecha = signal<Date>(new Date());
   readonly cuenta = signal<Cuenta | null>(null);
@@ -216,10 +219,8 @@ export class NuevoPedidoComponent {
       return;
     }
 
-    this.guardando.set(true);
-    this.api.crearPedido({
+    const cuerpo = {
       fecha: aTexto(this.fecha())!,
-      cuentaId: cuenta.id!,
       condicion: this.condicion(),
       descuentoPct: this.esVenta() ? this.descuentoPct() : 0,
       observacion: this.observacion() || null,
@@ -228,7 +229,15 @@ export class NuevoPedidoComponent {
         unidades: linea.unidades,
         proveedorId: linea.proveedor?.id ?? null
       }))
-    }).subscribe({
+    };
+
+    this.guardando.set(true);
+    const pedidoId = this.pedidoIdEnEdicion();
+    const guardado$ = pedidoId
+      ? this.api.editarPedido(pedidoId, cuerpo)
+      : this.api.crearPedido({ ...cuerpo, cuentaId: cuenta.id! });
+
+    guardado$.subscribe({
       next: pedido => {
         this.guardando.set(false);
         this.mensajes.add({ severity: 'success', summary: `Pedido ${pedido.numero} guardado` });
@@ -244,8 +253,40 @@ export class NuevoPedidoComponent {
     });
   }
 
+  /** Precarga el formulario con un pedido existente. La cuenta no se puede cambiar al editar. */
+  cargarParaEditar(pedido: Pedido): void {
+    this.pedidoIdEnEdicion.set(pedido.id);
+    this.fecha.set(aFecha(pedido.fecha));
+    this.cuenta.set({
+      id: pedido.cuenta.id, nombre: pedido.cuenta.nombre, tipo: pedido.cuenta.tipo,
+      zona: null, descuentoPct: 0, telefono: null, direccion: null, email: null, activo: true
+    });
+    this.condicion.set(pedido.condicion);
+    this.descuentoPct.set(pedido.descuentoPct);
+    this.observacion.set(pedido.observacion ?? '');
+    this.lineas.set(pedido.lineas.map(linea => ({
+      producto: {
+        id: linea.productoId, nombre: linea.productoNombre, categoria: null, proveedorId: null,
+        kg: null, lt: null, costo: linea.costoUnitario, precioMinorista: linea.precioUnitario,
+        precioMayorista: linea.precioUnitario, precioCantidad: linea.precioUnitario, descuentoPct: 0,
+        activo: true
+      },
+      unidades: linea.unidades,
+      precioUnitario: linea.precioUnitario,
+      stockDisponible: 0,
+      proveedor: linea.proveedorId
+        ? { id: linea.proveedorId, nombre: linea.proveedorNombre ?? '', tipo: 'PROVEEDOR',
+            zona: null, descuentoPct: 0, telefono: null, direccion: null, email: null, activo: true }
+        : null
+    })));
+    // stockDisponible se precarga en 0: hay que consultarlo real para no marcar
+    // falsamente "se pide al proveedor" en lineas que en realidad tienen stock.
+    this.recalcularPrecios();
+  }
+
   /** Deja el formulario listo para cargar el siguiente pedido sin cerrar la pantalla. */
   reset(): void {
+    this.pedidoIdEnEdicion.set(null);
     this.fecha.set(new Date());
     this.cuenta.set(null);
     this.condicion.set('MINORISTA');

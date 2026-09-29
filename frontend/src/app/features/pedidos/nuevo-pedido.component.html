@@ -8,16 +8,20 @@
 
     <div class="flex flex-col gap-1" data-tutorial="cuenta">
       <label class="text-sm text-gray-700">Cuenta</label>
-      <div class="flex gap-2">
-        <p-autoComplete class="flex-1" [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
-                        (onSelect)="elegirCuenta($event.value)"
-                        [suggestions]="cuentasSugeridas()" optionLabel="nombre"
-                        placeholder="Buscar por nombre" [minLength]="1"
-                        [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full" />
-        <p-button icon="pi pi-user-plus" severity="secondary" [outlined]="true"
-                  (onClick)="abrirNuevoCliente('')"
-                  ariaLabel="Cliente nuevo" pTooltip="Cliente nuevo" tooltipPosition="top" />
-      </div>
+      @if (pedidoIdEnEdicion()) {
+        <span class="py-2">{{ cuenta()?.nombre }}</span>
+      } @else {
+        <div class="flex gap-2">
+          <p-autoComplete class="flex-1" [ngModel]="cuenta()" (completeMethod)="buscarCuentas($event)"
+                          (onSelect)="elegirCuenta($event.value)"
+                          [suggestions]="cuentasSugeridas()" optionLabel="nombre"
+                          placeholder="Buscar por nombre" [minLength]="1"
+                          [appendTo]="'body'" styleClass="w-full" inputStyleClass="w-full" />
+          <p-button icon="pi pi-user-plus" severity="secondary" [outlined]="true"
+                    (onClick)="abrirNuevoCliente('')"
+                    ariaLabel="Cliente nuevo" pTooltip="Cliente nuevo" tooltipPosition="top" />
+        </div>
+      }
     </div>
   </div>
 

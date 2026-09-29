@@ -212,9 +212,31 @@ Los pedidos de refuerzo y consumo **no** entran en ventas, costo ni margen.
 
 ---
 
-## 7. Anulación de pedidos
+## 7. Edición y anulación de pedidos
 
-Marcar `anulado = true`. No borrar filas ni tocar las líneas.
+**Un pedido se puede editar o anular mientras no tenga un cobro o pago asociado.**
+Apenas se le registra un movimiento (`movimiento.pedido_id` apuntándolo), queda fijo:
+ni sus líneas ni su anulación se pueden tocar hasta que ese movimiento se borre.
+
+Motivo: es común que el proveedor no traiga un artículo del pedido, o que el cliente
+discuta una línea, y eso se descubre recién al momento de pagar/cobrar. Mientras el
+pedido no se pagó, conviene poder corregirlo directamente en vez de anularlo y
+cargarlo de nuevo. Una vez que ya se cobró o se pagó, tocarlo desincronizaría la
+cuenta corriente con lo que efectivamente se cobró/pagó — ahí sí hay que borrar el
+movimiento primero.
+
+Un cobro/pago puede quedar **sin** pedido asociado (movimiento suelto, como hoy): en
+ese caso no bloquea nada. El vínculo es opcional y se elige al cargar el cobro/pago.
+
+### Editar
+
+Reconstruye las líneas del pedido desde cero, igual que al crearlo: se recalculan
+precio, costo y el reparto stock/proveedor con los valores **vigentes** al momento de
+editar (no los del pedido original). La cuenta del pedido no se puede cambiar.
+
+### Anular
+
+Igual que antes: marcar `anulado = true`. No borrar filas ni tocar las líneas.
 
 Efectos automáticos, sin código adicional, porque todo se calcula con queries que
 filtran por `anulado = 0`:

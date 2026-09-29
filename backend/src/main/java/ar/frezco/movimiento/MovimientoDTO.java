@@ -16,7 +16,9 @@ public record MovimientoDTO(
         @NotNull(message = "El importe es obligatorio")
         @Positive(message = "El importe tiene que ser mayor a cero")
         BigDecimal importe,
-        @Size(max = 300) String observacion) {
+        @Size(max = 300) String observacion,
+        Long pedidoId,
+        String pedidoNumero) {
 
     public static MovimientoDTO de(Movimiento movimiento) {
         return new MovimientoDTO(
@@ -26,6 +28,8 @@ public record MovimientoDTO(
                 movimiento.getCuenta().getId(),
                 movimiento.getCuenta().getNombre(),
                 movimiento.getImporte(),
-                movimiento.getObservacion());
+                movimiento.getObservacion(),
+                movimiento.getPedido() == null ? null : movimiento.getPedido().getId(),
+                movimiento.getPedido() == null ? null : movimiento.getPedido().getNumero());
     }
 }

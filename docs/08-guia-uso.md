@@ -18,8 +18,12 @@ archivo `.env` del servidor y se reinicia el sistema.
    error: el sistema lo va a agregar al pedido del proveedor.
 6. **Guardar**. Vas directo al remito para mandárselo al cliente.
 
-**Los pedidos no se editan.** Si te equivocaste, anulalo desde el listado y cargalo de
-nuevo. El stock y los saldos se acomodan solos.
+**Podés editar o anular un pedido mientras no le hayas cargado el cobro o el pago.**
+Desde el listado, tocá el lápiz para corregirlo (por ejemplo, sacar un artículo que el
+proveedor no trajo) o el tacho para anularlo. Una vez que el pedido ya tiene un cobro
+o un pago asociado, queda fijo: si te equivocaste, primero borrá ese movimiento desde
+**Cobros y pagos** y ahí sí lo podés volver a editar. El stock y los saldos se
+acomodan solos.
 
 ## Cargar mercadería que comprás de más
 
@@ -46,6 +50,11 @@ refuerzos y los consumos.
 
 **Cobros y pagos**. Elegí *Cobro* para un cliente o *Pago* para el proveedor. Al elegir
 la cuenta te muestra cuánto debe, antes de que cargues el importe.
+
+Si el cobro o el pago corresponde a un pedido puntual, buscalo en el campo **Pedido**
+(opcional) y elegilo. Así queda ese pedido marcado como pagado y no se puede editar
+más. Si dejás el campo vacío, el movimiento queda suelto (como antes) y no bloquea
+ningún pedido.
 
 ## Ver cuánto te deben
 

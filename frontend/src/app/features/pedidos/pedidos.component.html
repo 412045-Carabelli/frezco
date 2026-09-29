@@ -54,7 +54,9 @@
           <p-button icon="pi pi-file" severity="secondary" [text]="true" size="small"
                     [routerLink]="['/remitos/cliente', pedido.id]" ariaLabel="Ver remito" />
         }
-        @if (!pedido.anulado) {
+        @if (pedido.editable) {
+          <p-button icon="pi pi-pencil" severity="secondary" [text]="true" size="small"
+                    (onClick)="editarPedido(pedido)" ariaLabel="Editar" />
           <p-button icon="pi pi-ban" severity="danger" [text]="true" size="small"
                     (onClick)="confirmarAnulacion(pedido)" ariaLabel="Anular" />
         }
@@ -115,7 +117,7 @@
   <p-dialog [visible]="true" (visibleChange)="cerrarNuevoPedido()" [modal]="true"
             [style]="{ width: '52rem', maxHeight: '90vh' }"
             [breakpoints]="{ '960px': '92vw', '640px': '100vw' }"
-            header="Nuevo pedido">
+            [header]="pedidoEnEdicion() ? 'Editar pedido ' + pedidoEnEdicion()!.numero : 'Nuevo pedido'">
     <app-nuevo-pedido #formNuevoPedido (guardado)="alGuardarPedido()" />
 
     <ng-template pTemplate="footer">

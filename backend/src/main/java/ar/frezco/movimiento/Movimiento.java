@@ -1,6 +1,7 @@
 package ar.frezco.movimiento;
 
 import ar.frezco.cuenta.Cuenta;
+import ar.frezco.pedido.Pedido;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,6 +48,12 @@ public class Movimiento {
 
     @Column(length = 300)
     private String observacion;
+
+    /** Pedido que este cobro/pago salda. Opcional: un movimiento suelto no lo tiene.
+     *  Mientras un pedido tenga un movimiento asociado, no se puede editar ni anular. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pedido_id")
+    private Pedido pedido;
 
     // DATETIME2 en UTC, no DATETIME OFFSET: lo escribe el DEFAULT SYSUTCDATETIME() de la tabla.
     @JdbcTypeCode(SqlTypes.TIMESTAMP)

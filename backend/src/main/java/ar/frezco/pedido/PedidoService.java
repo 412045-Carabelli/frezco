@@ -11,6 +11,7 @@ import ar.frezco.pedido.reparto.EstrategiaReparto;
 import ar.frezco.pedido.reparto.Repartos;
 import ar.frezco.producto.Producto;
 import ar.frezco.producto.ProductoRepository;
+import ar.frezco.movimiento.MovimientoRepository;
 import ar.frezco.stock.StockDisponible;
 import ar.frezco.stock.StockService;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class PedidoService {
     private final Precios precios;
     private final Repartos repartos;
     private final NumeradorDePedidos numerador;
+    private final MovimientoRepository movimientos;
 
     public PedidoService(PedidoRepository repositorio,
                          ProductoRepository productos,
@@ -38,7 +40,8 @@ public class PedidoService {
                          StockService stock,
                          Precios precios,
                          Repartos repartos,
-                         NumeradorDePedidos numerador) {
+                         NumeradorDePedidos numerador,
+                         MovimientoRepository movimientos) {
         this.repositorio = repositorio;
         this.productos = productos;
         this.cuentas = cuentas;
@@ -46,6 +49,7 @@ public class PedidoService {
         this.precios = precios;
         this.repartos = repartos;
         this.numerador = numerador;
+        this.movimientos = movimientos;
     }
 
     public List<PedidoDTO> listar(LocalDate desde, LocalDate hasta, Long cuentaId,
@@ -55,12 +59,13 @@ public class PedidoService {
                 .stream()
                 .filter(pedido -> incluirAnulados || !pedido.isAnulado())
                 .filter(pedido -> cuentaId == null || pedido.getCuenta().getId().equals(cuentaId))
-                .map(PedidoDTO::de)
+                .map(pedido -> PedidoDTO.de(pedido, movimientos.existsByPedidoId(pedido.getId())))
                 .toList();
     }
 
     public PedidoDTO buscar(Long id) {
-        return PedidoDTO.de(obtener(id));
+        Pedido pedido = obtener(id);
+        return PedidoDTO.de(pedido, movimientos.existsByPedidoId(pedido.getId()));
     }
 
     public Pedido obtener(Long id) {
@@ -104,7 +109,49 @@ public class PedidoService {
             pedido.agregarLinea(linea);
         }
 
-        return PedidoDTO.de(repositorio.save(pedido));
+        return PedidoDTO.de(repositorio.save(pedido), false);
+    }
+
+    /**
+     * Reconstruye las lineas del pedido desde cero, igual que {@link #crear}: se recalculan
+     * precio, costo y reparto stock/proveedor con los valores vigentes. La cuenta no cambia.
+     * Solo se puede editar mientras el pedido no tenga cobro/pago asociado.
+     */
+    @Transactional
+    public PedidoDTO editar(Long id, EditarPedidoRequest peticion) {
+        Pedido pedido = obtener(id);
+        if (pedido.isAnulado()) {
+            throw new ExcepcionesNegocio.Conflicto("El pedido " + pedido.getNumero() + " esta anulado");
+        }
+        verificarSinPago(pedido);
+
+        Cuenta cuenta = pedido.getCuenta();
+        PoliticaPrecio politica = precios.para(cuenta.getTipo());
+        EstrategiaReparto reparto = repartos.para(cuenta.getTipo());
+
+        CondicionVenta condicion = peticion.condicion() == null
+                ? CondicionVenta.MINORISTA
+                : peticion.condicion();
+        BigDecimal descuento = politica.descuentoAplicable(
+                peticion.descuentoPct() == null ? BigDecimal.ZERO : peticion.descuentoPct());
+
+        pedido.setFecha(peticion.fecha());
+        pedido.setCondicion(condicion);
+        pedido.setDescuentoPct(descuento);
+        pedido.setObservacion(peticion.observacion());
+
+        pedido.getLineas().clear();
+        repositorio.flush();
+
+        StockDisponible disponible = stock.disponible();
+        for (CrearPedidoRequest.LineaRequest lineaPedida : peticion.lineas()) {
+            PedidoLinea linea = armarLinea(lineaPedida, condicion, descuento, politica);
+            reparto.repartir(linea, disponible);
+            confirmarProveedor(linea);
+            pedido.agregarLinea(linea);
+        }
+
+        return PedidoDTO.de(repositorio.save(pedido), false);
     }
 
     /**
@@ -117,8 +164,18 @@ public class PedidoService {
         if (pedido.isAnulado()) {
             throw new ExcepcionesNegocio.Conflicto("El pedido " + pedido.getNumero() + " ya esta anulado");
         }
+        verificarSinPago(pedido);
         pedido.setAnulado(true);
         repositorio.save(pedido);
+    }
+
+    /** Una vez que el pedido tiene un cobro o pago asociado, no se puede editar ni anular. */
+    private void verificarSinPago(Pedido pedido) {
+        if (movimientos.existsByPedidoId(pedido.getId())) {
+            throw new ExcepcionesNegocio.Conflicto(
+                    "El pedido " + pedido.getNumero()
+                            + " ya tiene un cobro o pago asociado y no se puede modificar");
+        }
     }
 
     /** Precio y stock para mostrar la linea antes de guardar. */

@@ -15,6 +15,7 @@ public record PedidoDTO(
         BigDecimal descuentoPct,
         String observacion,
         boolean anulado,
+        boolean editable,
         BigDecimal total,
         BigDecimal totalCosto,
         BigDecimal margen,
@@ -32,7 +33,9 @@ public record PedidoDTO(
             BigDecimal importe,
             BigDecimal entradaStock,
             BigDecimal salidaStock,
-            BigDecimal unidadesProveedor) {
+            BigDecimal unidadesProveedor,
+            Long proveedorId,
+            String proveedorNombre) {
 
         static PedidoLineaDTO de(PedidoLinea linea) {
             return new PedidoLineaDTO(
@@ -44,11 +47,14 @@ public record PedidoDTO(
                     linea.getUnidades().multiply(linea.getPrecioUnitario()),
                     linea.getEntradaStock(),
                     linea.getSalidaStock(),
-                    linea.getUnidadesProveedor());
+                    linea.getUnidadesProveedor(),
+                    linea.getProveedor() == null ? null : linea.getProveedor().getId(),
+                    linea.getProveedor() == null ? null : linea.getProveedor().getNombre());
         }
     }
 
-    public static PedidoDTO de(Pedido pedido) {
+    /** {@code tienePago}: si tiene un cobro/pago asociado, no se puede editar ni anular. */
+    public static PedidoDTO de(Pedido pedido, boolean tienePago) {
         List<PedidoLineaDTO> lineas = pedido.getLineas().stream()
                 .map(PedidoLineaDTO::de)
                 .toList();
@@ -70,6 +76,7 @@ public record PedidoDTO(
                 pedido.getDescuentoPct(),
                 pedido.getObservacion(),
                 pedido.isAnulado(),
+                !pedido.isAnulado() && !tienePago,
                 total,
                 totalCosto,
                 total.subtract(totalCosto),

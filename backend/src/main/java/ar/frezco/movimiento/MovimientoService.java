@@ -5,6 +5,8 @@ import ar.frezco.config.Periodo;
 import ar.frezco.cuenta.Cuenta;
 import ar.frezco.cuenta.CuentaService;
 import ar.frezco.cuentacorriente.CuentaCorrienteService;
+import ar.frezco.pedido.Pedido;
+import ar.frezco.pedido.PedidoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +21,14 @@ public class MovimientoService {
     private final MovimientoRepository repositorio;
     private final CuentaService cuentas;
     private final CuentaCorrienteService cuentasCorrientes;
+    private final PedidoRepository pedidos;
 
     public MovimientoService(MovimientoRepository repositorio, CuentaService cuentas,
-                             CuentaCorrienteService cuentasCorrientes) {
+                             CuentaCorrienteService cuentasCorrientes, PedidoRepository pedidos) {
         this.repositorio = repositorio;
         this.cuentas = cuentas;
         this.cuentasCorrientes = cuentasCorrientes;
+        this.pedidos = pedidos;
     }
 
     public List<MovimientoDTO> listar(LocalDate desde, LocalDate hasta, Long cuentaId,
@@ -50,8 +54,29 @@ public class MovimientoService {
         movimiento.setCuenta(cuenta);
         movimiento.setImporte(dto.importe());
         movimiento.setObservacion(dto.observacion());
+        movimiento.setPedido(resolverPedido(dto.pedidoId(), cuenta, dto.tipo()));
 
         return MovimientoDTO.de(repositorio.save(movimiento));
+    }
+
+    /**
+     * El pedido que este movimiento salda es opcional. Si viene, mientras exista queda
+     * bloqueada la edicion/anulacion de ese pedido (ver PedidoService.verificarSinPago).
+     */
+    private Pedido resolverPedido(Long pedidoId, Cuenta cuenta, TipoMovimiento tipo) {
+        if (pedidoId == null) {
+            return null;
+        }
+        Pedido pedido = pedidos.findById(pedidoId)
+                .orElseThrow(() -> new ExcepcionesNegocio.NoEncontrado("No existe el pedido " + pedidoId));
+        if (pedido.isAnulado()) {
+            throw new ExcepcionesNegocio.Conflicto("El pedido " + pedido.getNumero() + " esta anulado");
+        }
+        if (tipo == TipoMovimiento.COBRO && !pedido.getCuenta().getId().equals(cuenta.getId())) {
+            throw new ExcepcionesNegocio.Conflicto(
+                    "El pedido " + pedido.getNumero() + " no es de la cuenta " + cuenta.getNombre());
+        }
+        return pedido;
     }
 
     /**

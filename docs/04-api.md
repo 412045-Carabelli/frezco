@@ -89,6 +89,7 @@ Reglas: no se permite crear una segunda cuenta de tipo `PROVEEDOR`, `REFUERZO` n
 GET    /api/pedidos                      ?desde=&hasta=&cuentaId=&incluirAnulados=false
 GET    /api/pedidos/{id}
 POST   /api/pedidos
+PUT    /api/pedidos/{id}
 POST   /api/pedidos/{id}/anular          -> 204
 ```
 
@@ -128,6 +129,7 @@ Response `201`:
   "condicion": "MINORISTA",
   "descuentoPct": 0,
   "anulado": false,
+  "editable": true,
   "total": 21200.00,
   "totalCosto": 15200.00,
   "margen": 6000.00,
@@ -141,11 +143,37 @@ Response `201`:
       "importe": 14300.00,
       "salidaStock": 1,
       "unidadesProveedor": 1,
-      "entradaStock": 0
+      "entradaStock": 0,
+      "proveedorId": 5,
+      "proveedorNombre": "Frigorífico Sur"
     }
   ]
 }
 ```
+
+`editable` es `false` si el pedido está anulado o ya tiene un cobro/pago asociado
+(ver `03-reglas-negocio.md`, sección 7); en ese caso `PUT` y `POST .../anular`
+devuelven `409`.
+
+### Editar pedido
+
+`PUT /api/pedidos/{id}`. Mismo body que crear pero sin `cuentaId` (la cuenta del
+pedido no cambia). Reconstruye las líneas desde cero con los precios y el reparto
+vigentes. Devuelve `409` si el pedido está anulado o ya tiene un cobro/pago asociado.
+
+```json
+{
+  "fecha": "2026-08-14",
+  "condicion": "MINORISTA",
+  "descuentoPct": 0,
+  "observacion": null,
+  "lineas": [
+    { "productoId": 3, "unidades": 2, "proveedorId": 5 }
+  ]
+}
+```
+
+Response `200`: mismo formato que crear.
 
 ### Vista previa de precio
 
@@ -175,12 +203,19 @@ DELETE /api/movimientos/{id}
   "tipo": "COBRO",
   "cuentaId": 12,
   "importe": 21200.00,
-  "observacion": "Transferencia"
+  "observacion": "Transferencia",
+  "pedidoId": 41
 }
 ```
 
+`pedidoId` es opcional: es el pedido que este cobro/pago salda. Mientras lo tenga
+asociado, ese pedido no se puede editar ni anular (ver `03-reglas-negocio.md`, sección
+7). Si viene, tiene que existir, no estar anulado y, si el tipo es `COBRO`, ser de la
+misma cuenta — devuelve `409` si no.
+
 A diferencia de los pedidos, los movimientos **sí se pueden borrar**: son registros
-simples sin efectos derivados sobre stock.
+simples sin efectos derivados sobre stock. Borrar un movimiento libera al pedido que
+tenía asociado para volver a editarlo o anularlo.
 
 Un `COBRO`/`PAGO` cuyo `importe` supere el saldo actual (deuda) de la cuenta devuelve
 `409`.

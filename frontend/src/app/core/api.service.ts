@@ -8,6 +8,7 @@ import {
   CrearPedido,
   Cuenta,
   CuentaCorriente,
+  EditarPedido,
   Movimiento,
   MovimientoStock,
   Pedido,
@@ -78,6 +79,10 @@ export class ApiService {
 
   crearPedido(pedido: CrearPedido): Observable<Pedido> {
     return this.http.post<Pedido>(`${this.base}/pedidos`, pedido);
+  }
+
+  editarPedido(id: number, pedido: EditarPedido): Observable<Pedido> {
+    return this.http.put<Pedido>(`${this.base}/pedidos/${id}`, pedido);
   }
 
   anularPedido(id: number): Observable<void> {
