@@ -53,6 +53,22 @@
                     styleClass="w-full" inputStyleClass="w-full" />
   </div>
 
+  <div class="flex flex-col gap-1 min-w-56">
+    <label class="text-sm text-gray-700">Pedido (opcional)</label>
+    <p-autoComplete [ngModel]="pedido()" (completeMethod)="buscarPedidos($event)"
+                    (onSelect)="elegirPedido($event.value)" (onClear)="pedido.set(null)"
+                    [suggestions]="pedidosSugeridos()" optionLabel="numero"
+                    placeholder="Buscar pedido" [minLength]="0"
+                    styleClass="w-full" inputStyleClass="w-full">
+      <ng-template let-pedido pTemplate="item">
+        <div class="flex items-center justify-between gap-3">
+          <span>{{ pedido.numero }}</span>
+          <span class="text-xs text-gray-400">{{ pedido.cuenta.nombre }}</span>
+        </div>
+      </ng-template>
+    </p-autoComplete>
+  </div>
+
   <div class="flex flex-col gap-1">
     <label class="text-sm text-gray-700">Importe</label>
     <p-inputNumber [ngModel]="importe()" (ngModelChange)="importe.set($event)"
@@ -104,7 +120,12 @@
         <p-tag [severity]="movimiento.tipo === 'COBRO' ? 'success' : 'warn'"
                [value]="movimiento.tipo === 'COBRO' ? 'Cobro' : 'Pago'" />
       </td>
-      <td>{{ movimiento.cuentaNombre }}</td>
+      <td>
+        {{ movimiento.cuentaNombre }}
+        @if (movimiento.pedidoNumero) {
+          <span class="text-xs text-gray-400 block">{{ movimiento.pedidoNumero }}</span>
+        }
+      </td>
       <td class="text-right whitespace-nowrap">$ {{ movimiento.importe | number:'1.2-2' }}</td>
       <td class="text-gray-500">{{ movimiento.observacion }}</td>
       <td class="text-right">

@@ -65,7 +65,10 @@ Pantalla principal del sistema. Carga en grilla:
 5. Al guardar, el sistema calcula automáticamente cuánto de cada línea sale de stock
    y cuánto hay que pedirle al proveedor.
 
-Los pedidos no se editan. Si hay un error, se anulan y se cargan de nuevo.
+Un pedido se puede editar o anular mientras no tenga un cobro o pago asociado. Una
+vez que se le registró un cobro (cliente) o un pago (proveedor), queda fijo: para
+corregirlo hay que borrar ese movimiento primero. Ver `docs/03-reglas-negocio.md`,
+sección 7.
 
 ### Remitos
 

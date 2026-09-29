@@ -5,6 +5,7 @@ import ar.frezco.cuenta.Cuenta;
 import ar.frezco.cuenta.CuentaService;
 import ar.frezco.cuenta.TipoCuenta;
 import ar.frezco.cuentacorriente.CuentaCorrienteService;
+import ar.frezco.pedido.PedidoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,8 @@ class MovimientoServiceTest {
     private final MovimientoRepository repositorio = mock(MovimientoRepository.class);
     private final CuentaService cuentas = mock(CuentaService.class);
     private final CuentaCorrienteService cuentasCorrientes = mock(CuentaCorrienteService.class);
-    private final MovimientoService servicio = new MovimientoService(repositorio, cuentas, cuentasCorrientes);
+    private final PedidoRepository pedidos = mock(PedidoRepository.class);
+    private final MovimientoService servicio = new MovimientoService(repositorio, cuentas, cuentasCorrientes, pedidos);
 
     private Cuenta cliente;
     private Cuenta proveedor;
@@ -85,6 +87,6 @@ class MovimientoServiceTest {
     }
 
     private MovimientoDTO movimiento(Long cuentaId, TipoMovimiento tipo, BigDecimal importe) {
-        return new MovimientoDTO(null, LocalDate.now(), tipo, cuentaId, null, importe, null);
+        return new MovimientoDTO(null, LocalDate.now(), tipo, cuentaId, null, importe, null, null, null);
     }
 }

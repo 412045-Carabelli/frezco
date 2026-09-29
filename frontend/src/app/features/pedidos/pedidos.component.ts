@@ -50,6 +50,7 @@ export class PedidosComponent {
   readonly cuentasSugeridas = signal<Cuenta[]>([]);
   readonly detalle = signal<Pedido | null>(null);
   readonly nuevoPedidoAbierto = signal(false);
+  readonly pedidoEnEdicion = signal<Pedido | null>(null);
 
   constructor() {
     effect(() => {
@@ -94,18 +95,33 @@ export class PedidosComponent {
   }
 
   abrirNuevoPedido(): void {
+    this.pedidoEnEdicion.set(null);
     this.nuevoPedidoAbierto.set(true);
     this.tutorial.iniciarSiCorresponde('/pedidos/nuevo');
   }
 
+  /** Mientras no tenga cobro/pago asociado, el pedido se puede editar; ver Pedido.editable. */
+  editarPedido(pedido: Pedido): void {
+    this.pedidoEnEdicion.set(pedido);
+    this.nuevoPedidoAbierto.set(true);
+    setTimeout(() => this.formNuevoPedido?.cargarParaEditar(pedido));
+  }
+
   cerrarNuevoPedido(): void {
     this.nuevoPedidoAbierto.set(false);
+    this.pedidoEnEdicion.set(null);
   }
 
   /** Se queda en la pantalla lista para cargar el siguiente pedido; el remito se ve desde Remitos. */
   alGuardarPedido(): void {
     this.cargar();
-    this.formNuevoPedido?.reset();
+    const editando = this.pedidoEnEdicion() !== null;
+    this.pedidoEnEdicion.set(null);
+    if (editando) {
+      this.cerrarNuevoPedido();
+    } else {
+      this.formNuevoPedido?.reset();
+    }
   }
 
   confirmarAnulacion(pedido: Pedido): void {

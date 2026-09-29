@@ -14,7 +14,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ApiService } from '../../core/api.service';
 import { ImpresionService } from '../../core/impresion.service';
 import { aTexto } from '../../core/fechas';
-import { Cuenta, Movimiento, Saldo, TipoMovimiento } from '../../core/modelos';
+import { Cuenta, Movimiento, Pedido, Saldo, TipoMovimiento } from '../../core/modelos';
 import { LayoutHeaderComponent } from '../../shared/layout-header/layout-header.component';
 import { BarraFiltrosComponent } from '../../shared/barra-filtros/barra-filtros.component';
 
@@ -51,6 +51,10 @@ export class MovimientosComponent {
   readonly importe = signal<number>(0);
   readonly observacion = signal('');
   readonly saldoCuenta = signal<number | null>(null);
+
+  /** Pedido que este cobro/pago salda. Opcional: mientras lo tenga, ese pedido no se puede editar. */
+  readonly pedido = signal<Pedido | null>(null);
+  readonly pedidosSugeridos = signal<Pedido[]>([]);
 
   readonly cuentasSugeridas = signal<Cuenta[]>([]);
   readonly deudas = signal<Saldo[]>([]);
@@ -104,6 +108,27 @@ export class MovimientosComponent {
       .subscribe(cuentas => this.cuentasSugeridas.set(cuentas));
   }
 
+  /** Volumen chico: se trae la lista de pedidos no anulados y se filtra en el cliente. */
+  buscarPedidos(evento: { query: string }): void {
+    const texto = evento.query.trim().toLowerCase();
+    this.api.pedidos({ incluirAnulados: false }).subscribe(pedidos => {
+      const filtrados = texto
+        ? pedidos.filter(p => p.numero.toLowerCase().includes(texto)
+            || p.cuenta.nombre.toLowerCase().includes(texto))
+        : pedidos;
+      this.pedidosSugeridos.set(filtrados.slice(0, 20));
+    });
+  }
+
+  /** Si es un cobro, el pedido ya define la cuenta: se precarga sola. */
+  elegirPedido(pedido: Pedido): void {
+    this.pedido.set(pedido);
+    if (this.tipo() === 'COBRO') {
+      this.elegirCuenta({ id: pedido.cuenta.id, nombre: pedido.cuenta.nombre, tipo: pedido.cuenta.tipo,
+        zona: null, descuentoPct: 0, telefono: null, direccion: null, email: null, activo: true });
+    }
+  }
+
   /** Mostrar el saldo al elegir la cuenta: saber cuanto deben antes de cargar el cobro. */
   elegirCuenta(cuenta: Cuenta): void {
     this.cuenta.set(cuenta);
@@ -125,6 +150,7 @@ export class MovimientosComponent {
   /** Precarga el formulario con la cuenta y el saldo total, lista para confirmar. */
   cobrarDeuda(saldo: Saldo): void {
     this.tipo.set('COBRO');
+    this.pedido.set(null);
     this.elegirCuenta({ id: saldo.cuentaId, nombre: saldo.nombre, tipo: 'CLIENTE',
       zona: null, descuentoPct: 0, telefono: null, direccion: null, email: null, activo: true });
     this.importe.set(saldo.saldo);
@@ -132,6 +158,7 @@ export class MovimientosComponent {
 
   pagarDeuda(saldo: Saldo): void {
     this.tipo.set('PAGO');
+    this.pedido.set(null);
     this.elegirCuenta({ id: saldo.cuentaId, nombre: saldo.nombre, tipo: 'PROVEEDOR',
       zona: null, descuentoPct: 0, telefono: null, direccion: null, email: null, activo: true });
     this.importe.set(saldo.saldo);
@@ -141,6 +168,7 @@ export class MovimientosComponent {
     this.tipo.set(tipo);
     this.cuenta.set(null);
     this.saldoCuenta.set(null);
+    this.pedido.set(null);
   }
 
   guardar(): void {
@@ -165,7 +193,8 @@ export class MovimientosComponent {
       tipo: this.tipo(),
       cuentaId: cuenta.id!,
       importe: this.importe(),
-      observacion: this.observacion() || null
+      observacion: this.observacion() || null,
+      pedidoId: this.pedido()?.id ?? null
     }).subscribe({
       next: () => {
         this.guardando.set(false);
@@ -210,5 +239,6 @@ export class MovimientosComponent {
     this.observacion.set('');
     this.cuenta.set(null);
     this.saldoCuenta.set(null);
+    this.pedido.set(null);
   }
 }

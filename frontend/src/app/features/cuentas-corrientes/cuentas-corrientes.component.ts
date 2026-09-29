@@ -124,7 +124,8 @@ export class CuentasCorrientesComponent {
       tipo: estado.cuenta.tipo === 'CLIENTE' ? 'COBRO' : 'PAGO',
       cuentaId: estado.cuenta.id,
       importe: this.importePago(),
-      observacion: this.observacionPago() || null
+      observacion: this.observacionPago() || null,
+      pedidoId: null
     }).subscribe({
       next: () => {
         this.guardandoPago.set(false);

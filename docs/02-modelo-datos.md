@@ -85,13 +85,16 @@ CREATE TABLE movimiento (
     cuenta_id           BIGINT         NOT NULL,
     importe             DECIMAL(14,2)  NOT NULL,
     observacion         NVARCHAR(300)  NULL,
+    pedido_id           BIGINT         NULL,      -- V8: pedido que este cobro/pago salda (opcional)
     creado_en           DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME(),
     CONSTRAINT fk_movimiento_cuenta FOREIGN KEY (cuenta_id) REFERENCES cuenta(id),
+    CONSTRAINT fk_movimiento_pedido FOREIGN KEY (pedido_id) REFERENCES pedido(id),
     CONSTRAINT ck_movimiento_tipo CHECK (tipo IN ('COBRO','PAGO'))
 );
 
 CREATE INDEX ix_movimiento_fecha  ON movimiento(fecha);
 CREATE INDEX ix_movimiento_cuenta ON movimiento(cuenta_id);
+CREATE INDEX ix_movimiento_pedido ON movimiento(pedido_id);
 ```
 
 ## Decisiones de modelado
@@ -179,6 +182,19 @@ terminar pidiendo a proveedores distintos según el momento.
 `V6__nombre_producto_no_unico.sql` saca el `UNIQUE (nombre)` de `producto` (estaba en
 `V1`). Con varios proveedores puede haber artículos parecidos de origen distinto (ej.
 "Brócoli 1 Kg" de dos proveedores) sin recurrir a sufijos artificiales para el nombre.
+
+### Pedido en movimiento: por qué es opcional y no una tabla intermedia
+
+`movimiento.pedido_id` (agregada en `V8__pedido_en_movimiento.sql`) es la forma de
+saber si un pedido ya se cobró o se pagó, para bloquear su edición (ver
+`docs/03-reglas-negocio.md`, sección 7). Es `NULL` en un movimiento suelto (un cobro
+o pago que no corresponde a un pedido puntual, como hoy).
+
+Se usa un FK simple (un movimiento salda a lo sumo un pedido) y no una tabla
+intermedia N a N porque el remito de proveedor ya consolida varios pedidos por
+período (ver sección 4 de reglas de negocio): si hace falta pagarle a un proveedor
+por varios pedidos a la vez, se cargan varios movimientos de `PAGO`, uno por pedido.
+Con el volumen del negocio (~35 pedidos/mes) esto no es una carga extra relevante.
 
 ## Datos semilla
 

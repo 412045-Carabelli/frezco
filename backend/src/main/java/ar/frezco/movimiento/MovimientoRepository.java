@@ -10,4 +10,6 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
     List<Movimiento> findByCuentaIdOrderByFechaAscIdAsc(Long cuentaId);
 
     List<Movimiento> findByFechaBetweenOrderByFechaDescIdDesc(LocalDate desde, LocalDate hasta);
+
+    boolean existsByPedidoId(Long pedidoId);
 }

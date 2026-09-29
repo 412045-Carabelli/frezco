@@ -40,6 +40,8 @@ export interface PedidoLinea {
   entradaStock: number;
   salidaStock: number;
   unidadesProveedor: number;
+  proveedorId: number | null;
+  proveedorNombre: string | null;
 }
 
 export interface Pedido {
@@ -51,6 +53,8 @@ export interface Pedido {
   descuentoPct: number;
   observacion: string | null;
   anulado: boolean;
+  /** false si esta anulado o ya tiene un cobro/pago asociado: no se puede editar ni anular. */
+  editable: boolean;
   total: number;
   totalCosto: number;
   margen: number;
@@ -60,6 +64,15 @@ export interface Pedido {
 export interface CrearPedido {
   fecha: string;
   cuentaId: number;
+  condicion: CondicionVenta;
+  descuentoPct: number;
+  observacion: string | null;
+  lineas: { productoId: number; unidades: number; proveedorId: number | null }[];
+}
+
+/** Igual a CrearPedido sin cuentaId: al editar, la cuenta del pedido no cambia. */
+export interface EditarPedido {
+  fecha: string;
   condicion: CondicionVenta;
   descuentoPct: number;
   observacion: string | null;
@@ -79,6 +92,9 @@ export interface Movimiento {
   cuentaNombre?: string;
   importe: number;
   observacion: string | null;
+  /** Pedido que este cobro/pago salda. Opcional: un movimiento suelto no lo tiene. */
+  pedidoId: number | null;
+  pedidoNumero?: string | null;
 }
 
 export interface StockItem {

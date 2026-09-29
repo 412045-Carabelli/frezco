@@ -115,8 +115,10 @@ y el cliente lee los remitos). Comentarios en español. Sin mezclar.
 el costo vigentes. Nunca se recalculan hacia atrás leyendo el producto: si mañana
 cambia el precio, los pedidos viejos tienen que seguir mostrando lo que se cobró.
 
-**Anulación, no borrado.** Los pedidos no se eliminan ni se editan. Se marcan
-`anulado = true`. Todos los cálculos ignoran los anulados.
+**Anulación, no borrado.** Los pedidos no se eliminan. Se pueden editar o anular
+(`anulado = true`) mientras no tengan un cobro/pago asociado; una vez que lo tienen,
+quedan fijos. Todos los cálculos ignoran los anulados. Ver `docs/03-reglas-negocio.md`,
+sección 7.
 
 **Sin usuarios.** Usuario y contraseña únicos en variables de entorno. Autenticación
 básica con sesión. Sin tabla de usuarios, sin roles, sin recuperación de contraseña.
@@ -138,7 +140,7 @@ docker compose up --build
 
 ## Qué NO hacer
 
-- No implementar edición de pedidos ya guardados.
+- No permitir editar ni anular un pedido que ya tiene un cobro/pago asociado.
 - No crear tabla de stock. El stock es un query.
 - No crear módulo de análisis de ventas ni sugerencia de compra (fuera de alcance).
 - No integrar AFIP ni facturación electrónica.
